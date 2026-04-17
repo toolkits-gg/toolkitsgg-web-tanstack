@@ -1,0 +1,235 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "./generated/prisma"
+}
+
+generator prismaIDB {
+  provider = "idb-client-generator"
+  output   = "./generated/prisma-idb"
+  
+  // Optional: Enable sync engine
+  //outboxSync = true
+  //rootModel  = "User"
+  //exclude    = ["Changelog", "Session"]
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+enum GameId {
+  none
+  remnant2
+  slaythespire2
+}
+
+enum BuildVisibility {
+  PUBLIC
+  UNLISTED
+  PRIVATE
+}
+
+enum BuildModeratorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  LOCKED
+}
+
+enum NotificationType {
+  SYSTEM
+  FOLLOW
+  BUILD_UPDATE
+  LIKE
+  MENTION
+}
+
+model User {
+  id            String         @id @default(cuid())
+  username      String         @unique
+  email         String         @unique
+  emailVerified Boolean        @default(false)
+  name          String?
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  verification  Verification[]
+
+  userProfile       UserProfile?
+  userFavoriteGames UserFavoriteGame[]
+
+  usersBeingFollowed UserFollowedUsers[] @relation("userBeingFollowed")
+  usersFollowed      UserFollowedUsers[] @relation("userFollowed")
+
+  notificationsReceived  Notification[] @relation("NotificationsReceived")
+  notificationsTriggered Notification[] @relation("NotificationsTriggered")
+  userRoles              UserRole[]     @relation("UserRoles")
+
+  remnant2CollectedItems   Remnant2CollectedItem[]
+  remnant2Builds           Remnant2Build[]
+  remnant2BuildCollections Remnant2BuildCollection[]
+
+  slayTheSpire2CollectedItems SlayTheSpire2CollectedItem[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([identifier, value])
+  @@index([userId])
+  @@map("verification")
+}
+
+model UserProfile {
+  id                  String               @id @default(cuid())
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  displayName         String               @default("Traveler")
+  bio                 String               @default("No bio provided.") @db.Text
+  avatarUrl           String?
+  primaryAvatarId     String?
+  primaryAvatarGameId GameId?
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId              String               @unique
+  avatarOverrides     UserAvatarOverride[]
+
+  @@index([userId])
+  @@map("user_profiles")
+}
+
+model UserAvatarOverride {
+  id            String      @id @default(cuid())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  gameId        GameId
+  avatarId      String
+  userProfile   UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  userProfileId String
+
+  @@unique([userProfileId, gameId])
+  @@index([userProfileId])
+  @@map("user_avatar_overrides")
+}
+
+model UserFavoriteGame {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  gameId    GameId
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@id([userId, gameId])
+  @@index([userId])
+  @@index([gameId])
+  @@map("user_favorite_games")
+}
+
+model UserFollowedUsers {
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation("userBeingFollowed", fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  followedUser   User     @relation("userFollowed", fields: [followedUserId], references: [id], onDelete: Cascade)
+  followedUserId String
+
+  @@id([userId, followedUserId])
+  @@index([userId])
+  @@index([followedUserId])
+  @@map("user_followed_users")
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  type     NotificationType
+  isRead   Boolean          @default(false)
+  groupKey String?
+
+  recipientId String
+  recipient   User   @relation("NotificationsReceived", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  actorId String?
+  actor   User?  @relation("NotificationsTriggered", fields: [actorId], references: [id], onDelete: Cascade)
+
+  metadata Json
+
+  @@index([recipientId, isRead])
+  @@index([recipientId, deletedAt, createdAt(sort: Desc)])
+  @@index([type, recipientId])
+  @@index([recipientId, actorId, type, isRead, createdAt])
+  @@index([recipientId, groupKey, createdAt])
+  @@map("notifications")
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
+
+  role Role
+
+  @@unique([userId, role])
+  @@index([userId])
+  @@index([role])
+  @@map("user_roles")
+}

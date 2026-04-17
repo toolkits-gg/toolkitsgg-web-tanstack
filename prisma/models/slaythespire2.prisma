@@ -1,0 +1,68 @@
+enum SlayTheSpire2ItemCategory {
+  RELIC
+  CARD
+  POTION
+  CHARACTER
+}
+
+// enum SlayTheSpire2UncollectableItemCategory {
+//   // TODO: Add your uncollectable item categories here
+//   PLACEHOLDER
+// }
+
+enum SlayTheSpire2PotionRarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EVENT
+  TOKEN
+}
+
+enum SlayTheSpire2RelicRarity {
+  STARTER
+  COMMON
+  UNCOMMON
+  RARE
+  ANCIENT
+  SHOP
+  EVENT
+  SPECIAL
+}
+
+enum SlayTheSpire2Character {
+  IRONCLAD
+  SILENT
+  REGENT
+  DEFECT
+  NECROBINDER
+}
+
+enum SlayTheSpire2DLC {
+  BASE
+}
+
+model SlayTheSpire2Item {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  name     String
+  disabled Boolean @default(false)
+
+  // SlayTheSpire2 specific fields
+  category              SlayTheSpire2ItemCategory
+  collectedItems        SlayTheSpire2CollectedItem[]
+}
+
+model SlayTheSpire2CollectedItem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  item   SlayTheSpire2Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String
+
+  @@index([userId])
+  @@index([itemId])
+}

@@ -1,0 +1,131 @@
+"use client";
+
+import {
+	Flex,
+	type MantineColorScheme,
+	Select,
+	Switch,
+	useMantineColorScheme,
+} from "@mantine/core";
+import { upperFirst, useLocalStorage } from "@mantine/hooks";
+import { useTheme as useNextTheme } from "next-themes";
+import { useState } from "react";
+
+import { LOCALSTORAGE_KEYS } from "@/features/theme/constants/localstorage-keys";
+import { allThemeClassNames } from "@/features/theme/constants/theme-class-names";
+import { allThemeDefinitions } from "@/features/theme/constants/theme-definitions";
+import { themeModes } from "@/features/theme/constants/theme-modes";
+import { parseColorScheme } from "@/features/theme/utils/parse-color-scheme";
+
+type ThemeChangerModalContentProps = {
+	gameId: string | undefined;
+};
+
+const ThemeChangerModalContent = ({
+	gameId,
+}: ThemeChangerModalContentProps) => {
+	const [autoChangeTheme, setAutoChangeTheme] = useLocalStorage({
+		key: LOCALSTORAGE_KEYS.AUTO_CHANGE_THEME,
+		defaultValue: true,
+	});
+
+	const { colorScheme: _colorScheme, setColorScheme } = useMantineColorScheme();
+
+	const { theme: nextTheme, setTheme: setNextTheme } = useNextTheme();
+	const [mode, setMode] = useState<MantineColorScheme>("auto");
+
+	const handleChangeNextTheme = (value: string | null) => {
+		const newNextTheme = value ?? "default-dark";
+
+		const newColorScheme = parseColorScheme(newNextTheme);
+		if (mode !== newColorScheme) {
+			setColorScheme(newColorScheme);
+		}
+		setNextTheme(newNextTheme);
+	};
+
+	const handleChangeMode = (value: string | null) => {
+		if (!value) return;
+		if (!nextTheme) return;
+
+		const assertedValue = value as MantineColorScheme;
+
+		setMode(assertedValue);
+		setColorScheme(assertedValue);
+
+		if (assertedValue === "light") {
+			setNextTheme(nextTheme?.replace("-dark", "-light"));
+		}
+		if (assertedValue === "dark") {
+			setNextTheme(nextTheme?.replace("-light", "-dark"));
+		}
+	};
+
+	const currentThemeValue =
+		nextTheme && allThemeClassNames.includes(nextTheme)
+			? nextTheme
+			: "default-dark";
+
+	return (
+		<Flex align="center" justify="space-between" gap="md" direction="column">
+			<Flex>
+				<Switch
+					defaultChecked={autoChangeTheme}
+					label="Auto change theme on game change"
+					onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+						const checked = event.currentTarget.checked;
+						setAutoChangeTheme(checked);
+
+						if (!nextTheme) return;
+
+						if (checked) {
+							const gameTheme = gameId ?? "default";
+
+							if (gameTheme !== nextTheme) {
+								const newNextTheme = nextTheme.replace(/^[^-]+/, gameTheme);
+								setNextTheme(newNextTheme);
+							}
+						}
+					}}
+				/>
+			</Flex>
+			<Flex gap="md" align="center" justify="space-between">
+				<Select
+					label="Select mode"
+					data={themeModes.map((tm) => ({
+						label: tm === "auto" ? "All" : upperFirst(tm),
+						value: tm,
+					}))}
+					value={mode}
+					onChange={handleChangeMode}
+				/>
+			</Flex>
+			<Flex w="100%" align="center" justify="center">
+				<Select
+					label="Select theme"
+					value={currentThemeValue}
+					data={allThemeDefinitions
+						.filter((def) => {
+							if (mode === "auto") {
+								return true;
+							}
+							if (mode === "dark" && def.label.includes("Dark")) {
+								return true;
+							}
+							if (mode === "light" && def.label.includes("Light")) {
+								return true;
+							}
+							return false;
+						})
+						.map((def) => ({
+							label: def.label,
+							value: def.className,
+						}))}
+					onChange={handleChangeNextTheme}
+				/>
+			</Flex>
+		</Flex>
+	);
+};
+
+export { ThemeChangerModalContent };

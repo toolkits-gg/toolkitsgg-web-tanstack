@@ -1,0 +1,22 @@
+services:
+  postgres:
+    container_name: toolkitsgg-web-local
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: toolkitsgg
+      POSTGRES_PASSWORD: devdevdev
+      POSTGRES_DB: toolkitsgg_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U toolkitsgg -d toolkitsgg_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
