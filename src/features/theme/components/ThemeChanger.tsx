@@ -1,5 +1,3 @@
-"use client";
-
 import { ActionIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { LuPalette } from "react-icons/lu";

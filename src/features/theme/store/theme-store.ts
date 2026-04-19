@@ -1,20 +1,21 @@
-import type { MantineThemeOverride } from '@mantine/core';
-import { create, type StateCreator } from 'zustand';
+import type { MantineThemeOverride } from "@mantine/core";
+import { useStore } from "@tanstack/react-store";
+import { Store } from "@tanstack/store";
 
-import { defaultTheme } from '@/features/theme/themes/default-theme';
+import { defaultTheme } from "@/features/theme/themes/default-theme";
 
-type ThemeSlice = {
-  theme: MantineThemeOverride;
-  changeTheme: (newTheme: MantineThemeOverride) => void;
+type ThemeState = {
+	theme: MantineThemeOverride;
 };
 
-const themeSlice: StateCreator<ThemeSlice, [], [], ThemeSlice> = (set) => ({
-  theme: defaultTheme,
-  changeTheme: (newTheme: MantineThemeOverride) => set({ theme: newTheme }),
-});
+const themeStore = new Store<ThemeState>({ theme: defaultTheme });
 
-const useMantineThemeStore = create<ThemeSlice>()((...a) => ({
-  ...themeSlice(...a),
-}));
+function changeTheme(newTheme: MantineThemeOverride) {
+	themeStore.setState(() => ({ theme: newTheme }));
+}
 
-export { useMantineThemeStore };
+function useMantineThemeStore<T>(selector: (state: ThemeState) => T): T {
+	return useStore(themeStore, selector);
+}
+
+export { themeStore, changeTheme, useMantineThemeStore };

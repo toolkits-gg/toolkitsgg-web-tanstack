@@ -1,5 +1,3 @@
-"use client";
-
 import {
 	Flex,
 	type MantineColorScheme,
@@ -10,12 +8,17 @@ import {
 import { upperFirst, useLocalStorage } from "@mantine/hooks";
 import { useTheme as useNextTheme } from "next-themes";
 import { useState } from "react";
-
+import { MANTINE_COLOR_SCHEMES } from "#/features/theme/constants/mantine-color-schemes";
 import { LOCALSTORAGE_KEYS } from "@/features/theme/constants/localstorage-keys";
-import { allThemeClassNames } from "@/features/theme/constants/theme-class-names";
-import { allThemeDefinitions } from "@/features/theme/constants/theme-definitions";
-import { themeModes } from "@/features/theme/constants/theme-modes";
 import { parseColorScheme } from "@/features/theme/utils/parse-color-scheme";
+
+// TODO: all-theme-definitions.ts
+// This feature was game-aware, need to rework it
+const allThemeDefinitions: Array<{ label: string; className: string }> = [];
+
+// TODO: all-theme-classnames.ts
+// This feature was game-aware, need to rework it
+const allThemeClassNames: string[] = [];
 
 type ThemeChangerModalContentProps = {
 	gameId: string | undefined;
@@ -92,7 +95,7 @@ const ThemeChangerModalContent = ({
 			<Flex gap="md" align="center" justify="space-between">
 				<Select
 					label="Select mode"
-					data={themeModes.map((tm) => ({
+					data={MANTINE_COLOR_SCHEMES.map((tm) => ({
 						label: tm === "auto" ? "All" : upperFirst(tm),
 						value: tm,
 					}))}
