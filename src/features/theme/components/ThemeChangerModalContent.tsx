@@ -8,17 +8,20 @@ import {
 import { upperFirst, useLocalStorage } from "@mantine/hooks";
 import { useTheme as useNextTheme } from "next-themes";
 import { useState } from "react";
+import {
+	getAllRegisteredThemeClassNames,
+	getAllRegisteredThemeDefinitions,
+} from "#/features/game/registry/game-registry";
 import { MANTINE_COLOR_SCHEMES } from "#/features/theme/constants/mantine-color-schemes";
 import { LOCALSTORAGE_KEYS } from "@/features/theme/constants/localstorage-keys";
 import { parseColorScheme } from "@/features/theme/utils/parse-color-scheme";
 
-// TODO: all-theme-definitions.ts
 // This feature was game-aware, need to rework it
-const allThemeDefinitions: Array<{ label: string; className: string }> = [];
+const allThemeDefinitions: Array<{ label: string; className: string }> =
+	getAllRegisteredThemeDefinitions();
 
-// TODO: all-theme-classnames.ts
 // This feature was game-aware, need to rework it
-const allThemeClassNames: string[] = [];
+const allThemeClassNames: string[] = getAllRegisteredThemeClassNames();
 
 type ThemeChangerModalContentProps = {
 	gameId: string | undefined;

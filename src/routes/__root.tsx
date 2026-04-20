@@ -20,7 +20,6 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { NuqsAdapter } from "nuqs/adapters/react";
 import { MantineProviderWithTheme } from "#/features/theme/providers/MantineProviderWithTheme";
 import "@fontsource/geist/400.css";
 import "@fontsource/geist/500.css";
@@ -36,6 +35,7 @@ import { DefaultLogo } from "#/components/AppLogo";
 import { buildNavLinks } from "#/components/navigation/build-nav-links";
 import { NavbarLinksGroup } from "#/components/navigation/NavbarLinksGroup";
 import { SocialMedia } from "#/components/SocialMedia";
+import { GameProvider } from "#/features/game/components/GameProvider";
 import { ThemeChanger } from "#/features/theme/components/ThemeChanger";
 import classes from "./Root.module.css";
 
@@ -88,7 +88,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					fontFamily: `'Geist', sans-serif`,
 				}}
 			>
-				<NuqsAdapter>
+				<GameProvider>
 					<MantineProviderWithTheme>
 						<ScreenshotPreviewProvider />
 						<AppShell
@@ -179,7 +179,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
 						{children}
 					</MantineProviderWithTheme>
-				</NuqsAdapter>
+				</GameProvider>
 
 				<TanStackDevtools
 					config={{
