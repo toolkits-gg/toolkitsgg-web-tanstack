@@ -25,6 +25,7 @@
     "db:local:down": "docker compose -f compose.local.yaml down -v"
   },
   "dependencies": {
+    "@better-auth/prisma-adapter": "1.6.5",
     "@faker-js/faker": "10.3.0",
     "@fontsource/geist": "5.2.8",
     "@mantine/carousel": "9.0.2",
@@ -58,6 +59,7 @@
     "@tiptap/starter-kit": "3.22.3",
     "better-auth": "1.5.3",
     "dayjs": "1.11.20",
+    "dotenv": "17.4.2",
     "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "idb": "8.0.3",
