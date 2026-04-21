@@ -23,13 +23,11 @@ const allThemeDefinitions: Array<{ label: string; className: string }> =
 // This feature was game-aware, need to rework it
 const allThemeClassNames: string[] = getAllRegisteredThemeClassNames();
 
-type ThemeChangerModalContentProps = {
+type ThemeModalProps = {
 	gameId: string | undefined;
 };
 
-const ThemeChangerModalContent = ({
-	gameId,
-}: ThemeChangerModalContentProps) => {
+const ThemeModal = ({ gameId }: ThemeModalProps) => {
 	const [autoChangeTheme, setAutoChangeTheme] = useLocalStorage({
 		key: LOCALSTORAGE_KEYS.AUTO_CHANGE_THEME,
 		defaultValue: true,
@@ -134,4 +132,4 @@ const ThemeChangerModalContent = ({
 	);
 };
 
-export { ThemeChangerModalContent };
+export { ThemeModal };

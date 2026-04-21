@@ -36,7 +36,7 @@ import { buildNavLinks } from "#/components/navigation/build-nav-links";
 import { NavbarLinksGroup } from "#/components/navigation/NavbarLinksGroup";
 import { SocialMedia } from "#/components/SocialMedia";
 import { GameProvider } from "#/features/game/components/GameProvider";
-import { ThemeChanger } from "#/features/theme/components/ThemeChanger";
+import { ChangeThemeButton } from "#/features/theme/components/ChangeThemeButton";
 import classes from "./Root.module.css";
 
 interface MyRouterContext {
@@ -156,7 +156,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 									</ScrollArea>
 
 									<Flex className={classes.themeChangerWrapper}>
-										<ThemeChanger gameId="none" />
+										<ChangeThemeButton gameId="none" />
 									</Flex>
 
 									<Flex className={classes.userMenuWrapper}>User Menu</Flex>

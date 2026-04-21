@@ -2,18 +2,18 @@ import { ActionIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { LuPalette } from "react-icons/lu";
 
-import { ThemeChangerModalContent } from "@/features/theme/components/ThemeChangerModalContent";
+import { ThemeModal } from "#/features/theme/components/ThemeModal";
 import type { GameId } from "@/prisma";
 
-type ThemeChangeProps = {
+type ChangeThemeButtonProps = {
 	gameId: GameId | undefined;
 };
 
-const ThemeChanger = ({ gameId }: ThemeChangeProps) => {
+const ChangeThemeButton = ({ gameId }: ChangeThemeButtonProps) => {
 	const handleOpenThemeModal = () => {
 		modals.open({
 			title: "Change theme",
-			children: <ThemeChangerModalContent gameId={gameId} />,
+			children: <ThemeModal gameId={gameId} />,
 		});
 	};
 
@@ -32,4 +32,4 @@ const ThemeChanger = ({ gameId }: ThemeChangeProps) => {
 	);
 };
 
-export { ThemeChanger };
+export { ChangeThemeButton };
