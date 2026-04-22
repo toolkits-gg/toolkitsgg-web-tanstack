@@ -50,7 +50,7 @@ enum REMNANT2_BUILD_TAG_CATEGORY {
 model Remnant2BuildTag {
   id        String                      @id @default(cuid())
   createdAt DateTime                    @default(now())
-  updatedAt DateTime?                   @updatedAt
+  updatedAt DateTime                    @updatedAt
   category  REMNANT2_BUILD_TAG_CATEGORY @default(Tag)
   build     Remnant2Build               @relation(fields: [buildId], references: [id], onDelete: Cascade)
   buildId   String
@@ -73,6 +73,8 @@ model Remnant2BuildCollection {
 }
 
 model Remnant2BuildsOnCollections {
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
   build        Remnant2Build           @relation(fields: [buildId], references: [id], onDelete: Cascade)
   buildId      String
   collection   Remnant2BuildCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
@@ -170,10 +172,12 @@ model Remnant2Item {
 }
 
 model Remnant2BuildItem {
-  id       String  @id @default(cuid())
-  level    Int     @default(1)
-  amount   Int?
-  optional Boolean @default(false)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  level     Int      @default(1)
+  amount    Int?
+  optional  Boolean  @default(false)
 
   item   Remnant2Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId String
@@ -196,6 +200,7 @@ model Remnant2CollectedItem {
   item   Remnant2Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId String
 
+  @@unique([userId, itemId])
   @@index([userId])
   @@index([itemId])
 }

@@ -63,6 +63,7 @@ model SlayTheSpire2CollectedItem {
   item   SlayTheSpire2Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId String
 
+  @@unique([userId, itemId])
   @@index([userId])
   @@index([itemId])
 }
