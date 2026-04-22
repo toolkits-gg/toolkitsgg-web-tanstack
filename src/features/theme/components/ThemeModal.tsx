@@ -74,7 +74,7 @@ const ThemeModal = ({ gameId }: ThemeModalProps) => {
 		<Flex align="center" justify="space-between" gap="md" direction="column">
 			<Flex>
 				<Switch
-					defaultChecked={autoChangeTheme}
+					checked={autoChangeTheme}
 					label="Auto change theme on game change"
 					onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
 						const checked = event.currentTarget.checked;
