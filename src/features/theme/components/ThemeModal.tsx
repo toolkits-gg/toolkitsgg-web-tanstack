@@ -11,6 +11,7 @@ import { useState } from "react";
 import {
 	getAllRegisteredThemeClassNames,
 	getAllRegisteredThemeDefinitions,
+	getGameTheme,
 } from "#/features/game/registry/game-registry";
 import { MANTINE_COLOR_SCHEMES } from "#/features/theme/constants/mantine-color-schemes";
 import { LOCALSTORAGE_KEYS } from "@/features/theme/constants/localstorage-keys";
@@ -83,10 +84,12 @@ const ThemeModal = ({ gameId }: ThemeModalProps) => {
 						if (!nextTheme) return;
 
 						if (checked) {
-							const gameTheme = gameId ?? "default";
+							const className =
+								(gameId ? getGameTheme(gameId)?.className : undefined) ??
+								"default";
 
-							if (gameTheme !== nextTheme) {
-								const newNextTheme = nextTheme.replace(/^[^-]+/, gameTheme);
+							if (className !== nextTheme) {
+								const newNextTheme = nextTheme.replace(/^[^-]+/, className);
 								setNextTheme(newNextTheme);
 							}
 						}
