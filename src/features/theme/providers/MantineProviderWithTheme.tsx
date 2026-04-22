@@ -3,7 +3,7 @@ import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { getAllRegisteredThemeClassNames } from "#/features/game/registry/game-registry";
-import { AutoChangeThemeProvider } from "#/features/theme/providers/AutoChangeThemeProvider";
+import { SyncAndApplyTheme } from "#/features/theme/providers/SyncAndApplyTheme";
 import { DEFAULT_NEXT_THEME } from "@/features/theme/constants/default-next-theme";
 import { useMantineThemeStore } from "@/features/theme/store/theme-store";
 
@@ -27,7 +27,7 @@ const MantineProviderWithTheme = ({
 			themes={allThemeClassNames}
 		>
 			<MantineProvider theme={mantineTheme} defaultColorScheme="dark">
-				<AutoChangeThemeProvider />
+				<SyncAndApplyTheme />
 				<Notifications />
 				<ModalsProvider>{children}</ModalsProvider>
 			</MantineProvider>
