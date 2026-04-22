@@ -36,16 +36,17 @@ const SyncAndApplyTheme = () => {
 	/**
 	 * Watches for changes to gameId, and if autoChangeTheme is enabled and
 	 * nextTheme is set, it will change the theme to match the game's theme.
-	 *
-	 * ! We read autoChangeTheme directly from localStorage instead of using
-	 * ! useLocalStorage to avoid stale-state issues: the useLocalStorage instance
-	 * ! here and the one in ThemeChangerModalContent are separate, and the browser
-	 * ! `storage` event only fires across windows — not within the same window —
-	 * ! so the two instances never stay in sync reactively.
 	 */
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <We intentionally want to only run this effect when gameId changes, not when nextTheme or autoChangeTheme changes>
 	useEffect(() => {
+		/**
+		 * ! We read autoChangeTheme directly from localStorage instead of using
+		 * ! useLocalStorage to avoid stale-state issues: the useLocalStorage instance
+		 * ! here and the one in ThemeModal are separate, and the browser
+		 * ! `storage` event only fires across windows — not within the same window —
+		 * ! so the two instances never stay in sync reactively.
+		 */
 		const stored = localStorage.getItem(LOCALSTORAGE_KEYS.AUTO_CHANGE_THEME);
 		const autoChangeTheme =
 			stored === null ? true : JSON.parse(stored) === true;
