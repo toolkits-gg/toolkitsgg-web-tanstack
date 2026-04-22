@@ -50,18 +50,6 @@ function getGameConfigTyped<TId extends RegistryGameId>(
 	return GAME_REGISTRY[gameId];
 }
 
-// Return an array of all THEME classNames across registered games (for validation, theme switcher dropdowns, etc.)
-function getAllRegisteredThemeClassNames(): string[] {
-	const classNamesSet = new Set<string>();
-	for (const gameId of REGISTERED_GAME_IDS) {
-		const theme = getGameTheme(gameId);
-		if (theme) {
-			classNamesSet.add(theme.className);
-		}
-	}
-	return Array.from(classNamesSet);
-}
-
 // Return an array of all THEME defintions across registered games (for validation, theme switcher dropdowns, etc.)
 function getAllRegisteredThemeDefinitions(): ToolkitThemeDefinition[] {
 	const definitions: ToolkitThemeDefinition[] = [
@@ -93,6 +81,13 @@ function getAllRegisteredThemeDefinitions(): ToolkitThemeDefinition[] {
 		}
 	}
 	return definitions;
+}
+
+// Return an array of all THEME classNames across registered games (for validation, theme switcher dropdowns, etc.)
+function getAllRegisteredThemeClassNames(): string[] {
+	return getAllRegisteredThemeDefinitions()
+		.map((def) => def.className)
+		.sort();
 }
 
 export {

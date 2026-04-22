@@ -27,7 +27,7 @@ import "@fontsource/geist/600.css";
 import "@fontsource/geist/700.css";
 import { ScreenshotPreviewProvider } from "#/features/screenshot/providers/ScreenshotPreviewProvider";
 import "@mantine/core/styles.layer.css";
-// ‼️ import notifications styles after core package styles
+// ‼️ import carousel and notifications styles after core package styles
 import "@mantine/carousel/styles.layer.css";
 import "@mantine/notifications/styles.css";
 import { useDisclosure } from "@mantine/hooks";

@@ -10,7 +10,7 @@ type ThemeState = {
 
 const themeStore = new Store<ThemeState>({ theme: defaultTheme });
 
-function changeTheme(newTheme: MantineThemeOverride) {
+function changeMantineTheme(newTheme: MantineThemeOverride) {
 	themeStore.setState(() => ({ theme: newTheme }));
 }
 
@@ -18,4 +18,4 @@ function useMantineThemeStore<T>(selector: (state: ThemeState) => T): T {
 	return useStore(themeStore, selector);
 }
 
-export { themeStore, changeTheme, useMantineThemeStore };
+export { themeStore, changeMantineTheme, useMantineThemeStore };

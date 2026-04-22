@@ -2,9 +2,10 @@
 
 import { useStore } from "@tanstack/react-store";
 import { gameStore } from "#/features/game/store/game-store";
+import type { GameId } from "@/prisma";
 
-export function useGameId(): string {
-	return useStore(gameStore, (state) => state.gameId) ?? "lobby";
+export function useGameId(): GameId {
+	return useStore(gameStore, (state) => state.gameId) ?? "none";
 }
 
 // If you ever need the full state (e.g. to read source)

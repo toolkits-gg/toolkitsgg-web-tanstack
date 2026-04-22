@@ -1,10 +1,12 @@
 // src/stores/gameStore.ts
+
 import { Store } from "@tanstack/store";
+import type { GameId } from "@/prisma";
 
 type GameSource = "subdomain" | "route" | "toggle" | "session" | "default";
 
 interface GameState {
-	gameId: string | null;
+	gameId: GameId | null;
 	source: GameSource;
 }
 
@@ -25,7 +27,7 @@ export const gameStore = new Store<GameState>({
 	source: stored?.source ?? "default",
 });
 
-export function setGame(id: string, source: GameSource) {
+export function setGame(id: GameId, source: GameSource) {
 	gameStore.setState((prev) => {
 		if (prev.source === "subdomain" && source === "route") return prev;
 		const next = { gameId: id, source };
