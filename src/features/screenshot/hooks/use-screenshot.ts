@@ -71,7 +71,7 @@ function useScreenshot({
 						return;
 					}
 				} catch (error) {
-					logger.error({ err: error }, "Screenshot error");
+					logger.error("Error capturing screenshot");
 					setError(
 						`Failed to capture screenshot: ${error instanceof Error ? error.message : "Unknown error"}`,
 					);

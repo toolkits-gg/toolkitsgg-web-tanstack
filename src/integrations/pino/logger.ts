@@ -26,6 +26,6 @@ const logger = createIsomorphicFn()
 				},
 			},
 		}),
-	);
+	)();
 
 export { logger };
