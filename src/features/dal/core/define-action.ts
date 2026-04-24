@@ -1,16 +1,13 @@
-import type {
-	DalReadAction,
-	DalWriteAction,
-} from "#/features/dal/core/types";
+import type { DalReadAction, DalWriteAction } from "#/features/dal/core/types";
 
-export function defineDalRead<I, O>(
-	config: Omit<DalReadAction<I, O>, "kind">,
-): DalReadAction<I, O> {
+export function defineDalRead<Input, Output>(
+	config: Omit<DalReadAction<Input, Output>, "kind">,
+): DalReadAction<Input, Output> {
 	return { kind: "read", ...config };
 }
 
-export function defineDalWrite<I, O>(
-	config: Omit<DalWriteAction<I, O>, "kind">,
-): DalWriteAction<I, O> {
+export function defineDalWrite<Input, Output>(
+	config: Omit<DalWriteAction<Input, Output>, "kind">,
+): DalWriteAction<Input, Output> {
 	return { kind: "write", ...config };
 }

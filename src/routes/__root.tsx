@@ -158,8 +158,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								</Flex>
 							</AppShell.Footer>
 						</AppShell>
-
-						{children}
 					</MantineProviderWithTheme>
 				</GameProvider>
 

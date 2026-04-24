@@ -7,10 +7,11 @@ describe("chooseBackend", () => {
 		{ authed: true, online: false, expected: "local" as const },
 		{ authed: false, online: true, expected: "local" as const },
 		{ authed: false, online: false, expected: "local" as const },
-	])(
-		"authed=$authed online=$online -> $expected",
-		({ authed, online, expected }) => {
-			expect(chooseBackend({ authed, online })).toBe(expected);
-		},
-	);
+	])("authed=$authed online=$online -> $expected", ({
+		authed,
+		online,
+		expected,
+	}) => {
+		expect(chooseBackend({ authed, online })).toBe(expected);
+	});
 });

@@ -8,11 +8,11 @@ import {
 	Text,
 	Title,
 } from "@mantine/core";
+import { useNetwork } from "@mantine/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { resolveWriteAction } from "#/features/dal/actions/registry";
 import { useEffectiveUserId } from "#/features/dal/identity/use-effective-user-id";
-import { useOnlineStatus } from "#/features/dal/online/use-online-status";
 import {
 	clearSynced,
 	deleteOp,
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/profile")({ component: ProfilePage });
 function ProfilePage() {
 	const { data: session } = useSession();
 	const effective = useEffectiveUserId();
-	const online = useOnlineStatus();
+	const { online } = useNetwork();
 	const queryClient = useQueryClient();
 
 	const pending = usePendingOps();
@@ -92,7 +92,9 @@ function ProfilePage() {
 								<Button
 									size="xs"
 									onClick={() => syncAll.mutate()}
-									disabled={!canSync || syncAll.isPending || !pending.data?.length}
+									disabled={
+										!canSync || syncAll.isPending || !pending.data?.length
+									}
 								>
 									{syncAll.isPending ? "Syncing…" : "Sync all"}
 								</Button>
@@ -132,6 +134,7 @@ function PendingList({
 			</Text>
 		);
 	}
+
 	return (
 		<Stack gap="xs">
 			{ops.map((op) => (

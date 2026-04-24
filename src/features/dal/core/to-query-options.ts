@@ -2,9 +2,9 @@ import { queryOptions } from "@tanstack/react-query";
 import type { DalReadAction } from "#/features/dal/core/types";
 import type { DalContextGetter } from "#/features/dal/hooks/use-dal-context-source";
 
-export function toQueryOptions<I, O>(
-	action: DalReadAction<I, O>,
-	input: I,
+export function toQueryOptions<Input, Output>(
+	action: DalReadAction<Input, Output>,
+	input: Input,
 	ctxGetter: DalContextGetter,
 ) {
 	return queryOptions({

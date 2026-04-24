@@ -17,24 +17,24 @@ export type SyncResult =
 	| { status: "noop" }
 	| { status: "error"; message: string };
 
-export interface DalReadAction<I, O> {
+export interface DalReadAction<Input, Output> {
 	kind: "read";
-	queryKey: (input: I) => QueryKey;
-	remote: (input: I, ctx: DalContext) => Promise<O>;
-	local: (input: I, ctx: DalContext) => Promise<O>;
+	queryKey: (input: Input) => QueryKey;
+	remote: (input: Input, ctx: DalContext) => Promise<Output>;
+	local: (input: Input, ctx: DalContext) => Promise<Output>;
 }
 
-export interface DalWriteAction<I, O> {
+export interface DalWriteAction<Input, Output> {
 	kind: "write";
 	entity: string;
 	operation: PendingOpOperation;
-	buildIdempotencyKey: (input: I, ctx: DalContext) => string;
+	buildIdempotencyKey: (input: Input, ctx: DalContext) => string;
 	invalidates: readonly string[];
-	remote: (input: I, ctx: DalContext) => Promise<O>;
-	local: (input: I, ctx: DalContext) => Promise<O>;
+	remote: (input: Input, ctx: DalContext) => Promise<Output>;
+	local: (input: Input, ctx: DalContext) => Promise<Output>;
 	sync: (op: PendingOp) => Promise<SyncResult>;
 }
 
-export type DalAction<I = unknown, O = unknown> =
-	| DalReadAction<I, O>
-	| DalWriteAction<I, O>;
+export type DalAction<Input = unknown, Output = unknown> =
+	| DalReadAction<Input, Output>
+	| DalWriteAction<Input, Output>;

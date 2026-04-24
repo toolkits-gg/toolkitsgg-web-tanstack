@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SyncResult } from "#/features/dal/core/types";
-import { compareTimestamps } from "#/features/dal/queue/lww";
+import { compareTimestamps } from "#/features/dal/queue/last-write-wins";
 import { requireUserId } from "#/features/dal/server/require-user";
 import { GameId, prisma } from "@/prisma";
 
@@ -21,10 +21,7 @@ const PendingOpSchema = z.object({
 
 type PendingOpPayload = z.infer<typeof PendingOpSchema>;
 
-type Handler = (
-	op: PendingOpPayload,
-	userId: string,
-) => Promise<SyncResult>;
+type Handler = (op: PendingOpPayload, userId: string) => Promise<SyncResult>;
 
 const DEDUPE_TTL_MS = 10 * 60 * 1000;
 const seen = new Map<string, { result: SyncResult; seenAt: number }>();
@@ -55,7 +52,8 @@ const remnant2CollectedItemHandler: Handler = async (op, userId) => {
 	if (op.operation === "delete") {
 		if (!record) return { status: "noop" };
 		const cmp = compareTimestamps(record, op);
-		if (cmp === "server-wins") return { status: "conflict", serverRecordJson: JSON.stringify(record) };
+		if (cmp === "server-wins")
+			return { status: "conflict", serverRecordJson: JSON.stringify(record) };
 		await prisma.remnant2CollectedItem.deleteMany({
 			where: { userId, itemId },
 		});
@@ -64,7 +62,8 @@ const remnant2CollectedItemHandler: Handler = async (op, userId) => {
 
 	if (record) {
 		const cmp = compareTimestamps(record, op);
-		if (cmp === "server-wins") return { status: "conflict", serverRecordJson: JSON.stringify(record) };
+		if (cmp === "server-wins")
+			return { status: "conflict", serverRecordJson: JSON.stringify(record) };
 		return { status: "noop" };
 	}
 
@@ -77,7 +76,8 @@ const userFavoriteGameHandler: Handler = async (op, userId) => {
 	const rawGameId = payload?.gameId;
 	if (!rawGameId) return { status: "error", message: "missing gameId" };
 	const gameId = GameId[rawGameId as keyof typeof GameId];
-	if (!gameId) return { status: "error", message: `unknown gameId ${rawGameId}` };
+	if (!gameId)
+		return { status: "error", message: `unknown gameId ${rawGameId}` };
 
 	const record = await prisma.userFavoriteGame.findUnique({
 		where: { userId_gameId: { userId, gameId } },
