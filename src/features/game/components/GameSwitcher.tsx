@@ -11,8 +11,9 @@ import {
 	UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { LuChevronRight, LuSearch, LuStar } from "react-icons/lu";
+import { LuChevronRight, LuHouse, LuSearch, LuStar } from "react-icons/lu";
 
 import { DefaultLogo } from "#/components/AppLogo";
 import { favoriteGameActions } from "#/features/dal/actions/favorite-games";
@@ -89,6 +90,7 @@ function GameSwitcher() {
 	const [opened, { toggle, close }] = useDisclosure(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const activeGameId = useGameId();
+	const navigate = useNavigate();
 
 	const { data } = useDalQuery(favoriteGameActions.list, undefined);
 	const favorite = useDalMutation(favoriteGameActions.favorite);
@@ -97,7 +99,7 @@ function GameSwitcher() {
 	const favoriteGameIds = data?.map((r) => r.gameId) ?? [];
 
 	const activeLabel =
-		getGameConfig(activeGameId)?.THEME?.label ?? "Select a game";
+		getGameConfig(activeGameId)?.THEME?.label ?? "Toolkits.gg";
 
 	const filteredGames = allGames.filter((g) =>
 		g.label.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -114,6 +116,12 @@ function GameSwitcher() {
 	const handleClose = () => {
 		close();
 		setSearchQuery("");
+	};
+
+	const handleGoHome = () => {
+		setGame("none", "toggle");
+		navigate({ to: "/" });
+		handleClose();
 	};
 
 	const handleSelectGame = (id: GameId) => {
@@ -167,6 +175,20 @@ function GameSwitcher() {
 					size="sm"
 					data-autofocus
 				/>
+
+				<UnstyledButton
+					className={classes.gameRow}
+					onClick={handleGoHome}
+					data-active={activeGameId === "none" || undefined}
+				>
+					<Group gap="xs">
+						<LuHouse size={14} />
+						<Text size="sm" fw={500}>
+							Toolkits.gg
+						</Text>
+					</Group>
+				</UnstyledButton>
+				<Divider my="xs" className={classes.separator} />
 
 				<ScrollArea.Autosize mah={400} type="auto">
 					{favoriteGames.length > 0 && (
