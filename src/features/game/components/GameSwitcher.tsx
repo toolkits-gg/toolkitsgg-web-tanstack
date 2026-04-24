@@ -163,10 +163,10 @@ function GameSwitcher() {
 						<Flex align="center" gap="sm">
 							<ClientOnly fallback={<DefaultLogo />}>
 								{getGameLogo(activeGameId) || <DefaultLogo />}
-								<Text size="sm" fw={600}>
-									{activeLabel}
-								</Text>
 							</ClientOnly>
+							<Text size="sm" fw={600}>
+								<ClientOnly fallback="Toolkits.gg">{activeLabel}</ClientOnly>
+							</Text>
 						</Flex>
 						<LuChevronRight size={18} />
 					</Group>
