@@ -29,7 +29,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { DefaultLogo } from "#/components/AppLogo";
-import { buildNavLinks } from "#/components/navigation/build-nav-links";
+import { getNavLinks } from "#/components/navigation/get-nav-links";
 import { NavbarLinksGroup } from "#/components/navigation/NavbarLinksGroup";
 import { SocialMedia } from "#/components/SocialMedia";
 import { GameProvider } from "#/features/game/components/GameProvider";
@@ -73,7 +73,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const [navbarOpened, { toggle: toggleNavbar }] = useDisclosure();
 
-	const navLinks = buildNavLinks();
+	const navLinks = getNavLinks();
 
 	return (
 		<html lang="en" {...mantineHtmlProps}>
