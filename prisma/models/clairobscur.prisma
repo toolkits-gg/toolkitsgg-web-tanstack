@@ -1,0 +1,74 @@
+enum ClairObscurItemCategory {
+  CHARACTER
+  LUMINA
+  PICTO
+  SKILL
+  WEAPON
+}
+
+enum ClairObscurCharacter {
+  GUSTAVE
+  LUNE
+  MAELLE
+  SCIEL
+  VERSO
+  MONOCO
+}
+
+enum ClairObscurAttribute {
+  VITALITY
+  MIGHT
+  AGILITY
+  DEFENSE
+  LUCK
+}
+
+enum ClairObscurElement {
+  DARK
+  EARTH
+  FIRE
+  ICE
+  LIGHT
+  LIGHTNING
+  PHYSICAL
+  VOID
+}
+
+enum ClairObscurStat {
+  ATTACK_POWER
+  SPEED
+  CRITICAL_RATE
+  HEALTH
+  DEFENSE
+}
+
+enum ClairObscurDLC {
+  BASE
+}
+
+model ClairObscurItem {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  name     String
+  disabled Boolean @default(false)
+
+  // ClairObscur specific fields
+  category              ClairObscurItemCategory
+  collectedItems        ClairObscurCollectedItem[]
+}
+
+model ClairObscurCollectedItem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  item   ClairObscurItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String
+
+  @@unique([userId, itemId])
+  @@index([userId])
+  @@index([itemId])
+}

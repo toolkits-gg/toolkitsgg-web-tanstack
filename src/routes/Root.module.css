@@ -8,15 +8,6 @@
   border-bottom: 1px solid var(--mantine-color-border-7);
 }
 
-.header .logoLink {
-  text-decoration: none;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
 .navbar {
   border-right: 1px solid var(--mantine-color-border-7);
 }

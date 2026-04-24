@@ -1,5 +1,12 @@
+import "@mantine/core/styles.layer.css";
+// ‼️ import carousel and notifications styles after core package styles
+import "@mantine/carousel/styles.layer.css";
+import "@mantine/notifications/styles.css";
+import "@fontsource/geist/400.css";
+import "@fontsource/geist/500.css";
+import "@fontsource/geist/600.css";
+import "@fontsource/geist/700.css";
 import {
-	Anchor,
 	AppShell,
 	Box,
 	Burger,
@@ -12,6 +19,7 @@ import {
 	Text,
 	Title,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import {
@@ -20,23 +28,15 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { MantineProviderWithTheme } from "#/features/theme/providers/MantineProviderWithTheme";
-import "@fontsource/geist/400.css";
-import "@fontsource/geist/500.css";
-import "@fontsource/geist/600.css";
-import "@fontsource/geist/700.css";
-import { ScreenshotPreviewProvider } from "#/features/screenshot/providers/ScreenshotPreviewProvider";
-import "@mantine/core/styles.layer.css";
-// ‼️ import carousel and notifications styles after core package styles
-import "@mantine/carousel/styles.layer.css";
-import "@mantine/notifications/styles.css";
-import { useDisclosure } from "@mantine/hooks";
 import { DefaultLogo } from "#/components/AppLogo";
 import { buildNavLinks } from "#/components/navigation/build-nav-links";
 import { NavbarLinksGroup } from "#/components/navigation/NavbarLinksGroup";
 import { SocialMedia } from "#/components/SocialMedia";
 import { GameProvider } from "#/features/game/components/GameProvider";
+import { GameSwitcher } from "#/features/game/components/GameSwitcher";
+import { ScreenshotPreviewProvider } from "#/features/screenshot/providers/ScreenshotPreviewProvider";
 import { ChangeThemeButton } from "#/features/theme/components/ChangeThemeButton";
+import { MantineProviderWithTheme } from "#/features/theme/providers/MantineProviderWithTheme";
 import classes from "./Root.module.css";
 
 interface MyRouterContext {
@@ -114,25 +114,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 									</Flex>
 
 									<Flex flex={1} align="center" justify="center" gap="xs">
-										<Anchor href="/" className={classes.logoLink}>
-											<Flex align="center" justify="center" gap="xs">
-												<DefaultLogo size={48} />
-												<Flex direction="column" gap={0}>
-													<Text
-														size="md"
-														c="sidebarFg"
-														fw={700}
-														ff="heading"
-														lh={1}
-													>
-														toolkits.gg
-													</Text>
-													<Text size="xs" fw={600} lh={1} tt="uppercase">
-														by toolkits.gg, inc.
-													</Text>
-												</Flex>
-											</Flex>
-										</Anchor>
+										<GameSwitcher />
 									</Flex>
 
 									<Flex justify="end" align="center">
@@ -176,8 +158,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								</Flex>
 							</AppShell.Footer>
 						</AppShell>
-
-						{children}
 					</MantineProviderWithTheme>
 				</GameProvider>
 

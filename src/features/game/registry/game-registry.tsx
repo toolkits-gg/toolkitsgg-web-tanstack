@@ -1,7 +1,9 @@
+import type { LogoSize } from "#/components/AppLogo";
 import type { AppItem } from "#/features/game/item/types/app-item";
 import type { GameConfig } from "#/features/game/types/game-config";
 import { defaultTheme } from "#/features/theme/themes/default-theme";
 import type { ToolkitThemeDefinition } from "#/features/theme/types/toolkit-theme-definition";
+import { GAME_CONFIG as CLAIROBSCUR_CONFIG } from "#/games/clairobscur/game-config";
 import { GAME_CONFIG as REMNANT2_CONFIG } from "#/games/remnant2/game-config";
 import { GAME_CONFIG as SLAYTHESPIRE2_CONFIG } from "#/games/slaythespire2/game-config";
 
@@ -10,6 +12,7 @@ type AnyGameConfig = GameConfig<AppItem, string>;
 
 // The registry — keys are the exact gameId strings
 const GAME_REGISTRY = {
+	clairObscur: CLAIROBSCUR_CONFIG,
 	remnant2: REMNANT2_CONFIG,
 	slaythespire2: SLAYTHESPIRE2_CONFIG,
 } satisfies Record<string, AnyGameConfig>;
@@ -37,9 +40,23 @@ function getGameItems(gameId: string): AnyGameConfig["ITEMS"] | undefined {
 	return GAME_REGISTRY[gameId as RegistryGameId]?.ITEMS;
 }
 
+// Logo shortcut - returns METADATA.renderLogo response or undefined
+function getGameLogo(gameId: string, logoSize: LogoSize = 36): React.ReactNode {
+	return GAME_REGISTRY[gameId as RegistryGameId]?.METADATA?.renderLogo?.(
+		logoSize,
+	);
+}
+
 // Theme shortcut — returns ToolkitThemeDefinition or undefined
 function getGameTheme(gameId: string): ToolkitThemeDefinition | undefined {
 	return GAME_REGISTRY[gameId as RegistryGameId]?.THEME;
+}
+
+// Metadata shortcut - returns METADATA or undefined
+function getGameMetadata(
+	gameId: string,
+): AnyGameConfig["METADATA"] | undefined {
+	return GAME_REGISTRY[gameId as RegistryGameId]?.METADATA;
 }
 
 // Type-safe overload when the caller already holds a literal RegistryGameId.
@@ -96,7 +113,9 @@ export {
 	getAllRegisteredThemeClassNames,
 	getAllRegisteredThemeDefinitions,
 	getGameConfig,
+	getGameLogo,
 	getGameItems,
+	getGameMetadata,
 	getGameTheme,
 	getGameConfigTyped,
 	isRegisteredGameId,

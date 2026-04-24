@@ -42,7 +42,6 @@
 
   @mixin hover {
     background-color: var(--mantine-color-primary-5);
-    color: var(--mantine-color-primaryFg-5);
   }
 }
 
