@@ -2,6 +2,7 @@ import type { AppItem } from "#/features/game/item/types/app-item";
 import type { GameConfig } from "#/features/game/types/game-config";
 import { defaultTheme } from "#/features/theme/themes/default-theme";
 import type { ToolkitThemeDefinition } from "#/features/theme/types/toolkit-theme-definition";
+import { GAME_CONFIG as CLAIROBSCUR_CONFIG } from "#/games/clairobscur/game-config";
 import { GAME_CONFIG as REMNANT2_CONFIG } from "#/games/remnant2/game-config";
 import { GAME_CONFIG as SLAYTHESPIRE2_CONFIG } from "#/games/slaythespire2/game-config";
 
@@ -10,6 +11,7 @@ type AnyGameConfig = GameConfig<AppItem, string>;
 
 // The registry — keys are the exact gameId strings
 const GAME_REGISTRY = {
+	clairObscur: CLAIROBSCUR_CONFIG,
 	remnant2: REMNANT2_CONFIG,
 	slaythespire2: SLAYTHESPIRE2_CONFIG,
 } satisfies Record<string, AnyGameConfig>;
