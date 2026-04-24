@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as GameIdRouteRouteImport } from './routes/$gameId/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
@@ -18,6 +19,11 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GameIdRouteRoute = GameIdRouteRouteImport.update({
@@ -44,6 +50,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$gameId': typeof GameIdRouteRoute
+  '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
   '/api/health': typeof ApiHealthRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$gameId': typeof GameIdRouteRoute
+  '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
   '/api/health': typeof ApiHealthRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -59,21 +67,42 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$gameId': typeof GameIdRouteRoute
+  '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
   '/api/health': typeof ApiHealthRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$gameId' | '/profile' | '/api/health' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/$gameId'
+    | '/changelog'
+    | '/profile'
+    | '/api/health'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$gameId' | '/profile' | '/api/health' | '/api/auth/$'
-  id: '__root__' | '/' | '/$gameId' | '/profile' | '/api/health' | '/api/auth/$'
+  to:
+    | '/'
+    | '/$gameId'
+    | '/changelog'
+    | '/profile'
+    | '/api/health'
+    | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/$gameId'
+    | '/changelog'
+    | '/profile'
+    | '/api/health'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GameIdRouteRoute: typeof GameIdRouteRoute
+  ChangelogRoute: typeof ChangelogRoute
   ProfileRoute: typeof ProfileRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -86,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$gameId': {
@@ -122,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GameIdRouteRoute: GameIdRouteRoute,
+  ChangelogRoute: ChangelogRoute,
   ProfileRoute: ProfileRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

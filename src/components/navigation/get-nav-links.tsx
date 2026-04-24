@@ -1,3 +1,4 @@
+import { GiLockedChest } from "react-icons/gi";
 import { LuBadgeHelp } from "react-icons/lu";
 
 type NavLinkSubLink = {
@@ -20,6 +21,22 @@ type NavLink = NavLinkBase &
 		| { url?: undefined; links: NavLinkSubLink[] }
 	);
 
+const buildGeneralNavLink = (): NavLink => ({
+	label: "Toolkits.gg",
+	icon: GiLockedChest,
+	initiallyOpened: true,
+	links: [
+		{
+			label: "Home",
+			link: "/",
+		},
+		{
+			label: "Change Log",
+			link: "/changelog",
+		},
+	],
+});
+
 const buildHelpNavLink = (onGetStarted?: () => void): NavLink => ({
 	label: "Help",
 	icon: LuBadgeHelp,
@@ -32,21 +49,17 @@ const buildHelpNavLink = (onGetStarted?: () => void): NavLink => ({
 		},
 		{
 			label: "Support Toolkits.gg",
-			link: "#",
+			link: "/",
 			dataWizardTarget: "support-link",
 		},
 	],
 });
 
-const buildNavLinks = (onGetStarted?: () => void): NavLink[] => {
+const getNavLinks = (onGetStarted?: () => void): NavLink[] => {
 	const navLinks: NavLink[] = [];
-
-	// TODO Add game specific links here
-
-	// * --- Navigation for Help related pages --- * //
+	navLinks.push(buildGeneralNavLink());
 	navLinks.push(buildHelpNavLink(onGetStarted));
-
 	return navLinks;
 };
 
-export { buildNavLinks };
+export { getNavLinks };
