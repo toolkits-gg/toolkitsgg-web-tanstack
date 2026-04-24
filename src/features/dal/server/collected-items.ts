@@ -26,8 +26,9 @@ export const uncollectItemServerFn = createServerFn({ method: "POST" })
 		return { ok: true as const };
 	});
 
-export const listCollectedItemsServerFn = createServerFn({ method: "GET" })
-	.handler(async () => {
-		const userId = await requireUserId();
-		return prisma.remnant2CollectedItem.findMany({ where: { userId } });
-	});
+export const listCollectedItemsServerFn = createServerFn({
+	method: "GET",
+}).handler(async () => {
+	const userId = await requireUserId();
+	return prisma.remnant2CollectedItem.findMany({ where: { userId } });
+});

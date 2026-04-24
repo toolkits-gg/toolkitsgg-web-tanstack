@@ -3,12 +3,12 @@ import {
 	defineDalWrite,
 } from "#/features/dal/core/define-action";
 import type { DalContext } from "#/features/dal/core/types";
-import { applyPendingOpServerFn } from "#/features/dal/server/sync";
 import {
 	collectItemServerFn,
 	listCollectedItemsServerFn,
 	uncollectItemServerFn,
 } from "#/features/dal/server/collected-items";
+import { applyPendingOpServerFn } from "#/features/dal/server/sync";
 import { getIDBClient } from "#/integrations/prisma-idb/idb-client";
 
 interface CollectedItemInput {
@@ -31,7 +31,10 @@ export const collectedItemActions = {
 		},
 	}),
 
-	collect: defineDalWrite<CollectedItemInput, { userId: string; itemId: string }>({
+	collect: defineDalWrite<
+		CollectedItemInput,
+		{ userId: string; itemId: string }
+	>({
 		entity: "remnant2CollectedItem",
 		operation: "upsert",
 		invalidates: ["remnant2CollectedItem"],

@@ -1,3 +1,4 @@
+import type { LogoSize } from "#/components/AppLogo";
 import type { AppItem } from "#/features/game/item/types/app-item";
 import type { GameConfig } from "#/features/game/types/game-config";
 import { defaultTheme } from "#/features/theme/themes/default-theme";
@@ -39,9 +40,23 @@ function getGameItems(gameId: string): AnyGameConfig["ITEMS"] | undefined {
 	return GAME_REGISTRY[gameId as RegistryGameId]?.ITEMS;
 }
 
+// Logo shortcut - returns METADATA.renderLogo response or undefined
+function getGameLogo(gameId: string, logoSize: LogoSize = 36): React.ReactNode {
+	return GAME_REGISTRY[gameId as RegistryGameId]?.METADATA?.renderLogo?.(
+		logoSize,
+	);
+}
+
 // Theme shortcut — returns ToolkitThemeDefinition or undefined
 function getGameTheme(gameId: string): ToolkitThemeDefinition | undefined {
 	return GAME_REGISTRY[gameId as RegistryGameId]?.THEME;
+}
+
+// Metadata shortcut - returns METADATA or undefined
+function getGameMetadata(
+	gameId: string,
+): AnyGameConfig["METADATA"] | undefined {
+	return GAME_REGISTRY[gameId as RegistryGameId]?.METADATA;
 }
 
 // Type-safe overload when the caller already holds a literal RegistryGameId.
@@ -98,7 +113,9 @@ export {
 	getAllRegisteredThemeClassNames,
 	getAllRegisteredThemeDefinitions,
 	getGameConfig,
+	getGameLogo,
 	getGameItems,
+	getGameMetadata,
 	getGameTheme,
 	getGameConfigTyped,
 	isRegisteredGameId,

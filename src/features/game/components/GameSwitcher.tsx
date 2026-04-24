@@ -11,7 +11,7 @@ import {
 	UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useNavigate } from "@tanstack/react-router";
+import { ClientOnly, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { LuChevronRight, LuHouse, LuSearch, LuStar } from "react-icons/lu";
 
@@ -22,6 +22,7 @@ import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
 import { useGameId } from "#/features/game/hooks/use-game-id";
 import {
 	getGameConfig,
+	getGameLogo,
 	REGISTERED_GAME_IDS,
 } from "#/features/game/registry/game-registry";
 import { setGame } from "#/features/game/store/game-store";
@@ -57,6 +58,7 @@ function GameRow({
 }: GameRowProps) {
 	return (
 		<UnstyledButton
+			component="div"
 			className={classes.gameRow}
 			onClick={() => onSelect(entry.id)}
 		>
@@ -152,13 +154,19 @@ function GameSwitcher() {
 			trapFocus
 		>
 			<Popover.Target>
-				<UnstyledButton className={classes.trigger} onClick={toggle}>
+				<UnstyledButton
+					component="div"
+					className={classes.trigger}
+					onClick={toggle}
+				>
 					<Group wrap="nowrap" gap="xs" justify="space-between">
 						<Flex align="center" gap="sm">
-							<DefaultLogo size={36} />
-							<Text size="sm" fw={600}>
-								{activeLabel}
-							</Text>
+							<ClientOnly fallback={<DefaultLogo />}>
+								{getGameLogo(activeGameId) || <DefaultLogo />}
+								<Text size="sm" fw={600}>
+									{activeLabel}
+								</Text>
+							</ClientOnly>
 						</Flex>
 						<LuChevronRight size={18} />
 					</Group>
@@ -177,6 +185,7 @@ function GameSwitcher() {
 				/>
 
 				<UnstyledButton
+					component="div"
 					className={classes.gameRow}
 					onClick={handleGoHome}
 					data-active={activeGameId === "none" || undefined}
