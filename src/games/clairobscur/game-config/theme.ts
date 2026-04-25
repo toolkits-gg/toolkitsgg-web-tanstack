@@ -1,5 +1,5 @@
 import type { MantineThemeOverride } from "@mantine/core";
-import { GAME_ID } from "#/games/slaythespire2/constants/game-id";
+import { GAME_ID } from "#/games/clairobscur/constants/game-id";
 import { BLACK, RED, WHITE } from "@/features/theme/constants/colors";
 import { baseTheme } from "@/features/theme/themes/base-theme";
 import type { ToolkitThemeDefinition } from "@/features/theme/types/toolkit-theme-definition";

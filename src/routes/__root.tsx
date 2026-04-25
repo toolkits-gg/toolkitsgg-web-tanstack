@@ -29,6 +29,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { DefaultLogo } from "#/components/AppLogo";
+import { AppNavbar } from "#/components/navigation/AppNavbar";
 import { getNavLinks } from "#/components/navigation/get-nav-links";
 import { NavbarLinksGroup } from "#/components/navigation/NavbarLinksGroup";
 import { SocialMedia } from "#/components/SocialMedia";
@@ -72,8 +73,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const [navbarOpened, { toggle: toggleNavbar }] = useDisclosure();
-
-	const navLinks = getNavLinks();
 
 	return (
 		<html lang="en" {...mantineHtmlProps}>
@@ -124,25 +123,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							</AppShell.Header>
 
 							<AppShell.Navbar className={classes.navbar}>
-								<Flex
-									component="nav"
-									w={{ base: 350, sm: 300 }}
-									className={classes.navbarInner}
-								>
-									<ScrollArea className={classes.scrollArea}>
-										<div className={classes.scrollAreaContent}>
-											{navLinks.map((navLink) => (
-												<NavbarLinksGroup {...navLink} key={navLink.label} />
-											))}
-										</div>
-									</ScrollArea>
-
-									<Flex className={classes.themeChangerWrapper}>
-										<ChangeThemeButton gameId="none" />
-									</Flex>
-
-									<Flex className={classes.userMenuWrapper}>User Menu</Flex>
-								</Flex>
+								<AppNavbar />
 							</AppShell.Navbar>
 
 							<AppShell.Main className={classes.main}>{children}</AppShell.Main>

@@ -16,6 +16,10 @@ type GameMetadata = {
 	}[];
 };
 
+type GamePages = {
+	renderItemLookup: () => React.ReactNode;
+};
+
 type GameConfig<
 	TItem extends AppItem = AppItem,
 	TCategory extends string | number | symbol = string,
@@ -29,6 +33,7 @@ type GameConfig<
 	};
 	METADATA: GameMetadata;
 	THEME: ToolkitThemeDefinition | undefined;
+	PAGES: GamePages;
 };
 
-export type { GameConfig, GameMetadata };
+export type { GameConfig, GameMetadata, GamePages };

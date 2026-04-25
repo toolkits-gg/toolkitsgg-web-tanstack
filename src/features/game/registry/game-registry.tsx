@@ -6,16 +6,17 @@ import type { ToolkitThemeDefinition } from "#/features/theme/types/toolkit-them
 import { GAME_CONFIG as CLAIROBSCUR_CONFIG } from "#/games/clairobscur/game-config";
 import { GAME_CONFIG as REMNANT2_CONFIG } from "#/games/remnant2/game-config";
 import { GAME_CONFIG as SLAYTHESPIRE2_CONFIG } from "#/games/slaythespire2/game-config";
+import type { GameId } from "@/prisma";
 
 // Widened type for runtime-keyed access (base AppItem, string category)
 type AnyGameConfig = GameConfig<AppItem, string>;
 
 // The registry — keys are the exact gameId strings
 const GAME_REGISTRY = {
-	clairObscur: CLAIROBSCUR_CONFIG,
+	clairobscur: CLAIROBSCUR_CONFIG,
 	remnant2: REMNANT2_CONFIG,
 	slaythespire2: SLAYTHESPIRE2_CONFIG,
-} satisfies Record<string, AnyGameConfig>;
+} satisfies Record<Exclude<GameId, "none">, AnyGameConfig>;
 
 // Derived union of valid keys — avoids hard-coding
 type RegistryGameId = keyof typeof GAME_REGISTRY;
@@ -57,6 +58,11 @@ function getGameMetadata(
 	gameId: string,
 ): AnyGameConfig["METADATA"] | undefined {
 	return GAME_REGISTRY[gameId as RegistryGameId]?.METADATA;
+}
+
+// Pages shortcut — returns PAGES bucket or undefined
+function getGamePages(gameId: string): AnyGameConfig["PAGES"] | undefined {
+	return GAME_REGISTRY[gameId as RegistryGameId]?.PAGES;
 }
 
 // Type-safe overload when the caller already holds a literal RegistryGameId.
@@ -116,6 +122,7 @@ export {
 	getGameLogo,
 	getGameItems,
 	getGameMetadata,
+	getGamePages,
 	getGameTheme,
 	getGameConfigTyped,
 	isRegisteredGameId,

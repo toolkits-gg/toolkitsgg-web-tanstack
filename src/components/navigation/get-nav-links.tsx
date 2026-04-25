@@ -1,5 +1,7 @@
+import { BsCollection } from "react-icons/bs";
 import { GiLockedChest } from "react-icons/gi";
 import { LuBadgeHelp } from "react-icons/lu";
+import type { GameId } from "@/prisma";
 
 type NavLinkSubLink = {
 	label: string;
@@ -55,9 +57,32 @@ const buildHelpNavLink = (onGetStarted?: () => void): NavLink => ({
 	],
 });
 
-const getNavLinks = (onGetStarted?: () => void): NavLink[] => {
+const buildItemsNavLink = (gameId: GameId): NavLink => ({
+	label: "Items",
+	icon: BsCollection,
+	initiallyOpened: true,
+	links: [
+		{
+			label: "Item List",
+			link: `${gameId}/items`,
+		},
+	],
+});
+
+type GetNavLinksParams = {
+	gameId: GameId | undefined;
+	onGetStarted?: () => void;
+};
+
+const getNavLinks = ({
+	onGetStarted,
+	gameId,
+}: GetNavLinksParams): NavLink[] => {
 	const navLinks: NavLink[] = [];
 	navLinks.push(buildGeneralNavLink());
+	if (gameId && gameId !== "none") {
+		navLinks.push(buildItemsNavLink(gameId));
+	}
 	navLinks.push(buildHelpNavLink(onGetStarted));
 	return navLinks;
 };
