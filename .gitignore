@@ -16,4 +16,4 @@ dist-ssr
 __unconfig*
 todos.json
 /prisma/generated
-
+settings.local.json

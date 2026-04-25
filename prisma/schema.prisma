@@ -141,7 +141,6 @@ model UserProfile {
   userId              String               @unique
   avatarOverrides     UserAvatarOverride[]
 
-  @@index([userId])
   @@map("user_profiles")
 }
 

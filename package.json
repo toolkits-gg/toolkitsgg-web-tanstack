@@ -22,7 +22,8 @@
     "db:local:start": "docker compose -f compose.local.yaml up -d",
     "db:local:stop": "docker compose -f compose.local.yaml stop",
     "db:local:restart": "docker compose -f compose.local.yaml restart",
-    "db:local:down": "docker compose -f compose.local.yaml down -v"
+    "db:local:down": "docker compose -f compose.local.yaml down -v",
+    "favicons:generate": "gulp generateFavicons"
   },
   "dependencies": {
     "@better-auth/prisma-adapter": "1.6.5",
@@ -53,6 +54,7 @@
     "@tanstack/react-start": "latest",
     "@tanstack/react-store": "latest",
     "@tanstack/react-table": "latest",
+    "@tanstack/react-virtual": "3.13.24",
     "@tanstack/router-plugin": "1.132.0",
     "@tanstack/store": "latest",
     "@tiptap/extension-link": "3.22.3",
@@ -67,6 +69,7 @@
     "idb": "8.0.3",
     "modern-screenshot": "4.7.0",
     "next-themes": "0.4.6",
+    "nuqs": "2.8.9",
     "pino": "10.3.1",
     "pino-pretty": "13.1.3",
     "prisma": "7.4.2",
@@ -92,6 +95,8 @@
     "babel-plugin-react-compiler": "1.0.0",
     "dotenv-cli": "11.0.0",
     "fake-indexeddb": "6.2.5",
+    "favicons": "7.2.0",
+    "gulp": "5.0.1",
     "jsdom": "28.1.0",
     "postcss": "8.5.10",
     "postcss-preset-mantine": "1.18.0",
@@ -103,9 +108,13 @@
     "vitest": "3.0.5"
   },
   "pnpm": {
+    "overrides": {
+      "sharp": "0.34.5"
+    },
     "onlyBuiltDependencies": [
       "esbuild",
-      "lightningcss"
+      "lightningcss",
+      "sharp"
     ]
   }
 }

@@ -8,6 +8,7 @@ const METADATA: GameMetadata = {
 	name: "Slay the Spire II",
 	label: "Slay the Spire 2",
 	description: `The iconic roguelike deckbuilder returns. Craft a unique deck, encounter bizarre creatures, and discover relics of immense power in Slay the Spire 2!`,
+	faviconSourcePath: "games/slaythespire2/logos/512STS2.png",
 	renderLogo: (size: LogoSize) => <SlayTheSpire2Logo size={size} />,
 	externalResources: [
 		{

@@ -1,8 +1,12 @@
 {
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(pnpm tsc *)",
-      "Bash(pnpm test *)"
+      "Bash(pnpm test *)",
+      "Bash(pnpm check *)",
+      "Bash(pnpm biome *)",
+      "Bash(pnpm db:generate)"
     ]
   }
 }

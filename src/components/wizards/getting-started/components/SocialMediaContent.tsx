@@ -1,0 +1,39 @@
+"use client";
+
+import { Button, Stack } from "@mantine/core";
+import { Link } from "@tanstack/react-router";
+import { SiDiscord, SiGithub } from "react-icons/si";
+import { DISCORD_URL, GITHUB_URL } from "#/constants/paths";
+
+const SocialMediaContent = () => {
+	return (
+		<Stack gap="sm">
+			<Button
+				component={Link}
+				href={DISCORD_URL}
+				target="_blank"
+				rel="noopener noreferrer"
+				leftSection={<SiDiscord size={18} />}
+				variant="light"
+				color="violet"
+				fullWidth
+			>
+				Join our Discord
+			</Button>
+
+			<Button
+				component={Link}
+				href={GITHUB_URL}
+				target="_blank"
+				rel="noopener noreferrer"
+				leftSection={<SiGithub size={18} />}
+				variant="light"
+				fullWidth
+			>
+				View on GitHub
+			</Button>
+		</Stack>
+	);
+};
+
+export { SocialMediaContent };

@@ -11,6 +11,7 @@ const GAME_CONFIG = {
 	THEME,
 	METADATA,
 	PAGES,
+	SEARCH_PARAMS: undefined, // TODO
 } satisfies GameConfig<ClairObscurLocalItem, ClairObscurItemCategory>;
 
 export { GAME_CONFIG };

@@ -11,7 +11,11 @@ import {
 	UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { ClientOnly, useNavigate } from "@tanstack/react-router";
+import {
+	ClientOnly,
+	useNavigate,
+	useRouterState,
+} from "@tanstack/react-router";
 import { useState } from "react";
 import { LuChevronRight, LuHouse, LuSearch, LuStar } from "react-icons/lu";
 
@@ -93,6 +97,7 @@ function GameSwitcher() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const activeGameId = useGameId();
 	const navigate = useNavigate();
+	const { location } = useRouterState();
 
 	const { data } = useDalQuery(favoriteGameActions.list, undefined);
 	const favorite = useDalMutation(favoriteGameActions.favorite);
@@ -128,6 +133,17 @@ function GameSwitcher() {
 
 	const handleSelectGame = (id: GameId) => {
 		setGame(id, "toggle");
+
+		// If on a game-scoped route, navigate to the same sub-path under the new game
+		const segments = location.pathname.split("/").filter(Boolean);
+		if (
+			segments.length > 0 &&
+			(REGISTERED_GAME_IDS as readonly string[]).includes(segments[0])
+		) {
+			segments[0] = id;
+			void navigate({ to: `/${segments.join("/")}` as never });
+		}
+
 		handleClose();
 	};
 
@@ -158,6 +174,7 @@ function GameSwitcher() {
 					component="div"
 					className={classes.trigger}
 					onClick={toggle}
+					data-wizard-target="game-switcher"
 				>
 					<Group wrap="nowrap" gap="xs" justify="space-between">
 						<Flex align="center" gap="sm">

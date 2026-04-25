@@ -44,6 +44,18 @@ export const collectedItemActions = {
 		local: async (input, ctx) => {
 			const userId = await resolveLocalUserId(ctx);
 			const idb = await getIDBClient();
+			// The IDB schema keeps User FK, so ensure a stub user record exists
+			// before inserting the collected item to satisfy the FK constraint.
+			await idb.user.upsert({
+				where: { id: userId },
+				update: {},
+				create: {
+					id: userId,
+					username: `_local_${userId}`,
+					email: `_local_${userId}@local.invalid`,
+					emailVerified: false,
+				},
+			});
 			return idb.remnant2CollectedItem.upsert({
 				where: { userId_itemId: { userId, itemId: input.itemId } },
 				update: {},

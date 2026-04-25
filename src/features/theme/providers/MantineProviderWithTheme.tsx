@@ -2,6 +2,7 @@ import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { SyncFavicon } from "#/features/game/components/SyncFavicon";
 import { getAllRegisteredThemeClassNames } from "#/features/game/registry/game-registry";
 import { SyncAndApplyTheme } from "#/features/theme/providers/SyncAndApplyTheme";
 import { DEFAULT_NEXT_THEME } from "@/features/theme/constants/default-next-theme";
@@ -28,6 +29,7 @@ const MantineProviderWithTheme = ({
 		>
 			<MantineProvider theme={mantineTheme} defaultColorScheme="dark">
 				<SyncAndApplyTheme />
+				<SyncFavicon />
 				<Notifications />
 				<ModalsProvider>{children}</ModalsProvider>
 			</MantineProvider>

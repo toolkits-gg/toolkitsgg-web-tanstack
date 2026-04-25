@@ -39,14 +39,14 @@ const buildGeneralNavLink = (): NavLink => ({
 	],
 });
 
-const buildHelpNavLink = (onGetStarted?: () => void): NavLink => ({
+const buildHelpNavLink = (onGettingStartedWizard?: () => void): NavLink => ({
 	label: "Help",
 	icon: LuBadgeHelp,
 	initiallyOpened: true,
 	links: [
 		{
 			label: "Getting Started",
-			onClick: onGetStarted,
+			onClick: onGettingStartedWizard,
 			dataWizardTarget: "get-started-link",
 		},
 		{
@@ -64,18 +64,18 @@ const buildItemsNavLink = (gameId: GameId): NavLink => ({
 	links: [
 		{
 			label: "Item List",
-			link: `${gameId}/items`,
+			link: `/${gameId}/items`,
 		},
 	],
 });
 
 type GetNavLinksParams = {
 	gameId: GameId | undefined;
-	onGetStarted?: () => void;
+	onGettingStartedWizard?: () => void;
 };
 
 const getNavLinks = ({
-	onGetStarted,
+	onGettingStartedWizard,
 	gameId,
 }: GetNavLinksParams): NavLink[] => {
 	const navLinks: NavLink[] = [];
@@ -83,7 +83,7 @@ const getNavLinks = ({
 	if (gameId && gameId !== "none") {
 		navLinks.push(buildItemsNavLink(gameId));
 	}
-	navLinks.push(buildHelpNavLink(onGetStarted));
+	navLinks.push(buildHelpNavLink(onGettingStartedWizard));
 	return navLinks;
 };
 

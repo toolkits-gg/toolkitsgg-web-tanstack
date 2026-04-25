@@ -1,0 +1,107 @@
+.input {
+	padding: var(--mantine-spacing-2xs) var(--mantine-spacing-xs);
+	border: 1px solid var(--tri-state-filter-color);
+	border-radius: var(--mantine-radius-default);
+	cursor: pointer;
+	background-color: light-dark(
+		var(--mantine-color-input-1),
+		var(--mantine-color-input-9)
+	);
+	min-height: 32px;
+	display: flex;
+	align-items: center;
+	width: 100%;
+	text-align: left;
+	transition: border-color 0.2s ease;
+
+	&:hover {
+		border-color: var(--tri-state-filter-color-hover);
+	}
+}
+
+.dropdown {
+	background-color: light-dark(
+		var(--mantine-color-input-1),
+		var(--mantine-color-input-9)
+	);
+	border: 1px solid var(--tri-state-filter-color);
+}
+
+.searchInput {
+	background-color: light-dark(
+		var(--mantine-color-input-1),
+		var(--mantine-color-input-9)
+	);
+	border-color: light-dark(
+		var(--mantine-color-input-6),
+		var(--mantine-color-input-5)
+	);
+	color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+}
+
+.option {
+	padding: var(--mantine-spacing-3xs) var(--mantine-spacing-xs);
+	cursor: pointer;
+	border-radius: var(--mantine-radius-sm);
+	background-color: transparent;
+	border: none;
+	width: 100%;
+	text-align: left;
+	transition: background-color 0.2s ease;
+
+	&:hover {
+		background-color: light-dark(
+			var(--tri-state-filter-option-hover-light),
+			var(--tri-state-filter-option-hover-dark)
+		);
+	}
+}
+
+.optionActive {
+	background-color: light-dark(
+		var(--mantine-color-gray-1),
+		var(--mantine-color-dark-6)
+	);
+
+	&:hover {
+		background-color: light-dark(
+			var(--tri-state-filter-option-active-hover-light),
+			var(--tri-state-filter-option-active-hover-dark)
+		);
+	}
+}
+
+.pillInclude {
+	background-color: light-dark(
+		var(--mantine-color-success-1),
+		var(--mantine-color-success-9)
+	);
+	color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+	border: 1px solid
+		light-dark(var(--mantine-color-success-3), var(--mantine-color-success-7));
+	font-size: var(--mantine-font-size-xs);
+}
+
+.pillExclude {
+	background-color: light-dark(
+		var(--mantine-color-error-1),
+		var(--mantine-color-error-9)
+	);
+	color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+	border: 1px solid
+		light-dark(var(--mantine-color-error-3), var(--mantine-color-error-7));
+	font-size: var(--mantine-font-size-xs);
+}
+
+.pillRemove {
+	color: inherit;
+	opacity: 0.7;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+.hint {
+	border-top: 1px solid var(--mantine-color-border-5);
+}

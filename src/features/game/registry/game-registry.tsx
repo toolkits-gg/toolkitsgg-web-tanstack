@@ -18,15 +18,13 @@ const GAME_REGISTRY = {
 	slaythespire2: SLAYTHESPIRE2_CONFIG,
 } satisfies Record<Exclude<GameId, "none">, AnyGameConfig>;
 
-// Derived union of valid keys — avoids hard-coding
 type RegistryGameId = keyof typeof GAME_REGISTRY;
 
-// All registered IDs (useful for iteration, nav menus, subdomain validation)
 const REGISTERED_GAME_IDS: readonly RegistryGameId[] = Object.keys(
 	GAME_REGISTRY,
 ) as RegistryGameId[];
 
-// Type guard: narrows arbitrary string to RegistryGameId
+// type guard
 function isRegisteredGameId(id: string): id is RegistryGameId {
 	return id in GAME_REGISTRY;
 }
@@ -38,7 +36,9 @@ function getGameConfig(gameId: string): AnyGameConfig | undefined {
 
 // Items shortcut — returns ITEMS bucket or undefined
 function getGameItems(gameId: string): AnyGameConfig["ITEMS"] | undefined {
-	return GAME_REGISTRY[gameId as RegistryGameId]?.ITEMS;
+	return GAME_REGISTRY[gameId as RegistryGameId]?.ITEMS as
+		| AnyGameConfig["ITEMS"]
+		| undefined;
 }
 
 // Logo shortcut - returns METADATA.renderLogo response or undefined
@@ -46,6 +46,13 @@ function getGameLogo(gameId: string, logoSize: LogoSize = 36): React.ReactNode {
 	return GAME_REGISTRY[gameId as RegistryGameId]?.METADATA?.renderLogo?.(
 		logoSize,
 	);
+}
+
+// Search params shortcut - returns SEARCH_PARAMS or undefined
+function getGameSearchParams(
+	gameId: string,
+): AnyGameConfig["SEARCH_PARAMS"] | undefined {
+	return GAME_REGISTRY[gameId as RegistryGameId]?.SEARCH_PARAMS;
 }
 
 // Theme shortcut — returns ToolkitThemeDefinition or undefined
@@ -123,6 +130,7 @@ export {
 	getGameItems,
 	getGameMetadata,
 	getGamePages,
+	getGameSearchParams,
 	getGameTheme,
 	getGameConfigTyped,
 	isRegisteredGameId,

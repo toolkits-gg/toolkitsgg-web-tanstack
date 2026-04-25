@@ -53,8 +53,7 @@ model ClairObscurItem {
   disabled Boolean @default(false)
 
   // ClairObscur specific fields
-  category              ClairObscurItemCategory
-  collectedItems        ClairObscurCollectedItem[]
+  category ClairObscurItemCategory
 }
 
 model ClairObscurCollectedItem {
@@ -65,10 +64,8 @@ model ClairObscurCollectedItem {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
-  item   ClairObscurItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId String
 
   @@unique([userId, itemId])
   @@index([userId])
-  @@index([itemId])
 }

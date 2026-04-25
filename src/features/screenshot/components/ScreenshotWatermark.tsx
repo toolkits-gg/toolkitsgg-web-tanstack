@@ -19,7 +19,7 @@ const ScreenshotWatermark = ({
 	gap = 2,
 }: ScreenshotWatermarkProps) => {
 	return (
-		<Flex align="center" justify="flex-end" w="100%" gap={gap} py={0} px="sm">
+		<Flex align="center" justify="center" w="100%" gap={gap} py={0} px="sm">
 			{renderLogo(logoSize)}
 			<Flex direction="column" gap={0}>
 				<Text fz="lg" fw={700} c="accent" ff="heading" lh={1}>

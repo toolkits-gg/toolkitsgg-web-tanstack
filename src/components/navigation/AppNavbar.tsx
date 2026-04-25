@@ -6,9 +6,17 @@ import { useGameId } from "#/features/game/hooks/use-game-id";
 import { ChangeThemeButton } from "#/features/theme/components/ChangeThemeButton";
 import classes from "./AppNavbar.module.css";
 
-const AppNavbar = () => {
+type AppNavbarProps = {
+	onGettingStartedWizard: () => void;
+};
+
+const AppNavbar = ({ onGettingStartedWizard }: AppNavbarProps) => {
 	const gameId = useGameId();
-	const navLinks = getNavLinks({ gameId });
+
+	const navLinks = getNavLinks({
+		gameId,
+		onGettingStartedWizard,
+	});
 
 	return (
 		<Flex

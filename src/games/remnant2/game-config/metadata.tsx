@@ -8,6 +8,7 @@ const METADATA: GameMetadata = {
 	name: "Remnant II",
 	label: "Remnant 2",
 	description: `REMNANT II® pits survivors of humanity against new deadly creatures and god-like bosses across terrifying worlds. Play solo or co-op with two other friends to explore the depths of the unknown to stop an evil from destroying reality itself.`,
+	faviconSourcePath: "games/remnant2/logos/512R2.png",
 	renderLogo: (size: LogoSize) => <Remnant2Logo size={size} />,
 	externalResources: [
 		{

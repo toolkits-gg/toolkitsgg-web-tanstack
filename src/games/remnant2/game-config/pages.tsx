@@ -1,8 +1,187 @@
+import { MultiSelect, SimpleGrid, Stack, Text } from "@mantine/core";
+import { parseAsString } from "nuqs";
+import type { ReactNode } from "react";
+import {
+	TriStateFilter,
+	type TriStateFilterValue,
+} from "#/components/TriStateFilter";
+import { AppItemPage } from "#/features/game/item/components/AppItemPage";
+import type { AppItem } from "#/features/game/item/types/app-item";
+import type { GameFilterConfig } from "#/features/game/item/types/game-filter-config";
+import { getItemSubcategories } from "#/features/game/item/utils/get-item-subcategories";
 import type { GamePages } from "#/features/game/types/game-config";
-import { Text } from "@mantine/core";
+import { ITEMS } from "#/games/remnant2/game-config/items";
+import type { Remnant2DLC } from "@/prisma";
+
+const REMNANT2_DLC_LABELS: Record<Remnant2DLC, string> = {
+	BASE: "Base Game",
+	DLC1: "The Awakened King",
+	DLC2: "The Forgotten Kingdom",
+	DLC3: "The Dark Horizon",
+};
+
+function parseDlc(raw: string): TriStateFilterValue {
+	if (!raw) return {};
+	try {
+		return JSON.parse(raw) as TriStateFilterValue;
+	} catch {
+		return {};
+	}
+}
+
+function formatDlcLabel(raw: string): string {
+	const dlc = parseDlc(raw);
+	const included = Object.entries(dlc)
+		.filter(([, s]) => s === "include")
+		.map(([k]) => REMNANT2_DLC_LABELS[k as Remnant2DLC] ?? k);
+	const excluded = Object.entries(dlc)
+		.filter(([, s]) => s === "exclude")
+		.map(([k]) => REMNANT2_DLC_LABELS[k as Remnant2DLC] ?? k);
+	const parts: string[] = [];
+	if (included.length > 0) parts.push(`+${included.join(", ")}`);
+	if (excluded.length > 0) parts.push(`-${excluded.join(", ")}`);
+	return parts.join(" / ");
+}
+
+function formatCategoryLabel(raw: string): string {
+	const selected = raw ? raw.split(",").filter(Boolean) : [];
+	if (selected.length === 0) return "";
+	if (selected.length === 1) {
+		const val = selected[0] ?? "";
+		if (val.includes(":")) {
+			const [cat, sub] = val.split(":");
+			return `${titleCase(sub ?? "")} ${titleCase(cat ?? "")}`;
+		}
+		return titleCase(val);
+	}
+	return `${selected.length} selected`;
+}
+
+function titleCase(str: string): string {
+	return str
+		.split(/[_ ]/)
+		.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+		.join(" ");
+}
+
+function itemMatchesCategory(item: AppItem, filterValue: string): boolean {
+	if (filterValue.includes(":")) {
+		const [category, subcategory] = filterValue.split(":");
+		if (String(item.category) !== category) return false;
+		return (
+			item.subcategory !== undefined && String(item.subcategory) === subcategory
+		);
+	}
+	return String(item.category) === filterValue;
+}
+
+const remnant2FilterConfig: GameFilterConfig = {
+	label: "Remnant 2 Filters",
+	parsers: {
+		category: parseAsString.withDefault(""),
+		dlc: parseAsString.withDefault(""),
+	},
+	defs: [
+		{
+			key: "category",
+			label: "Categories",
+			defaultValue: "",
+			serialize: (v) => v || undefined,
+			formatValue: formatCategoryLabel,
+		},
+		{
+			key: "dlc",
+			label: "DLC",
+			defaultValue: "",
+			serialize: (v) => v || undefined,
+			formatValue: formatDlcLabel,
+		},
+	],
+	renderControls: (
+		params: Record<string, string>,
+		setParam: (key: string, value: string | undefined) => void,
+		_filteredItems: AppItem[],
+	): ReactNode => {
+		const categoryRaw = params.category ?? "";
+		const selectedCategories = categoryRaw ? categoryRaw.split(",") : [];
+		const dlcFilter = parseDlc(params.dlc ?? "");
+		const groupedSubcategories = getItemSubcategories(ITEMS.all);
+
+		return (
+			<Stack gap="xs">
+				<Text fz="sm" fw={500} c="dimmed">
+					Remnant 2 Filters
+				</Text>
+				<SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+					<MultiSelect
+						label="Categories"
+						placeholder="Select categories"
+						data={groupedSubcategories}
+						value={selectedCategories}
+						onChange={(val) =>
+							setParam("category", val.length > 0 ? val.join(",") : undefined)
+						}
+					/>
+					<TriStateFilter
+						label="DLC"
+						options={REMNANT2_DLC_LABELS}
+						value={dlcFilter}
+						onChange={(val) =>
+							setParam(
+								"dlc",
+								Object.keys(val).length > 0 ? JSON.stringify(val) : undefined,
+							)
+						}
+						placeholder="Filter by DLC"
+					/>
+				</SimpleGrid>
+			</Stack>
+		);
+	},
+	filterItems: (
+		items: AppItem[],
+		params: Record<string, string>,
+	): AppItem[] => {
+		const categoryRaw = params.category ?? "";
+		const selectedCategories = categoryRaw
+			? categoryRaw.split(",").filter(Boolean)
+			: [];
+		const dlcFilter = parseDlc(params.dlc ?? "");
+		const hasDlcFilters = Object.keys(dlcFilter).length > 0;
+
+		let result = items;
+
+		if (selectedCategories.length > 0) {
+			result = result.filter((item) =>
+				selectedCategories.some((f) => itemMatchesCategory(item, f)),
+			);
+		}
+
+		if (hasDlcFilters) {
+			const includedDlcs = Object.entries(dlcFilter)
+				.filter(([, s]) => s === "include")
+				.map(([k]) => k);
+			const excludedDlcs = Object.entries(dlcFilter)
+				.filter(([, s]) => s === "exclude")
+				.map(([k]) => k);
+
+			result = result.filter((item) => {
+				const itemDlc = (item as { dlc?: string }).dlc ?? "";
+				if (excludedDlcs.includes(itemDlc)) return false;
+				if (includedDlcs.length > 0 && !includedDlcs.includes(itemDlc))
+					return false;
+				return true;
+			});
+		}
+
+		return result;
+	},
+};
 
 const PAGES: GamePages = {
-	renderItemLookup: () => <Text>Coming Soon</Text>,
+	renderItemLookup: () => (
+		<AppItemPage items={ITEMS} gameFilterConfig={remnant2FilterConfig} />
+	),
 };
 
 export { PAGES };

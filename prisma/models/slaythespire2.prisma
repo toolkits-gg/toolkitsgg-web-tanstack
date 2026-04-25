@@ -48,8 +48,7 @@ model SlayTheSpire2Item {
   disabled Boolean @default(false)
 
   // SlayTheSpire2 specific fields
-  category              SlayTheSpire2ItemCategory
-  collectedItems        SlayTheSpire2CollectedItem[]
+  category SlayTheSpire2ItemCategory
 }
 
 model SlayTheSpire2CollectedItem {
@@ -60,10 +59,8 @@ model SlayTheSpire2CollectedItem {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
-  item   SlayTheSpire2Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId String
 
   @@unique([userId, itemId])
   @@index([userId])
-  @@index([itemId])
 }

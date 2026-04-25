@@ -90,8 +90,6 @@ model Remnant2BuildCollectionCount {
   count   Int           @default(0)
   build   Remnant2Build @relation(fields: [buildId], references: [id], onDelete: Cascade)
   buildId String        @unique
-
-  @@index([buildId])
 }
 
 model Remnant2BuildLikeCount {
@@ -99,8 +97,6 @@ model Remnant2BuildLikeCount {
   count   Int           @default(0)
   build   Remnant2Build @relation(fields: [buildId], references: [id], onDelete: Cascade)
   buildId String        @unique
-
-  @@index([buildId])
 }
 
 model Remnant2BuildDuplicateCount {
@@ -108,8 +104,6 @@ model Remnant2BuildDuplicateCount {
   count   Int           @default(0)
   build   Remnant2Build @relation(fields: [buildId], references: [id], onDelete: Cascade)
   buildId String        @unique
-
-  @@index([buildId])
 }
 
 model Remnant2BuildViewCount {
@@ -117,8 +111,6 @@ model Remnant2BuildViewCount {
   count   Int           @default(0)
   build   Remnant2Build @relation(fields: [buildId], references: [id], onDelete: Cascade)
   buildId String        @unique
-
-  @@index([buildId])
 }
 
 enum Remnant2ItemCategory {
@@ -166,9 +158,8 @@ model Remnant2Item {
   disabled Boolean @default(false)
 
   // Remnant2 specific fields
-  category              Remnant2ItemCategory
-  buildItems            Remnant2BuildItem[]
-  collectedItems        Remnant2CollectedItem[]
+  category   Remnant2ItemCategory
+  buildItems Remnant2BuildItem[]
 }
 
 model Remnant2BuildItem {
@@ -197,10 +188,8 @@ model Remnant2CollectedItem {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
-  item   Remnant2Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId String
 
   @@unique([userId, itemId])
   @@index([userId])
-  @@index([itemId])
 }

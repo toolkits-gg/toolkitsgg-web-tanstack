@@ -15,7 +15,6 @@ import {
 	Flex,
 	Group,
 	mantineHtmlProps,
-	ScrollArea,
 	Text,
 	Title,
 } from "@mantine/core";
@@ -28,15 +27,15 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import { DefaultLogo } from "#/components/AppLogo";
 import { AppNavbar } from "#/components/navigation/AppNavbar";
-import { getNavLinks } from "#/components/navigation/get-nav-links";
-import { NavbarLinksGroup } from "#/components/navigation/NavbarLinksGroup";
 import { SocialMedia } from "#/components/SocialMedia";
+import { GettingStartedWizard } from "#/components/wizards/getting-started/components/GettingStartedWizard";
+import { useGettingStartedWizard } from "#/components/wizards/getting-started/hooks/use-getting-started-wizard";
 import { GameProvider } from "#/features/game/components/GameProvider";
 import { GameSwitcher } from "#/features/game/components/GameSwitcher";
 import { ScreenshotPreviewProvider } from "#/features/screenshot/providers/ScreenshotPreviewProvider";
-import { ChangeThemeButton } from "#/features/theme/components/ChangeThemeButton";
 import { MantineProviderWithTheme } from "#/features/theme/providers/MantineProviderWithTheme";
 import classes from "./Root.module.css";
 
@@ -58,7 +57,23 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				title: "Toolkits.gg",
 			},
 		],
-		links: [],
+		links: [
+			{
+				rel: "icon",
+				type: "image/x-icon",
+				href: "/favicons/default/favicon.ico",
+			},
+			{
+				rel: "icon",
+				type: "image/png",
+				sizes: "32x32",
+				href: "/favicons/default/favicon-32x32.png",
+			},
+			{
+				rel: "apple-touch-icon",
+				href: "/favicons/default/apple-touch-icon.png",
+			},
+		],
 	}),
 	shellComponent: RootDocument,
 	notFoundComponent: () => {
@@ -74,6 +89,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const [navbarOpened, { toggle: toggleNavbar }] = useDisclosure();
 
+	const { openWizard, closeWizard, setCurrentWizardStepId, wizardOpened } =
+		useGettingStartedWizard();
+
 	return (
 		<html lang="en" {...mantineHtmlProps}>
 			<head>
@@ -87,60 +105,71 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					fontFamily: `'Geist', sans-serif`,
 				}}
 			>
-				<GameProvider>
-					<MantineProviderWithTheme>
-						<ScreenshotPreviewProvider />
-						<AppShell
-							padding="md"
-							header={{ height: 60 }}
-							footer={{ height: 48 }}
-							navbar={{
-								width: 300,
-								breakpoint: "sm",
-								collapsed: { mobile: !navbarOpened },
-							}}
-						>
-							<AppShell.Header px="sm" className={classes.header}>
-								<Group h="100%" justify="space-between">
-									<Flex justify="start" align="center">
-										<Burger
-											opened={navbarOpened}
-											onClick={toggleNavbar}
-											hiddenFrom="sm"
-											size="sm"
-											color="var(--mantine-color-primary-4)"
-										/>
+				<NuqsAdapter>
+					<GameProvider>
+						<MantineProviderWithTheme>
+							<ScreenshotPreviewProvider />
+							<AppShell
+								padding="md"
+								header={{ height: 60 }}
+								footer={{ height: 48 }}
+								navbar={{
+									width: 300,
+									breakpoint: "sm",
+									collapsed: { mobile: !navbarOpened },
+								}}
+							>
+								<AppShell.Header px="sm" className={classes.header}>
+									<Group h="100%" justify="space-between">
+										<Flex justify="start" align="center">
+											<Burger
+												opened={navbarOpened}
+												onClick={toggleNavbar}
+												hiddenFrom="sm"
+												size="sm"
+												color="var(--mantine-color-primary-4)"
+											/>
+										</Flex>
+
+										<Flex flex={1} align="center" justify="center" gap="xs">
+											<GameSwitcher />
+										</Flex>
+
+										<Flex justify="end" align="center">
+											{/* <NotificationBellMenu /> */}
+										</Flex>
+									</Group>
+								</AppShell.Header>
+
+								<AppShell.Navbar className={classes.navbar}>
+									<AppNavbar onGettingStartedWizard={openWizard} />
+								</AppShell.Navbar>
+
+								<AppShell.Main className={classes.main}>
+									{children}
+								</AppShell.Main>
+
+								<AppShell.Footer p="xs" className={classes.footer}>
+									<Flex justify="center" align="center" gap="sm" wrap="wrap">
+										<DefaultLogo size={24} />
+										<Text size="xs" c="dimmed">
+											© {new Date().getFullYear()} Toolkits.gg
+										</Text>
+										<Divider orientation="vertical" />
+										<SocialMedia />
 									</Flex>
-
-									<Flex flex={1} align="center" justify="center" gap="xs">
-										<GameSwitcher />
-									</Flex>
-
-									<Flex justify="end" align="center">
-										{/* <NotificationBellMenu /> */}
-									</Flex>
-								</Group>
-							</AppShell.Header>
-
-							<AppShell.Navbar className={classes.navbar}>
-								<AppNavbar />
-							</AppShell.Navbar>
-
-							<AppShell.Main className={classes.main}>{children}</AppShell.Main>
-
-							<AppShell.Footer p="xs" className={classes.footer}>
-								<Flex justify="center" align="center" gap="sm" wrap="wrap">
-									<DefaultLogo size={24} />
-									<Text size="xs" c="dimmed">
-										© {new Date().getFullYear()} Toolkits.gg
-									</Text>
-									<Divider orientation="vertical" />
-									<SocialMedia />
-								</Flex>
-							</AppShell.Footer>
-						</AppShell>
-					</MantineProviderWithTheme>
-				</GameProvider>
+								</AppShell.Footer>
+								<GettingStartedWizard
+									opened={wizardOpened}
+									onClose={closeWizard}
+									navbarOpened={navbarOpened}
+									toggleNavbar={toggleNavbar}
+									onStepChange={setCurrentWizardStepId}
+								/>
+							</AppShell>
+						</MantineProviderWithTheme>
+					</GameProvider>
+				</NuqsAdapter>
 
 				<TanStackDevtools
 					config={{

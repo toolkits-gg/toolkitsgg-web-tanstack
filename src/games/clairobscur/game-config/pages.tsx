@@ -1,8 +1,9 @@
+import { AppItemPage } from "#/features/game/item/components/AppItemPage";
 import type { GamePages } from "#/features/game/types/game-config";
-import { Text } from "@mantine/core";
+import { ITEMS } from "#/games/clairobscur/game-config/items";
 
 const PAGES: GamePages = {
-	renderItemLookup: () => <Text>Coming Soon</Text>,
+	renderItemLookup: () => <AppItemPage items={ITEMS} />,
 };
 
 export { PAGES };
