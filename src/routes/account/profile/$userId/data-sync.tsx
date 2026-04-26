@@ -1,5 +1,14 @@
-import { Badge, Button, Group, Stack, Text, Title } from "@mantine/core";
+import {
+	Badge,
+	Button,
+	Divider,
+	Group,
+	Stack,
+	Text,
+	Title,
+} from "@mantine/core";
 import { useNetwork } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { resolveWriteAction } from "#/features/dal/actions/registry";
@@ -28,6 +37,20 @@ function DataSync() {
 		mutationFn: async () => {
 			if (!pending.data) return null;
 			return syncOps(pending.data, { resolveAction: resolveWriteAction });
+		},
+		onSuccess: (report) => {
+			if (!report) return;
+			const parts: string[] = [];
+			if (report.applied) parts.push(`${report.applied} applied`);
+			if (report.noops) parts.push(`${report.noops} already up-to-date`);
+			if (report.conflicts) parts.push(`${report.conflicts} conflicts`);
+			if (report.errors) parts.push(`${report.errors} errors`);
+			const hasIssues = report.conflicts > 0 || report.errors > 0;
+			notifications.show({
+				title: hasIssues ? "Sync completed with issues" : "Sync complete",
+				message: parts.length ? parts.join(", ") : "Nothing to sync.",
+				color: hasIssues ? "orange" : "green",
+			});
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
@@ -68,12 +91,15 @@ function DataSync() {
 				</Text>
 			) : null}
 			<PendingList
-				ops={pending.data ?? []}
+				ops={(pending.data ?? []).filter((op) => op.status !== "synced")}
 				onDelete={(id) => {
 					deleteOp(id).then(() =>
 						queryClient.invalidateQueries({ queryKey: ["dal-queue"] }),
 					);
 				}}
+			/>
+			<SyncedList
+				ops={(pending.data ?? []).filter((op) => op.status === "synced")}
 			/>
 		</Stack>
 	);
@@ -132,6 +158,30 @@ function PendingList({
 				</Group>
 			))}
 		</Stack>
+	);
+}
+
+function SyncedList({ ops }: { ops: PendingOp[] }) {
+	if (!ops.length) return null;
+
+	return (
+		<>
+			<Divider label="Completed" labelPosition="left" />
+			<Stack gap="xs">
+				{ops.map((op) => (
+					<Group key={op.id} gap="xs" wrap="nowrap" align="center">
+						<Badge>{op.entity}</Badge>
+						<Badge variant="light">{op.operation}</Badge>
+						<Badge color="green" variant="outline">
+							synced
+						</Badge>
+						<Text size="xs" c="dimmed" style={{ flex: 1 }}>
+							{op.idempotencyKey}
+						</Text>
+					</Group>
+				))}
+			</Stack>
+		</>
 	);
 }
 
