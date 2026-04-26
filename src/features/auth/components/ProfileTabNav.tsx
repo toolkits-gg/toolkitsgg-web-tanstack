@@ -2,8 +2,8 @@ import { Tabs } from "@mantine/core";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 
 type ProfileTabNavProps = {
-	userId: string;
-	isOwner: boolean;
+	basePath: string;
+	showDataSync?: boolean;
 };
 
 const TABS = [
@@ -14,20 +14,22 @@ const TABS = [
 	{ label: "Created Builds", path: "created-builds" },
 ] as const;
 
-const OWNER_TABS = [{ label: "Data Sync", path: "data-sync" }] as const;
+const DATA_SYNC_TAB = { label: "Data Sync", path: "data-sync" } as const;
 
-export function ProfileTabNav({ userId, isOwner }: ProfileTabNavProps) {
+export function ProfileTabNav({ basePath, showDataSync = false }: ProfileTabNavProps) {
 	const navigate = useNavigate();
 	const location = useRouterState({ select: (s) => s.location });
-	const basePath = `/account/profile/${userId}`;
 
 	const getTabValue = (path: string) =>
 		path === "" ? basePath : `${basePath}/${path}`;
 
+	const allTabs = showDataSync
+		? ([...TABS, DATA_SYNC_TAB] as readonly { label: string; path: string }[])
+		: (TABS as readonly { label: string; path: string }[]);
+
 	const activeTab = (() => {
 		const pathname = location.pathname.replace(/\/$/, "");
 		if (pathname === basePath) return basePath;
-		const allTabs = [...TABS, ...OWNER_TABS];
 		for (const tab of allTabs) {
 			if (tab.path && pathname.endsWith(`/${tab.path}`)) {
 				return `${basePath}/${tab.path}`;
@@ -35,8 +37,6 @@ export function ProfileTabNav({ userId, isOwner }: ProfileTabNavProps) {
 		}
 		return basePath;
 	})();
-
-	const tabs = isOwner ? ([...TABS, ...OWNER_TABS] as readonly { label: string; path: string }[]) : (TABS as readonly { label: string; path: string }[]);
 
 	const handleTabChange = (value: string | null) => {
 		if (!value) return;
@@ -46,7 +46,7 @@ export function ProfileTabNav({ userId, isOwner }: ProfileTabNavProps) {
 	return (
 		<Tabs value={activeTab} onChange={handleTabChange}>
 			<Tabs.List>
-				{tabs.map((tab) => {
+				{allTabs.map((tab) => {
 					const value = getTabValue(tab.path);
 					return (
 						<Tabs.Tab key={value} value={value}>

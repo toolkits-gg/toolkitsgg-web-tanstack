@@ -52,7 +52,7 @@ function ProfileLayout() {
 				serverAvatarUrl={serverAvatarUrl}
 				isOwner={isOwner}
 			/>
-			<ProfileTabNav userId={userId} isOwner={isOwner} />
+			<ProfileTabNav basePath={`/account/profile/${userId}`} showDataSync={isOwner} />
 			<Box p="md">
 				<Outlet />
 			</Box>

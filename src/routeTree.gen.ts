@@ -11,10 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
-import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ChangelogRouteImport } from './routes/changelog'
+import { Route as ProfileRouteRouteImport } from './routes/profile/route'
 import { Route as GameIdRouteRouteImport } from './routes/$gameId/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProfileIndexRouteImport } from './routes/profile/index'
+import { Route as ProfileLikedBuildsRouteImport } from './routes/profile/liked-builds'
+import { Route as ProfileCreatedBuildsRouteImport } from './routes/profile/created-builds'
+import { Route as ProfileCollectionStatsRouteImport } from './routes/profile/collection-stats'
+import { Route as ProfileBuildCollectionsRouteImport } from './routes/profile/build-collections'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as GameIdItemsRouteImport } from './routes/$gameId/items'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -36,14 +41,14 @@ const SignInRoute = SignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ChangelogRoute = ChangelogRouteImport.update({
   id: '/changelog',
   path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRouteRoute = ProfileRouteRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GameIdRouteRoute = GameIdRouteRouteImport.update({
@@ -55,6 +60,31 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfileRouteRoute,
+} as any)
+const ProfileLikedBuildsRoute = ProfileLikedBuildsRouteImport.update({
+  id: '/liked-builds',
+  path: '/liked-builds',
+  getParentRoute: () => ProfileRouteRoute,
+} as any)
+const ProfileCreatedBuildsRoute = ProfileCreatedBuildsRouteImport.update({
+  id: '/created-builds',
+  path: '/created-builds',
+  getParentRoute: () => ProfileRouteRoute,
+} as any)
+const ProfileCollectionStatsRoute = ProfileCollectionStatsRouteImport.update({
+  id: '/collection-stats',
+  path: '/collection-stats',
+  getParentRoute: () => ProfileRouteRoute,
+} as any)
+const ProfileBuildCollectionsRoute = ProfileBuildCollectionsRouteImport.update({
+  id: '/build-collections',
+  path: '/build-collections',
+  getParentRoute: () => ProfileRouteRoute,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
@@ -117,12 +147,17 @@ const AccountProfileUserIdBuildCollectionsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$gameId': typeof GameIdRouteRouteWithChildren
+  '/profile': typeof ProfileRouteRouteWithChildren
   '/changelog': typeof ChangelogRoute
-  '/profile': typeof ProfileRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/$gameId/items': typeof GameIdItemsRoute
   '/api/health': typeof ApiHealthRoute
+  '/profile/build-collections': typeof ProfileBuildCollectionsRoute
+  '/profile/collection-stats': typeof ProfileCollectionStatsRoute
+  '/profile/created-builds': typeof ProfileCreatedBuildsRoute
+  '/profile/liked-builds': typeof ProfileLikedBuildsRoute
+  '/profile/': typeof ProfileIndexRoute
   '/account/profile/$userId': typeof AccountProfileUserIdRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/account/profile/$userId/build-collections': typeof AccountProfileUserIdBuildCollectionsRoute
@@ -136,11 +171,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$gameId': typeof GameIdRouteRouteWithChildren
   '/changelog': typeof ChangelogRoute
-  '/profile': typeof ProfileRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/$gameId/items': typeof GameIdItemsRoute
   '/api/health': typeof ApiHealthRoute
+  '/profile/build-collections': typeof ProfileBuildCollectionsRoute
+  '/profile/collection-stats': typeof ProfileCollectionStatsRoute
+  '/profile/created-builds': typeof ProfileCreatedBuildsRoute
+  '/profile/liked-builds': typeof ProfileLikedBuildsRoute
+  '/profile': typeof ProfileIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/account/profile/$userId/build-collections': typeof AccountProfileUserIdBuildCollectionsRoute
   '/account/profile/$userId/collection-stats': typeof AccountProfileUserIdCollectionStatsRoute
@@ -153,12 +192,17 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$gameId': typeof GameIdRouteRouteWithChildren
+  '/profile': typeof ProfileRouteRouteWithChildren
   '/changelog': typeof ChangelogRoute
-  '/profile': typeof ProfileRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/$gameId/items': typeof GameIdItemsRoute
   '/api/health': typeof ApiHealthRoute
+  '/profile/build-collections': typeof ProfileBuildCollectionsRoute
+  '/profile/collection-stats': typeof ProfileCollectionStatsRoute
+  '/profile/created-builds': typeof ProfileCreatedBuildsRoute
+  '/profile/liked-builds': typeof ProfileLikedBuildsRoute
+  '/profile/': typeof ProfileIndexRoute
   '/account/profile/$userId': typeof AccountProfileUserIdRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/account/profile/$userId/build-collections': typeof AccountProfileUserIdBuildCollectionsRoute
@@ -173,12 +217,17 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$gameId'
-    | '/changelog'
     | '/profile'
+    | '/changelog'
     | '/sign-in'
     | '/sign-up'
     | '/$gameId/items'
     | '/api/health'
+    | '/profile/build-collections'
+    | '/profile/collection-stats'
+    | '/profile/created-builds'
+    | '/profile/liked-builds'
+    | '/profile/'
     | '/account/profile/$userId'
     | '/api/auth/$'
     | '/account/profile/$userId/build-collections'
@@ -192,11 +241,15 @@ export interface FileRouteTypes {
     | '/'
     | '/$gameId'
     | '/changelog'
-    | '/profile'
     | '/sign-in'
     | '/sign-up'
     | '/$gameId/items'
     | '/api/health'
+    | '/profile/build-collections'
+    | '/profile/collection-stats'
+    | '/profile/created-builds'
+    | '/profile/liked-builds'
+    | '/profile'
     | '/api/auth/$'
     | '/account/profile/$userId/build-collections'
     | '/account/profile/$userId/collection-stats'
@@ -208,12 +261,17 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$gameId'
-    | '/changelog'
     | '/profile'
+    | '/changelog'
     | '/sign-in'
     | '/sign-up'
     | '/$gameId/items'
     | '/api/health'
+    | '/profile/build-collections'
+    | '/profile/collection-stats'
+    | '/profile/created-builds'
+    | '/profile/liked-builds'
+    | '/profile/'
     | '/account/profile/$userId'
     | '/api/auth/$'
     | '/account/profile/$userId/build-collections'
@@ -227,8 +285,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GameIdRouteRoute: typeof GameIdRouteRouteWithChildren
+  ProfileRouteRoute: typeof ProfileRouteRouteWithChildren
   ChangelogRoute: typeof ChangelogRoute
-  ProfileRoute: typeof ProfileRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   ApiHealthRoute: typeof ApiHealthRoute
@@ -252,18 +310,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/changelog': {
       id: '/changelog'
       path: '/changelog'
       fullPath: '/changelog'
       preLoaderRoute: typeof ChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$gameId': {
@@ -279,6 +337,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/profile/': {
+      id: '/profile/'
+      path: '/'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof ProfileRouteRoute
+    }
+    '/profile/liked-builds': {
+      id: '/profile/liked-builds'
+      path: '/liked-builds'
+      fullPath: '/profile/liked-builds'
+      preLoaderRoute: typeof ProfileLikedBuildsRouteImport
+      parentRoute: typeof ProfileRouteRoute
+    }
+    '/profile/created-builds': {
+      id: '/profile/created-builds'
+      path: '/created-builds'
+      fullPath: '/profile/created-builds'
+      preLoaderRoute: typeof ProfileCreatedBuildsRouteImport
+      parentRoute: typeof ProfileRouteRoute
+    }
+    '/profile/collection-stats': {
+      id: '/profile/collection-stats'
+      path: '/collection-stats'
+      fullPath: '/profile/collection-stats'
+      preLoaderRoute: typeof ProfileCollectionStatsRouteImport
+      parentRoute: typeof ProfileRouteRoute
+    }
+    '/profile/build-collections': {
+      id: '/profile/build-collections'
+      path: '/build-collections'
+      fullPath: '/profile/build-collections'
+      preLoaderRoute: typeof ProfileBuildCollectionsRouteImport
+      parentRoute: typeof ProfileRouteRoute
     }
     '/api/health': {
       id: '/api/health'
@@ -365,6 +458,26 @@ const GameIdRouteRouteWithChildren = GameIdRouteRoute._addFileChildren(
   GameIdRouteRouteChildren,
 )
 
+interface ProfileRouteRouteChildren {
+  ProfileBuildCollectionsRoute: typeof ProfileBuildCollectionsRoute
+  ProfileCollectionStatsRoute: typeof ProfileCollectionStatsRoute
+  ProfileCreatedBuildsRoute: typeof ProfileCreatedBuildsRoute
+  ProfileLikedBuildsRoute: typeof ProfileLikedBuildsRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
+}
+
+const ProfileRouteRouteChildren: ProfileRouteRouteChildren = {
+  ProfileBuildCollectionsRoute: ProfileBuildCollectionsRoute,
+  ProfileCollectionStatsRoute: ProfileCollectionStatsRoute,
+  ProfileCreatedBuildsRoute: ProfileCreatedBuildsRoute,
+  ProfileLikedBuildsRoute: ProfileLikedBuildsRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
+}
+
+const ProfileRouteRouteWithChildren = ProfileRouteRoute._addFileChildren(
+  ProfileRouteRouteChildren,
+)
+
 interface AccountProfileUserIdRouteRouteChildren {
   AccountProfileUserIdBuildCollectionsRoute: typeof AccountProfileUserIdBuildCollectionsRoute
   AccountProfileUserIdCollectionStatsRoute: typeof AccountProfileUserIdCollectionStatsRoute
@@ -395,8 +508,8 @@ const AccountProfileUserIdRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GameIdRouteRoute: GameIdRouteRouteWithChildren,
+  ProfileRouteRoute: ProfileRouteRouteWithChildren,
   ChangelogRoute: ChangelogRoute,
-  ProfileRoute: ProfileRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   ApiHealthRoute: ApiHealthRoute,
