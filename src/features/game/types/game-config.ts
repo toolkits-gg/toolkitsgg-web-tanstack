@@ -1,5 +1,6 @@
 import type { createSearchParamsCache } from "nuqs/server";
 import type { LogoSize } from "#/components/AppLogo";
+import type { GameAvatar } from "#/features/game/types/game-avatar";
 import type { AppItem } from "#/features/game/item/types/app-item";
 import type { ToolkitThemeDefinition } from "#/features/theme/types/toolkit-theme-definition";
 import type { GameId } from "@/prisma";
@@ -38,6 +39,7 @@ type GameConfig<
 	PAGES: GamePages;
 	SEARCH_PARAMS: ReturnType<typeof createSearchParamsCache> | undefined;
 	THEME: ToolkitThemeDefinition | undefined;
+	AVATARS?: GameAvatar[];
 };
 
 export type { GameConfig, GameMetadata, GamePages };

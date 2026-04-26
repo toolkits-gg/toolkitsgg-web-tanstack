@@ -2,6 +2,7 @@ import { Flex, ScrollArea } from "@mantine/core";
 import { ClientOnly } from "@tanstack/react-router";
 import { getNavLinks } from "#/components/navigation/get-nav-links";
 import { NavbarLinksGroup } from "#/components/navigation/NavbarLinksGroup";
+import { UserMenu } from "#/features/auth/components/UserMenu";
 import { useGameId } from "#/features/game/hooks/use-game-id";
 import { ChangeThemeButton } from "#/features/theme/components/ChangeThemeButton";
 import classes from "./AppNavbar.module.css";
@@ -38,7 +39,11 @@ const AppNavbar = ({ onGettingStartedWizard }: AppNavbarProps) => {
 				<ChangeThemeButton gameId="none" />
 			</Flex>
 
-			<Flex className={classes.userMenuWrapper}>User Menu</Flex>
+			<ClientOnly fallback={<Flex className={classes.userMenuWrapper} />}>
+				<Flex className={classes.userMenuWrapper}>
+					<UserMenu />
+				</Flex>
+			</ClientOnly>
 		</Flex>
 	);
 };

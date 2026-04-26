@@ -1,5 +1,6 @@
 import type { LogoSize } from "#/components/AppLogo";
 import type { AppItem } from "#/features/game/item/types/app-item";
+import type { GameAvatar } from "#/features/game/types/game-avatar";
 import type { GameConfig } from "#/features/game/types/game-config";
 import { defaultTheme } from "#/features/theme/themes/default-theme";
 import type { ToolkitThemeDefinition } from "#/features/theme/types/toolkit-theme-definition";
@@ -72,6 +73,12 @@ function getGamePages(gameId: string): AnyGameConfig["PAGES"] | undefined {
 	return GAME_REGISTRY[gameId as RegistryGameId]?.PAGES;
 }
 
+// Avatars shortcut — returns AVATARS array or undefined
+function getGameAvatars(gameId: string): GameAvatar[] | undefined {
+	return (GAME_REGISTRY[gameId as RegistryGameId] as AnyGameConfig | undefined)
+		?.AVATARS;
+}
+
 // Type-safe overload when the caller already holds a literal RegistryGameId.
 // Return type preserves the original narrow generics from satisfies.
 function getGameConfigTyped<TId extends RegistryGameId>(
@@ -125,6 +132,7 @@ export {
 	REGISTERED_GAME_IDS,
 	getAllRegisteredThemeClassNames,
 	getAllRegisteredThemeDefinitions,
+	getGameAvatars,
 	getGameConfig,
 	getGameLogo,
 	getGameItems,
