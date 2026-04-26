@@ -47,7 +47,7 @@ export function UserMenu() {
 	const subtitle = isAuthenticated ? (session?.user.email ?? "") : "Local account";
 	const profileHref = isAuthenticated && session?.user.id
 		? `/account/profile/${session.user.id}`
-		: undefined;
+		: "/profile";
 
 	const handleOpenAvatarPicker = () => {
 		modals.open({

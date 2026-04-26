@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as GameIdRouteRouteImport } from './routes/$gameId/route'
@@ -24,6 +26,16 @@ import { Route as AccountProfileUserIdCreatedBuildsRouteImport } from './routes/
 import { Route as AccountProfileUserIdCollectionStatsRouteImport } from './routes/account/profile/$userId/collection-stats'
 import { Route as AccountProfileUserIdBuildCollectionsRouteImport } from './routes/account/profile/$userId/build-collections'
 
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -107,6 +119,8 @@ export interface FileRoutesByFullPath {
   '/$gameId': typeof GameIdRouteRouteWithChildren
   '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/$gameId/items': typeof GameIdItemsRoute
   '/api/health': typeof ApiHealthRoute
   '/account/profile/$userId': typeof AccountProfileUserIdRouteRouteWithChildren
@@ -123,6 +137,8 @@ export interface FileRoutesByTo {
   '/$gameId': typeof GameIdRouteRouteWithChildren
   '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/$gameId/items': typeof GameIdItemsRoute
   '/api/health': typeof ApiHealthRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -139,6 +155,8 @@ export interface FileRoutesById {
   '/$gameId': typeof GameIdRouteRouteWithChildren
   '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/$gameId/items': typeof GameIdItemsRoute
   '/api/health': typeof ApiHealthRoute
   '/account/profile/$userId': typeof AccountProfileUserIdRouteRouteWithChildren
@@ -157,6 +175,8 @@ export interface FileRouteTypes {
     | '/$gameId'
     | '/changelog'
     | '/profile'
+    | '/sign-in'
+    | '/sign-up'
     | '/$gameId/items'
     | '/api/health'
     | '/account/profile/$userId'
@@ -173,6 +193,8 @@ export interface FileRouteTypes {
     | '/$gameId'
     | '/changelog'
     | '/profile'
+    | '/sign-in'
+    | '/sign-up'
     | '/$gameId/items'
     | '/api/health'
     | '/api/auth/$'
@@ -188,6 +210,8 @@ export interface FileRouteTypes {
     | '/$gameId'
     | '/changelog'
     | '/profile'
+    | '/sign-in'
+    | '/sign-up'
     | '/$gameId/items'
     | '/api/health'
     | '/account/profile/$userId'
@@ -205,6 +229,8 @@ export interface RootRouteChildren {
   GameIdRouteRoute: typeof GameIdRouteRouteWithChildren
   ChangelogRoute: typeof ChangelogRoute
   ProfileRoute: typeof ProfileRoute
+  SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
   ApiHealthRoute: typeof ApiHealthRoute
   AccountProfileUserIdRouteRoute: typeof AccountProfileUserIdRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -212,6 +238,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -357,6 +397,8 @@ const rootRouteChildren: RootRouteChildren = {
   GameIdRouteRoute: GameIdRouteRouteWithChildren,
   ChangelogRoute: ChangelogRoute,
   ProfileRoute: ProfileRoute,
+  SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
   ApiHealthRoute: ApiHealthRoute,
   AccountProfileUserIdRouteRoute: AccountProfileUserIdRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
