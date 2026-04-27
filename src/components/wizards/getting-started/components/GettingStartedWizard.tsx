@@ -1,5 +1,3 @@
-"use client";
-
 import { useMediaQuery } from "@mantine/hooks";
 import { useGameId } from "#/features/game/hooks/use-game-id";
 import { LOCALSTORAGE_KEY_PREFIX } from "@/components/wizards/getting-started/constants/localstorage-keys";

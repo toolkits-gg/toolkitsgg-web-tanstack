@@ -1,5 +1,3 @@
-"use client";
-
 import { Button, Stack } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { SiDiscord, SiKofi, SiPatreon, SiPaypal } from "react-icons/si";

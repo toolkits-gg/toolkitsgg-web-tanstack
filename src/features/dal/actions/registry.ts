@@ -1,5 +1,6 @@
 import { collectedItemActions } from "#/features/dal/actions/collected-items";
 import { favoriteGameActions } from "#/features/dal/actions/favorite-games";
+import { userProfileActions } from "#/features/dal/actions/user-profile";
 import type { DalWriteAction } from "#/features/dal/core/types";
 
 const writeActions: Array<DalWriteAction<unknown, unknown>> = [
@@ -7,6 +8,15 @@ const writeActions: Array<DalWriteAction<unknown, unknown>> = [
 	collectedItemActions.uncollect as unknown as DalWriteAction<unknown, unknown>,
 	favoriteGameActions.favorite as unknown as DalWriteAction<unknown, unknown>,
 	favoriteGameActions.unfavorite as unknown as DalWriteAction<unknown, unknown>,
+	userProfileActions.updateAvatar as unknown as DalWriteAction<unknown, unknown>,
+	userProfileActions.removeAvatarOverride as unknown as DalWriteAction<
+		unknown,
+		unknown
+	>,
+	userProfileActions.removePrimaryAvatar as unknown as DalWriteAction<
+		unknown,
+		unknown
+	>,
 ];
 
 export function resolveWriteAction(

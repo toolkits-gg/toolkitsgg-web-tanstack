@@ -1,5 +1,3 @@
-"use client";
-
 import { Button, Stack } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { SiDiscord, SiGithub } from "react-icons/si";

@@ -11,6 +11,7 @@ import { useNetwork } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { resolveWriteAction } from "#/features/dal/actions/registry";
 import {
 	clearSynced,
@@ -29,6 +30,9 @@ function DataSync() {
 	const { data: session } = useSession();
 	const { online } = useNetwork();
 	const queryClient = useQueryClient();
+
+	const [mounted, setMounted] = useState(false);
+	useEffect(() => setMounted(true), []);
 
 	const pending = usePendingOps();
 	const canSync = !!session?.user?.id && online;
@@ -85,7 +89,7 @@ function DataSync() {
 					</Button>
 				</Group>
 			</Group>
-			{!canSync ? (
+			{mounted && !canSync ? (
 				<Text size="sm" c="dimmed">
 					Sign in and come online to push pending changes.
 				</Text>
