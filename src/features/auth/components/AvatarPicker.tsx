@@ -17,23 +17,18 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
-import {
-	LuCheck,
-	LuChevronDown,
-	LuSearch,
-	LuX,
-} from "react-icons/lu";
-import { favoriteGameActions } from "#/features/dal/actions/favorite-games";
-import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
+import { LuCheck, LuChevronDown, LuSearch, LuX } from "react-icons/lu";
 import { useUserProfile } from "#/features/auth/hooks/use-user-profile";
 import { avatarImageUrl } from "#/features/auth/utils/resolve-avatar";
+import { favoriteGameActions } from "#/features/dal/actions/favorite-games";
+import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
+import { useGameId } from "#/features/game/hooks/use-game-id";
 import {
 	getGameAvatars,
 	getGameConfig,
 	getGameLogo,
 	REGISTERED_GAME_IDS,
 } from "#/features/game/registry/game-registry";
-import { useGameId } from "#/features/game/hooks/use-game-id";
 import type { GameAvatar } from "#/features/game/types/game-avatar";
 import type { GameId } from "@/prisma";
 import classes from "./AvatarPicker.module.css";
@@ -44,12 +39,14 @@ type GameWithAvatars = {
 	avatars: GameAvatar[];
 };
 
-const gamesWithAvatars: GameWithAvatars[] = REGISTERED_GAME_IDS.flatMap((id) => {
-	const config = getGameConfig(id);
-	const avatars = getGameAvatars(id);
-	if (!avatars?.length || !config) return [];
-	return [{ gameId: id as GameId, label: config.METADATA.label, avatars }];
-});
+const gamesWithAvatars: GameWithAvatars[] = REGISTERED_GAME_IDS.flatMap(
+	(id) => {
+		const config = getGameConfig(id);
+		const avatars = getGameAvatars(id);
+		if (!avatars?.length || !config) return [];
+		return [{ gameId: id as GameId, label: config.METADATA.label, avatars }];
+	},
+);
 
 function findAvatarImage(
 	avatarId: string,
@@ -58,7 +55,7 @@ function findAvatarImage(
 	const avatars = getGameAvatars(gameId);
 	const avatar = avatars?.find((a) => a.id === avatarId);
 	if (!avatar) return null;
-	return { avatar, imageUrl: avatarImageUrl(avatar.imageUrl) };
+	return { avatar, imageUrl: avatarImageUrl(avatar.imageUrl, gameId) };
 }
 
 function getDefaultBrowsingGameId(
@@ -96,10 +93,14 @@ export function AvatarPicker() {
 		getDefaultBrowsingGameId(gameId, favoriteGameIds),
 	);
 	const [gameSearch, setGameSearch] = useState("");
-	const [gamePickerOpened, { toggle: toggleGamePicker, close: closeGamePicker }] =
-		useDisclosure(false);
+	const [
+		gamePickerOpened,
+		{ toggle: toggleGamePicker, close: closeGamePicker },
+	] = useDisclosure(false);
 
-	const browsingGame = gamesWithAvatars.find((g) => g.gameId === browsingGameId);
+	const browsingGame = gamesWithAvatars.find(
+		(g) => g.gameId === browsingGameId,
+	);
 	const overrideForBrowsedGame = avatarOverrides.find(
 		(o) => o.gameId === browsingGameId,
 	);
@@ -116,7 +117,10 @@ export function AvatarPicker() {
 			? avatarOverrides.find((o) => o.gameId === browsingGameId)
 			: null;
 	const gameSpecificAvatar = browsingGameOverride
-		? findAvatarImage(browsingGameOverride.avatarId, browsingGameOverride.avatarGameId)
+		? findAvatarImage(
+				browsingGameOverride.avatarId,
+				browsingGameOverride.avatarGameId,
+			)
 		: null;
 
 	const filteredGames = gamesWithAvatars.filter((g) =>
@@ -151,7 +155,10 @@ export function AvatarPicker() {
 		if (!selectedAvatarId || !selectedGameId) return;
 		setSelectedAvatarId(null);
 		setSelectedGameId(null);
-		await updateAvatar({ avatarId: selectedAvatarId, avatarGameId: selectedGameId });
+		await updateAvatar({
+			avatarId: selectedAvatarId,
+			avatarGameId: selectedGameId,
+		});
 	};
 
 	const handleRemovePrimary = async () => {
@@ -220,7 +227,7 @@ export function AvatarPicker() {
 				>
 					<Stack gap={4} align="center">
 						<Avatar
-							src={avatarImageUrl(avatar.imageUrl)}
+							src={avatarImageUrl(avatar.imageUrl, game.gameId)}
 							alt={avatar.name}
 							size={56}
 							radius="sm"
@@ -321,10 +328,15 @@ export function AvatarPicker() {
 					<>
 						<Divider orientation="vertical" />
 						<Group gap="xs">
-							<Avatar src={gameSpecificAvatar?.imageUrl} size={40} radius="sm" />
+							<Avatar
+								src={gameSpecificAvatar?.imageUrl}
+								size={40}
+								radius="sm"
+							/>
 							<Stack gap={0}>
 								<Text size="xs" fw={600}>
-									{getGameConfig(browsingGameId)?.METADATA.label ?? browsingGameId}
+									{getGameConfig(browsingGameId)?.METADATA.label ??
+										browsingGameId}
 								</Text>
 								<Text size="xs" c="dimmed">
 									{gameSpecificAvatar

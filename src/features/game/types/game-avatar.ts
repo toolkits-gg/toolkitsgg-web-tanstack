@@ -5,6 +5,4 @@ type GameAvatar = {
 	category?: string;
 };
 
-type GameAvatars = GameAvatar[];
-
-export type { GameAvatar, GameAvatars };
+export type { GameAvatar };

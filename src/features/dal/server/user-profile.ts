@@ -1,8 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireUserId } from "#/features/dal/server/require-user";
+import { getOptionalUserId, requireUserId } from "#/features/dal/server/require-user";
 import { getGameAvatars } from "#/features/game/registry/game-registry";
 import { GameId, prisma } from "@/prisma";
+
+export const getViewerUserIdServerFn = createServerFn({ method: "GET" }).handler(
+	async () => getOptionalUserId(),
+);
 
 export const getUserProfileServerFn = createServerFn({ method: "GET" }).handler(
 	async () => {

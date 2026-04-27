@@ -1,10 +1,9 @@
 import { Box, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
-import { useSession } from "#/integrations/better-auth/auth-client";
 import { ProfileHeader } from "#/features/auth/components/ProfileHeader";
 import { ProfileTabNav } from "#/features/auth/components/ProfileTabNav";
 import { resolveAvatar } from "#/features/auth/utils/resolve-avatar";
-import { getPublicUserProfileServerFn } from "#/features/dal/server/user-profile";
+import { getPublicUserProfileServerFn, getViewerUserIdServerFn } from "#/features/dal/server/user-profile";
 import type { GameId } from "@/prisma";
 
 export const Route = createFileRoute("/account/profile/$userId")({
@@ -13,7 +12,8 @@ export const Route = createFileRoute("/account/profile/$userId")({
 			data: { userId: params.userId },
 		});
 		if (!user?.userProfile) throw notFound();
-		return { user };
+		const viewerUserId = await getViewerUserIdServerFn();
+		return { user, isOwner: viewerUserId === user.id };
 	},
 	notFoundComponent: () => (
 		<Box p="md">
@@ -25,11 +25,9 @@ export const Route = createFileRoute("/account/profile/$userId")({
 });
 
 function ProfileLayout() {
-	const { user } = Route.useLoaderData();
-	const { data: session } = useSession();
+	const { user, isOwner } = Route.useLoaderData();
 	const { userId } = Route.useParams();
 
-	const isOwner = !!session?.user && session.user.id === user.id;
 	const profile = user.userProfile!;
 
 	const { avatarUrl: serverAvatarUrl } = resolveAvatar({
