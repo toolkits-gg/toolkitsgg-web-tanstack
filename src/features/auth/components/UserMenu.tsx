@@ -44,10 +44,13 @@ export function UserMenu() {
 		.slice(0, 2)
 		.toUpperCase();
 
-	const subtitle = isAuthenticated ? (session?.user.email ?? "") : "Local account";
-	const profileHref = isAuthenticated && session?.user.id
-		? `/account/profile/${session.user.id}`
-		: "/profile";
+	const subtitle = isAuthenticated
+		? (session?.user.email ?? "")
+		: "Local account";
+	const profileHref =
+		isAuthenticated && session?.user.id
+			? `/account/profile/${session.user.id}`
+			: "/profile";
 
 	const handleOpenAvatarPicker = () => {
 		modals.open({
@@ -63,7 +66,7 @@ export function UserMenu() {
 	};
 
 	return (
-		<Group justify="center" w="100%">
+		<Group justify="center" w="100%" data-wizard-target="user-menu">
 			<Menu
 				withArrow
 				width={300}
@@ -108,12 +111,7 @@ export function UserMenu() {
 								{subtitle}
 							</Text>
 							{profileHref && (
-								<Text
-									size="xs"
-									c="primary"
-									component="a"
-									href={profileHref}
-								>
+								<Text size="xs" c="primary" component="a" href={profileHref}>
 									View your profile
 								</Text>
 							)}
@@ -124,17 +122,13 @@ export function UserMenu() {
 
 					<Menu.Label>Builds</Menu.Label>
 					<Menu.Item
-						leftSection={
-							<LuHeart size={16} color={theme.colors.red[6]} />
-						}
+						leftSection={<LuHeart size={16} color={theme.colors.red[6]} />}
 						disabled
 					>
 						Liked builds
 					</Menu.Item>
 					<Menu.Item
-						leftSection={
-							<LuStar size={16} color={theme.colors.yellow[6]} />
-						}
+						leftSection={<LuStar size={16} color={theme.colors.yellow[6]} />}
 						disabled
 					>
 						Saved builds
@@ -186,20 +180,10 @@ export function UserMenu() {
 							</Button>
 						) : (
 							<Flex align="center" justify="space-between" w="100%" gap="md">
-								<Button
-									component="a"
-									href="/sign-up"
-									w="100%"
-									variant="filled"
-								>
+								<Button component="a" href="/sign-up" w="100%" variant="filled">
 									Sign up
 								</Button>
-								<Button
-									component="a"
-									href="/sign-in"
-									w="100%"
-									variant="subtle"
-								>
+								<Button component="a" href="/sign-in" w="100%" variant="subtle">
 									Sign in
 								</Button>
 							</Flex>
