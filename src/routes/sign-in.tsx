@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { LuSwords } from "react-icons/lu";
+import { SiDiscord } from "react-icons/si";
 import { authClient } from "#/integrations/better-auth/auth-client";
 
 export const Route = createFileRoute("/sign-in")({ component: SignInPage });
@@ -59,8 +59,8 @@ function SignInPage() {
 				</Title>
 				<Stack>
 					<Button
-						leftSection={<LuSwords size={18} />}
-						variant="default"
+						leftSection={<SiDiscord size={18} />}
+						color="secondary.5"
 						onClick={handleDiscord}
 						fullWidth
 					>
