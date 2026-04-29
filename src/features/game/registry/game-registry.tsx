@@ -30,6 +30,10 @@ function isRegisteredGameId(id: string): id is RegistryGameId {
 	return id in GAME_REGISTRY;
 }
 
+function getValidatedGameId(id: string): GameId | undefined {
+	return id in GAME_REGISTRY ? (id as GameId) : undefined;
+}
+
 // Generic runtime lookup — returns widened AnyGameConfig or undefined
 function getGameConfig(gameId: string): AnyGameConfig | undefined {
 	return GAME_REGISTRY[gameId as RegistryGameId];
@@ -142,6 +146,7 @@ export {
 	getGameTheme,
 	getGameConfigTyped,
 	isRegisteredGameId,
+	getValidatedGameId,
 };
 
 export type { AnyGameConfig, RegistryGameId };
