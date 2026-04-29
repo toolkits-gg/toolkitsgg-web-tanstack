@@ -27,7 +27,11 @@ const MantineProviderWithTheme = ({
 			disableTransitionOnChange
 			themes={allThemeClassNames}
 		>
-			<MantineProvider theme={mantineTheme} defaultColorScheme="dark">
+			<MantineProvider
+				theme={mantineTheme}
+				defaultColorScheme="dark"
+				deduplicateCssVariables
+			>
 				<SyncAndApplyTheme />
 				<SyncFavicon />
 				<Notifications />

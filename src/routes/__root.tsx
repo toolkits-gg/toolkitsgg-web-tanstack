@@ -27,16 +27,13 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import { DefaultLogo } from "#/components/AppLogo";
+import { AppProviders } from "#/components/AppProviders";
 import { AppNavbar } from "#/components/navigation/AppNavbar";
 import { SocialMedia } from "#/components/SocialMedia";
 import { GettingStartedWizard } from "#/components/wizards/getting-started/components/GettingStartedWizard";
 import { useGettingStartedWizard } from "#/components/wizards/getting-started/hooks/use-getting-started-wizard";
-import { GameProvider } from "#/features/game/components/GameProvider";
 import { GameSwitcher } from "#/features/game/components/GameSwitcher";
-import { ScreenshotPreviewProvider } from "#/features/screenshot/providers/ScreenshotPreviewProvider";
-import { MantineProviderWithTheme } from "#/features/theme/providers/MantineProviderWithTheme";
 import classes from "./Root.module.css";
 
 interface MyRouterContext {
@@ -105,71 +102,64 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					fontFamily: `'Geist', sans-serif`,
 				}}
 			>
-				<NuqsAdapter>
-					<GameProvider>
-						<MantineProviderWithTheme>
-							<ScreenshotPreviewProvider />
-							<AppShell
-								padding="md"
-								header={{ height: 60 }}
-								footer={{ height: 48 }}
-								navbar={{
-									width: 300,
-									breakpoint: "sm",
-									collapsed: { mobile: !navbarOpened },
-								}}
-							>
-								<AppShell.Header px="sm" className={classes.header}>
-									<Group h="100%" justify="space-between">
-										<Flex justify="start" align="center">
-											<Burger
-												opened={navbarOpened}
-												onClick={toggleNavbar}
-												hiddenFrom="sm"
-												size="sm"
-												color="var(--mantine-color-primary-4)"
-											/>
-										</Flex>
+				<AppProviders>
+					<AppShell
+						padding="md"
+						header={{ height: 60 }}
+						footer={{ height: 48 }}
+						navbar={{
+							width: 300,
+							breakpoint: "sm",
+							collapsed: { mobile: !navbarOpened },
+						}}
+					>
+						<AppShell.Header px="sm" className={classes.header}>
+							<Group h="100%" justify="space-between">
+								<Flex justify="start" align="center">
+									<Burger
+										opened={navbarOpened}
+										onClick={toggleNavbar}
+										hiddenFrom="sm"
+										size="sm"
+										color="var(--mantine-color-primary-4)"
+									/>
+								</Flex>
 
-										<Flex flex={1} align="center" justify="center" gap="xs">
-											<GameSwitcher />
-										</Flex>
+								<Flex flex={1} align="center" justify="center" gap="xs">
+									<GameSwitcher />
+								</Flex>
 
-										<Flex justify="end" align="center">
-											{/* <NotificationBellMenu /> */}
-										</Flex>
-									</Group>
-								</AppShell.Header>
+								<Flex justify="end" align="center">
+									{/* <NotificationBellMenu /> */}
+								</Flex>
+							</Group>
+						</AppShell.Header>
 
-								<AppShell.Navbar className={classes.navbar}>
-									<AppNavbar onGettingStartedWizard={openWizard} />
-								</AppShell.Navbar>
+						<AppShell.Navbar className={classes.navbar}>
+							<AppNavbar onGettingStartedWizard={openWizard} />
+						</AppShell.Navbar>
 
-								<AppShell.Main className={classes.main}>
-									{children}
-								</AppShell.Main>
+						<AppShell.Main className={classes.main}>{children}</AppShell.Main>
 
-								<AppShell.Footer p="xs" className={classes.footer}>
-									<Flex justify="center" align="center" gap="sm" wrap="wrap">
-										<DefaultLogo size={24} />
-										<Text size="xs" c="dimmed">
-											© {new Date().getFullYear()} Toolkits.gg
-										</Text>
-										<Divider orientation="vertical" />
-										<SocialMedia />
-									</Flex>
-								</AppShell.Footer>
-								<GettingStartedWizard
-									opened={wizardOpened}
-									onClose={closeWizard}
-									navbarOpened={navbarOpened}
-									toggleNavbar={toggleNavbar}
-									onStepChange={setCurrentWizardStepId}
-								/>
-							</AppShell>
-						</MantineProviderWithTheme>
-					</GameProvider>
-				</NuqsAdapter>
+						<AppShell.Footer p="xs" className={classes.footer}>
+							<Flex justify="center" align="center" gap="sm" wrap="wrap">
+								<DefaultLogo size={24} />
+								<Text size="xs" c="dimmed">
+									© {new Date().getFullYear()} Toolkits.gg
+								</Text>
+								<Divider orientation="vertical" />
+								<SocialMedia />
+							</Flex>
+						</AppShell.Footer>
+						<GettingStartedWizard
+							opened={wizardOpened}
+							onClose={closeWizard}
+							navbarOpened={navbarOpened}
+							toggleNavbar={toggleNavbar}
+							onStepChange={setCurrentWizardStepId}
+						/>
+					</AppShell>
+				</AppProviders>
 
 				<TanStackDevtools
 					config={{
