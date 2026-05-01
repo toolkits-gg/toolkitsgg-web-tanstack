@@ -14,23 +14,31 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { LuCamera, LuCheck, LuPlus } from "react-icons/lu";
 import { GameImage } from "#/components/GameImage";
-import { ScreenshotContainer, type WatermarkConfig } from "#/features/screenshot/components/ScreenshotContainer";
-import { useScreenshot } from "#/features/screenshot/hooks/use-screenshot";
-import { useGameId } from "#/features/game/hooks/use-game-id";
-import { getGameMetadata } from "#/features/game/registry/game-registry";
-import type { AppItem } from "#/features/game/item/types/app-item";
-import { collectedItemActions } from "#/features/dal/actions/collected-items";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
+import { useGameId } from "#/features/game/hooks/use-game-id";
+import type { AppItem } from "#/features/game/item/types/app-item";
+import { getGameMetadata } from "#/features/game/registry/game-registry";
+import type {
+	CollectItemInput,
+	GameCollectedItemsDal,
+} from "#/features/game/types/game-config";
+import {
+	ScreenshotContainer,
+	type WatermarkConfig,
+} from "#/features/screenshot/components/ScreenshotContainer";
+import { useScreenshot } from "#/features/screenshot/hooks/use-screenshot";
 
 type ItemInfoModalProps = {
 	item: AppItem;
+	dal: GameCollectedItemsDal;
 	isCollectable: boolean;
-	onCollect: (id: string) => void;
-	onUncollect: (id: string) => void;
+	onCollect: ({ itemId, itemName }: CollectItemInput) => void;
+	onUncollect: ({ itemId, itemName }: CollectItemInput) => void;
 };
 
 const ItemInfoModal = ({
 	item,
+	dal,
 	isCollectable,
 	onCollect,
 	onUncollect,
@@ -41,7 +49,11 @@ const ItemInfoModal = ({
 	const gameId = useGameId();
 	const metadata = getGameMetadata(gameId);
 	const watermark: WatermarkConfig | false = metadata
-		? { gameConfig: { METADATA: { renderLogo: metadata.renderLogo, label: metadata.label } } }
+		? {
+				gameConfig: {
+					METADATA: { renderLogo: metadata.renderLogo, label: metadata.label },
+				},
+			}
 		: false;
 
 	const { triggerScreenshot, screenshotLoading } = useScreenshot({
@@ -64,16 +76,16 @@ const ItemInfoModal = ({
 		triggerScreenshot();
 	};
 
-	const { data: collectedData } = useDalQuery(collectedItemActions.list, undefined);
+	const { data: collectedData } = useDalQuery(dal.list, undefined);
 	const isCollected = (collectedData ?? []).some((r) => r.itemId === item.id);
 	const hasDescription =
 		item.description.length > 0 && item.description[0] !== "";
 
 	const handleToggleCollect = () => {
 		if (isCollected) {
-			onUncollect(item.id);
+			onUncollect({ itemId: item.id, itemName: item.name });
 		} else {
-			onCollect(item.id);
+			onCollect({ itemId: item.id, itemName: item.name });
 		}
 	};
 

@@ -1,34 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getOptionalUserId, requireUserId } from "#/features/dal/server/require-user";
+import { requireUserId } from "#/features/auth/dal/require-user.server";
 import { getGameAvatars } from "#/features/game/registry/game-registry";
 import { GameId, prisma } from "@/prisma";
 
-export const getViewerUserIdServerFn = createServerFn({ method: "GET" }).handler(
-	async () => getOptionalUserId(),
-);
-
-export const getUserProfileServerFn = createServerFn({ method: "GET" }).handler(
-	async () => {
-		const userId = await requireUserId();
-		return prisma.user.findUnique({
-			where: { id: userId },
-			include: {
-				userProfile: {
-					include: { avatarOverrides: true },
-				},
-			},
-		});
-	},
-);
-
 const AvatarInput = z.object({
 	avatarId: z.string(),
-	avatarGameId: z.nativeEnum(GameId),
-	targetGameId: z.nativeEnum(GameId).optional(),
+	avatarGameId: z.enum(GameId),
+	targetGameId: z.enum(GameId).optional(),
 });
 
-export const updateAvatarServerFn = createServerFn({ method: "POST" })
+const updateAvatarServerFn = createServerFn({ method: "POST" })
 	.inputValidator((v: unknown) => AvatarInput.parse(v))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId();
@@ -72,7 +54,7 @@ export const updateAvatarServerFn = createServerFn({ method: "POST" })
 		return { ok: true as const };
 	});
 
-export const removePrimaryAvatarServerFn = createServerFn({ method: "POST" }).handler(
+const removePrimaryAvatarServerFn = createServerFn({ method: "POST" }).handler(
 	async () => {
 		const userId = await requireUserId();
 		await prisma.userProfile.update({
@@ -85,7 +67,7 @@ export const removePrimaryAvatarServerFn = createServerFn({ method: "POST" }).ha
 
 const RemoveOverrideInput = z.object({ targetGameId: z.nativeEnum(GameId) });
 
-export const removeAvatarOverrideServerFn = createServerFn({ method: "POST" })
+const removeAvatarOverrideServerFn = createServerFn({ method: "POST" })
 	.inputValidator((v: unknown) => RemoveOverrideInput.parse(v))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId();
@@ -103,21 +85,23 @@ const UpdateProfileInput = z.object({
 	bio: z.string().max(500).optional(),
 });
 
-export const updateProfileServerFn = createServerFn({ method: "POST" })
+const updateProfileServerFn = createServerFn({ method: "POST" })
 	.inputValidator((v: unknown) => UpdateProfileInput.parse(v))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId();
 		await prisma.userProfile.update({
 			where: { userId },
 			data: {
-				...(data.displayName !== undefined && { displayName: data.displayName }),
+				...(data.displayName !== undefined && {
+					displayName: data.displayName,
+				}),
 				...(data.bio !== undefined && { bio: data.bio }),
 			},
 		});
 		return { ok: true as const };
 	});
 
-export const getPublicUserProfileServerFn = createServerFn({ method: "GET" })
+const getPublicUserProfileServerFn = createServerFn({ method: "GET" })
 	.inputValidator((v: unknown) => z.object({ userId: z.string() }).parse(v))
 	.handler(async ({ data }) => {
 		return prisma.user.findUnique({
@@ -129,3 +113,11 @@ export const getPublicUserProfileServerFn = createServerFn({ method: "GET" })
 			},
 		});
 	});
+
+export {
+	updateAvatarServerFn,
+	removePrimaryAvatarServerFn,
+	removeAvatarOverrideServerFn,
+	updateProfileServerFn,
+	getPublicUserProfileServerFn,
+};

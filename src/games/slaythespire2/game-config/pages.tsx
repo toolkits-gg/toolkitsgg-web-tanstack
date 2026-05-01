@@ -4,41 +4,14 @@ import type { ReactNode } from "react";
 import { AppItemPage } from "#/features/game/item/components/AppItemPage";
 import type { AppItem } from "#/features/game/item/types/app-item";
 import type { GameFilterConfig } from "#/features/game/item/types/game-filter-config";
+import {
+	formatCategoryLabel,
+	itemMatchesCategory,
+} from "#/features/game/item/utils/filter-helpers";
 import { getItemSubcategories } from "#/features/game/item/utils/get-item-subcategories";
 import type { GamePages } from "#/features/game/types/game-config";
+import { slayTheSpire2CollectedItemsDal } from "#/games/slaythespire2/dal/collected-items";
 import { ITEMS } from "#/games/slaythespire2/game-config/items";
-
-function formatCategoryLabel(raw: string): string {
-	const selected = raw ? raw.split(",").filter(Boolean) : [];
-	if (selected.length === 0) return "";
-	if (selected.length === 1) {
-		const val = selected[0] ?? "";
-		if (val.includes(":")) {
-			const [cat, sub] = val.split(":");
-			return `${titleCase(sub ?? "")} ${titleCase(cat ?? "")}`;
-		}
-		return titleCase(val);
-	}
-	return `${selected.length} selected`;
-}
-
-function titleCase(str: string): string {
-	return str
-		.split(/[_ ]/)
-		.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-		.join(" ");
-}
-
-function itemMatchesCategory(item: AppItem, filterValue: string): boolean {
-	if (filterValue.includes(":")) {
-		const [category, subcategory] = filterValue.split(":");
-		if (String(item.category) !== category) return false;
-		return (
-			item.subcategory !== undefined && String(item.subcategory) === subcategory
-		);
-	}
-	return String(item.category) === filterValue;
-}
 
 const slayTheSpire2FilterConfig: GameFilterConfig = {
 	label: "Slay the Spire 2 Filters",
@@ -99,7 +72,7 @@ const slayTheSpire2FilterConfig: GameFilterConfig = {
 
 const PAGES: GamePages = {
 	renderItemLookup: () => (
-		<AppItemPage items={ITEMS} gameFilterConfig={slayTheSpire2FilterConfig} />
+		<AppItemPage items={ITEMS} dal={slayTheSpire2CollectedItemsDal} gameFilterConfig={slayTheSpire2FilterConfig} />
 	),
 };
 

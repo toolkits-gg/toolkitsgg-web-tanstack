@@ -1,5 +1,5 @@
+import type { ItemTag } from "#/features/game/item/types/item-tag";
 import { ARCHETYPE_COLORS } from "#/games/remnant2/constants/archetype-colors";
-import type { ItemTag } from "#/games/remnant2/types/item-tag";
 
 /**
  * These tags are highlighted inline in item descriptions throughout the toolkit.

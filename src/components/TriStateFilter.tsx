@@ -97,8 +97,7 @@ const TriStateFilter = ({
 		onChange({});
 	};
 
-	const removeItem = (itemName: string, e: React.MouseEvent) => {
-		e.stopPropagation();
+	const removeItem = (itemName: string) => {
 		const newValue = { ...value };
 		delete newValue[itemName];
 		onChange(newValue);
@@ -120,6 +119,7 @@ const TriStateFilter = ({
 						<Text size="sm" fw={500} mb="2xs">
 							{label}
 						</Text>
+						{/** biome-ignore lint/a11y/useSemanticElements: <Popover is a button, cannot nest button in button> */}
 						<div
 							role="button"
 							tabIndex={0}
@@ -152,7 +152,7 @@ const TriStateFilter = ({
 										<Pill
 											key={item}
 											withRemoveButton
-											onRemove={(e) => removeItem(item, e)}
+											onRemove={() => removeItem(item)}
 											classNames={{
 												root: classes.pillInclude,
 												remove: classes.pillRemove,
@@ -166,7 +166,7 @@ const TriStateFilter = ({
 										<Pill
 											key={item}
 											withRemoveButton
-											onRemove={(e) => removeItem(item, e)}
+											onRemove={() => removeItem(item)}
 											classNames={{
 												root: classes.pillExclude,
 												remove: classes.pillRemove,

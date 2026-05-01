@@ -5,9 +5,9 @@ import type { DalContext } from "#/features/dal/core/types";
 import { getOrCreateAnonUserId } from "#/features/dal/identity/anon-id";
 import { useSession } from "#/integrations/better-auth/auth-client";
 
-export type DalContextGetter = () => DalContext;
+type DalContextGetter = () => DalContext;
 
-export function useDalContextSource(): DalContextGetter {
+const useDalContextSource = (): DalContextGetter => {
 	const { data } = useSession();
 	const { online } = useNetwork();
 	const sourceRef = useRef<DalContext>({
@@ -23,4 +23,6 @@ export function useDalContextSource(): DalContextGetter {
 	};
 
 	return useCallback(() => sourceRef.current, []);
-}
+};
+
+export { useDalContextSource, type DalContextGetter };

@@ -14,6 +14,7 @@ pnpm test             # Run vitest once (CI-style)
 pnpm check            # Biome check (lint + format)
 pnpm format           # Biome format only
 pnpm lint             # Biome lint only
+pnpm type             # TypeScript type check (no emit)
 ```
 
 Single test: `pnpm vitest run path/to/file.test.ts` or `pnpm vitest run -t "test name"`.
@@ -35,7 +36,26 @@ Two Prisma clients are generated from a single `schema.prisma`:
 - `prisma/generated/prisma` — Postgres server client (used via `src/db.ts` and `prisma/client.ts`).
 - `prisma/generated/prisma-idb` — IndexedDB client for the browser (via `@prisma-idb/idb-client-generator`), used offline/client-side in `src/integrations/prisma-idb`.
 
-Always re-run `pnpm db:generate` after editing `schema.prisma`; both generators run together.
+Per-game Prisma models live in separate files imported by `schema.prisma`: `prisma/models/clairobscur.prisma`, `prisma/models/remnant2.prisma`, `prisma/models/slaythespire2.prisma`. When adding a new game, create a corresponding `prisma/models/<gameId>.prisma`.
+
+Always re-run `pnpm db:generate` after editing any `.prisma` file; both generators run together.
+
+## Skills
+
+Skills live in `.claude/skills/`. Use the `/skill-name` slash command or reference them when working on relevant code.
+
+| Skill | Use when |
+|---|---|
+| `tanstack-start` | Server functions, SSR, deployment |
+| `tanstack-router` | Routes, loaders, search params, link generation |
+| `tanstack-query` | `useQuery`, `useMutation`, query keys, cache invalidation |
+| `tanstack-form` | Form state, validation, field arrays |
+| `tanstack-virtual` | Virtualizing large lists |
+| `tanstack-table` | Tables, sorting, filtering, pagination |
+| `tanstack-store` | Reactive stores with `@tanstack/store` |
+| `mantine-custom-components` | Creating components with Mantine Styles API, `factory()`, compound components |
+| `better-auth-best-practices` | Auth config, plugins, session management |
+| `web-design-guidelines` | Accessibility, UX review |
 
 ## Architecture
 
@@ -52,15 +72,81 @@ Always re-run `pnpm db:generate` after editing `schema.prisma`; both generators 
 - Routes live in `src/routes/`. `routeTree.gen.ts` is **generated** — do not edit (also marked read-only in `.vscode/settings.json` and excluded from Biome).
 - Root shell is `src/routes/__root.tsx`: renders `<html>`, global providers (`GameProvider` → `MantineProviderWithTheme` → `ModalsProvider`), and the Mantine `AppShell` (header + navbar + footer).
 - Game-scoped URLs live under `src/routes/$gameId/` — the `gameId` param is written into the game store on mount.
+- Profile routes: `src/routes/profile/` (current user, must be signed in) and `src/routes/account/profile/$userId/` (public profiles).
 
 ### Game registry pattern
 
-Everything game-specific hangs off a central registry:
+Everything game-specific hangs off a central registry. Each game under `src/games/<gameId>/` exposes a `game-config/index.ts` that exports:
 
-- `src/features/game/registry/game-registry.ts` wires games keyed by `gameId` to their `GameConfig` (`ITEMS` + `THEME`).
-- Each game under `src/games/<gameId>/` exposes a `game-config/index.ts` that `satisfies GameConfig<...>` with game-specific item and category generics (e.g. `Remnant2LocalItem`, `Remnant2ItemCategory`).
-- The `GameId` enum is defined in `schema.prisma` and imported from `@/prisma`. Adding a new game means: add the enum value, create `src/games/<id>/`, then register it in `game-registry.ts`.
-- `getAllRegisteredThemeDefinitions()` expands each game theme into light+dark variants plus a base `default-light`/`default-dark`. Add themes by attaching them to a game's `game-config`, not by editing the registry output.
+```typescript
+export const GAME_CONFIG = {
+  ITEMS,        // { all, collectable, categorized, categories, uncollectableCategories }
+  THEME,        // ToolkitThemeDefinition
+  METADATA,     // id, name, label, description, faviconSourcePath, renderLogo(), externalResources[]
+  PAGES,        // { renderItemLookup: () => ReactNode }
+  SEARCH_PARAMS, // nuqs search param cache (optional)
+  AVATARS,      // GameAvatar[] (optional)
+  DAL,          // { collectedItems: GameCollectedItemsDal }
+} satisfies GameConfig<LocalItem, CategoryEnum>
+```
+
+`src/features/game/registry/game-registry.tsx` wires every `gameId` to its `GameConfig` and exports convenience functions: `getGameConfig()`, `getGameItems()`, `getGameTheme()`, `getGameMetadata()`, `getGamePages()`, `getGameAvatars()`, `getGameConfigTyped<TId>()`, `getAllRegisteredThemeDefinitions()`, `getAllRegisteredThemeClassNames()`, `isRegisteredGameId()`, `getValidatedGameId()`.
+
+The `GameId` enum is defined in `schema.prisma` and imported from `@/prisma`. `getAllRegisteredThemeDefinitions()` expands each game theme into light+dark variants plus a base `default-light`/`default-dark`.
+
+### Feature/game separation rule
+
+Game-specific logic (Prisma queries, sync handlers, server functions, DAL actions) must live in `src/games/<gameId>/`. Never add game-keyed branches or inline game handlers to files under `src/features/`.
+
+DAL actions split by scope:
+- **Cross-game** (e.g. `favoriteGames`, `userProfile`) → `src/features/dal/actions/`
+- **Game-specific** (e.g. `collectedItems`) → `src/games/<gameId>/dal/`
+
+All cross-game aggregation maps (registries) belong in `src/features/game/registry/`. When adding a new game, that folder is the single place to look for all maps that need a new entry — `game-registry.tsx`, `game-sync-handler-registry.ts`, `game-db-seed-registry.ts`, `game-idb-seed-registry.ts`, `favicon-registry.json`. Registry files may import from `src/games/` but must not contain any per-game business logic inline.
+
+### Adding a new game
+
+Follow these steps in order. The registry is the single place to check; no other `src/features/` files need changes.
+
+1. **Add the enum value** — open `prisma/schema.prisma` and append the new id to `enum GameId`.
+
+2. **Create game models** — copy an existing `prisma/models/<gameId>.prisma` as a template and create `prisma/models/<newGameId>.prisma`. Add the `@@prisma.import` line in `schema.prisma`.
+
+3. **Generate & migrate** — `pnpm db:generate && pnpm db:migrate`.
+
+4. **Scaffold the game directory** — create `src/games/<newGameId>/` with:
+
+   ```
+   game-config/
+     index.ts          # exports GAME_CONFIG satisfies GameConfig<LocalItem, CategoryEnum>
+     metadata.tsx      # id, name, label, description, faviconSourcePath, renderLogo()
+     pages.tsx         # GamePages with renderItemLookup()
+     theme.ts          # ToolkitThemeDefinition (colors, Mantine overrides)
+     items.ts          # item data + categorization
+     search-params.ts  # nuqs parsers (optional — only if custom filters needed)
+     avatars.ts        # GameAvatar[] (optional)
+     db-seed.ts        # GameDBSeed (initial Postgres data)
+     idb-seed.ts       # GameIDBSeed (initial IndexedDB data)
+   dal/
+     collected-items.ts        # defineDalRead / defineDalWrite actions
+     server/
+       sync-handler.ts         # createCollectedItemSyncHandler export
+       server-functions.ts     # TanStack Start server functions
+   types/                      # game-specific TypeScript types
+   constants/                  # game-specific constants
+   item-data/                  # raw item definitions
+   components/                 # game-specific UI (e.g. Logo.tsx)
+   ```
+
+5. **Register in all registry files** (all live in `src/features/game/registry/`):
+
+   | File | What to add |
+   |---|---|
+   | `game-registry.tsx` | Entry in `GAME_REGISTRY` object |
+   | `game-db-seed-registry.ts` | Entry in `allGameDBSeeds` |
+   | `game-idb-seed-registry.ts` | Entry in `allGameIDBSeeds` |
+   | `game-sync-handler-registry.ts` | Entry mapping entity name → `collectedItemSyncHandler` |
+   | `favicon-registry.json` | `"<gameId>": "<favicon-path>"` |
 
 ### Active-game resolution
 
@@ -77,6 +163,73 @@ A `subdomain`-sourced value deliberately wins over later `route` writes — be c
 - `MantineProviderWithTheme` reads the active Mantine theme from `theme-store.ts` and feeds `next-themes` with the full list of registered theme class names (`getAllRegisteredThemeClassNames()`), so `html[data-theme]`/`className` toggling is driven off the registry.
 - `SyncAndApplyTheme` syncs `next-themes` ↔ the Mantine store and persists `autoChangeTheme` in `localStorage`.
 
+### DAL (offline-first)
+
+The DAL (`src/features/dal/`) is an offline-first data layer. Every read/write executes against either a **remote** backend (TanStack Start server functions → Postgres) or a **local** backend (IndexedDB). The backend is chosen automatically: remote when the user is authenticated and online, local otherwise. Local writes are queued as `PendingOp`s and synced later with last-write-wins conflict resolution.
+
+```
+Component
+  └─ useDalQuery / useDalMutation
+       └─ DalContext { anonUserId, authUserId, backend }
+            ├─ "remote"  →  action.remote(input, ctx)   (server function)
+            └─ "local"   →  action.local(input, ctx)    (IndexedDB)
+                                 └─ [writes] enqueueOp() → PendingOp → syncOps()
+```
+
+**Key types:**
+
+```typescript
+interface DalContext {
+  anonUserId: string;        // UUID from localStorage — always present
+  authUserId: string | null; // set when signed in
+  backend: "remote" | "local";
+}
+```
+
+Use `ctx.authUserId ?? ctx.anonUserId` as the stable local user ID.
+
+**Define actions** with the factory helpers:
+
+```typescript
+import { defineDalRead, defineDalWrite } from "#/features/dal/core/define-action";
+
+// Read
+const list = defineDalRead<void, MyItem[]>({
+  queryKey: () => ["myEntity", "list"],
+  remote: async (_input, _ctx) => myListServerFn(),
+  local: async (_input, ctx) => listLocalItems(ctx.authUserId ?? ctx.anonUserId),
+});
+
+// Write
+const upsert = defineDalWrite<MyInput, MyItem>({
+  entity: "myEntity",
+  operation: "upsert",
+  invalidates: ["myEntity"],
+  buildIdempotencyKey: (input, ctx) => `myEntity:upsert:${ctx.anonUserId}:${input.id}`,
+  remote: async (input, _ctx) => myUpsertServerFn({ data: input }),
+  local: async (input, ctx) => upsertLocalItem({ userId: ctx.authUserId ?? ctx.anonUserId, ...input }),
+  sync: (op) => applyPendingOpServerFn({ data: op }),
+});
+```
+
+**Use in components:**
+
+```typescript
+const { data } = useDalQuery(myActions.list, undefined);
+const mutation = useDalMutation(myActions.upsert);
+mutation.mutate({ id: "...", value: "..." });
+```
+
+**Server helpers** (use inside server functions only):
+
+```typescript
+import { requireUserId, getOptionalUserId } from "#/features/dal/server/require-user";
+const userId = await requireUserId();   // throws 401 if no session
+const userId = await getOptionalUserId(); // returns null if unauthenticated
+```
+
+See `src/features/dal/README.md` for the full sync queue, conflict resolution, and testing documentation.
+
 ### Imports & path aliases
 
 Three aliases resolve to the same place — use the one already in the file:
@@ -87,7 +240,11 @@ Three aliases resolve to the same place — use the one already in the file:
 
 ### Env vars
 
-Validated with zod in `src/config/env.ts`. Server keys (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DISCORD_*`, `IMAGEKIT_*`, `RESEND_KEY`) come from `process.env`; client keys must be `VITE_*` and come from `import.meta.env`. `.env.local.example` is the template.
+Validated with zod in `src/config/env.ts` (server) and `src/config/client-env.ts` (client). `.env.local.example` is the template.
+
+Server keys (from `process.env`): `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `IMAGEKIT_CLIENT_ID`, `IMAGEKIT_CLIENT_SECRET`, `IMAGEKIT_ENDPOINT_URL`, `RESEND_KEY`.
+
+Client keys must be `VITE_*` (from `import.meta.env`): `VITE_APP_NAME`, `VITE_APP_URL`, `VITE_CLOUDFRONT_URL`.
 
 ## Code style
 

@@ -10,6 +10,7 @@ import {
 	useMantineTheme,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
 	LuCamera,
@@ -28,6 +29,7 @@ import classes from "./UserMenu.module.css";
 
 export function UserMenu() {
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const theme = useMantineTheme();
 	const { profile, isLoading, isAuthenticated, session } = useUserProfile();
 	const { avatarUrl } = useResolvedAvatar();
@@ -60,9 +62,15 @@ export function UserMenu() {
 		});
 	};
 
-	const handleSignOut = async () => {
-		await signOut();
-		await navigate({ to: "/" });
+	const handleSignOut = () => {
+		signOut({
+			fetchOptions: {
+				onSuccess: async () => {
+					queryClient.removeQueries({ queryKey: ["dal"] });
+					await navigate({ to: "/" });
+				},
+			},
+		});
 	};
 
 	return (

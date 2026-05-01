@@ -2,7 +2,7 @@ import { Box, Collapse, Group, ThemeIcon, UnstyledButton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Link } from "@tanstack/react-router";
 import { LuChevronRight } from "react-icons/lu";
-import type { NavLinkSubLink } from "@/components/navigation/types/nav-link";
+import type { NavLinkSubLink } from "#/components/navigation/get-nav-links";
 import classes from "./NavbarLinksGroup.module.css";
 
 interface NavbarLinksGroupProps {

@@ -1,16 +1,18 @@
 import { getRequest } from "@tanstack/react-start/server";
 import { auth } from "#/integrations/better-auth/auth";
 
-export async function requireUserId(): Promise<string> {
+const requireUserId = async (): Promise<string> => {
 	const request = getRequest();
 	const session = await auth.api.getSession({ headers: request.headers });
 	const userId = session?.user?.id;
 	if (!userId) throw new Response("Unauthorized", { status: 401 });
 	return userId;
-}
+};
 
-export async function getOptionalUserId(): Promise<string | null> {
+const getOptionalUserId = async (): Promise<string | null> => {
 	const request = getRequest();
 	const session = await auth.api.getSession({ headers: request.headers });
 	return session?.user?.id ?? null;
-}
+};
+
+export { getOptionalUserId, requireUserId };

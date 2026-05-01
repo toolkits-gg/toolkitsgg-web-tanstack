@@ -1,5 +1,9 @@
 {
   "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": [
+    "node_modules",
+    "prisma/generated/prisma-idb/client"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",

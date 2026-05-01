@@ -1,5 +1,4 @@
 import { AppImage } from "#/components/AppImage";
-import { clientEnv } from "#/config/client-env";
 
 type LogoSize = 24 | 36 | 48 | 64 | 128 | 256 | 512 | 1024;
 const DEFAULT_LOGO_SIZE: LogoSize = 36;

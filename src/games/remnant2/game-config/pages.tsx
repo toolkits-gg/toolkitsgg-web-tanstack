@@ -9,8 +9,13 @@ import { AppItemPage } from "#/features/game/item/components/AppItemPage";
 import type { AppItem } from "#/features/game/item/types/app-item";
 import type { GameFilterConfig } from "#/features/game/item/types/game-filter-config";
 import { getItemSubcategories } from "#/features/game/item/utils/get-item-subcategories";
+import {
+	formatCategoryLabel,
+	itemMatchesCategory,
+} from "#/features/game/item/utils/filter-helpers";
 import type { GamePages } from "#/features/game/types/game-config";
 import { ITEMS } from "#/games/remnant2/game-config/items";
+import { remnant2CollectedItemsDal } from "#/games/remnant2/dal/collected-items";
 import type { Remnant2DLC } from "@/prisma";
 
 const REMNANT2_DLC_LABELS: Record<Remnant2DLC, string> = {
@@ -43,37 +48,6 @@ function formatDlcLabel(raw: string): string {
 	return parts.join(" / ");
 }
 
-function formatCategoryLabel(raw: string): string {
-	const selected = raw ? raw.split(",").filter(Boolean) : [];
-	if (selected.length === 0) return "";
-	if (selected.length === 1) {
-		const val = selected[0] ?? "";
-		if (val.includes(":")) {
-			const [cat, sub] = val.split(":");
-			return `${titleCase(sub ?? "")} ${titleCase(cat ?? "")}`;
-		}
-		return titleCase(val);
-	}
-	return `${selected.length} selected`;
-}
-
-function titleCase(str: string): string {
-	return str
-		.split(/[_ ]/)
-		.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-		.join(" ");
-}
-
-function itemMatchesCategory(item: AppItem, filterValue: string): boolean {
-	if (filterValue.includes(":")) {
-		const [category, subcategory] = filterValue.split(":");
-		if (String(item.category) !== category) return false;
-		return (
-			item.subcategory !== undefined && String(item.subcategory) === subcategory
-		);
-	}
-	return String(item.category) === filterValue;
-}
 
 const remnant2FilterConfig: GameFilterConfig = {
 	label: "Remnant 2 Filters",
@@ -180,7 +154,7 @@ const remnant2FilterConfig: GameFilterConfig = {
 
 const PAGES: GamePages = {
 	renderItemLookup: () => (
-		<AppItemPage items={ITEMS} gameFilterConfig={remnant2FilterConfig} />
+		<AppItemPage items={ITEMS} dal={remnant2CollectedItemsDal} gameFilterConfig={remnant2FilterConfig} />
 	),
 };
 

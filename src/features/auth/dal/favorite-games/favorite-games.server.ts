@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireUserId } from "#/features/dal/server/require-user";
+import { requireUserId } from "#/features/auth/dal/require-user.server";
 import { GameId, prisma } from "@/prisma";
 
 const FavoriteInput = z.object({ gameId: z.nativeEnum(GameId) });
 
-export const favoriteGameServerFn = createServerFn({ method: "POST" })
+const favoriteGameServerFn = createServerFn({ method: "POST" })
 	.inputValidator((v: unknown) => FavoriteInput.parse(v))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId();
@@ -16,7 +16,7 @@ export const favoriteGameServerFn = createServerFn({ method: "POST" })
 		});
 	});
 
-export const unfavoriteGameServerFn = createServerFn({ method: "POST" })
+const unfavoriteGameServerFn = createServerFn({ method: "POST" })
 	.inputValidator((v: unknown) => FavoriteInput.parse(v))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId();
@@ -26,8 +26,15 @@ export const unfavoriteGameServerFn = createServerFn({ method: "POST" })
 		return { ok: true as const };
 	});
 
-export const listFavoriteGamesServerFn = createServerFn({ method: "GET" })
-	.handler(async () => {
-		const userId = await requireUserId();
-		return prisma.userFavoriteGame.findMany({ where: { userId } });
-	});
+const listFavoriteGamesServerFn = createServerFn({
+	method: "GET",
+}).handler(async () => {
+	const userId = await requireUserId();
+	return prisma.userFavoriteGame.findMany({ where: { userId } });
+});
+
+export {
+	favoriteGameServerFn,
+	unfavoriteGameServerFn,
+	listFavoriteGamesServerFn,
+};

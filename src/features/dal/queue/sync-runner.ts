@@ -1,16 +1,13 @@
 import type { DalWriteAction } from "#/features/dal/core/types";
-import {
-	deleteOp,
-	markStatus,
-	type PendingOp,
-} from "#/features/dal/queue/pending-ops";
+import { deleteOp, markStatus } from "#/features/dal/queue/pending-ops";
+import type { PendingOp } from "#/features/dal/queue/types";
 
-export interface SyncAllOptions {
+interface SyncAllOptions {
 	resolveAction: (entity: string) => DalWriteAction<unknown, unknown> | null;
 	onProgress?: (op: PendingOp, index: number, total: number) => void;
 }
 
-export interface SyncAllReport {
+interface SyncAllReport {
 	applied: number;
 	conflicts: number;
 	noops: number;
@@ -18,10 +15,10 @@ export interface SyncAllReport {
 	skipped: number;
 }
 
-export async function syncOps(
+const syncOps = async (
 	ops: PendingOp[],
 	options: SyncAllOptions,
-): Promise<SyncAllReport> {
+): Promise<SyncAllReport> => {
 	const report: SyncAllReport = {
 		applied: 0,
 		conflicts: 0,
@@ -67,4 +64,6 @@ export async function syncOps(
 		}
 	}
 	return report;
-}
+};
+
+export { syncOps };

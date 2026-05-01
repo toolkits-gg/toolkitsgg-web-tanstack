@@ -1,22 +1,20 @@
-import {
-	getLocalDB,
-	type LocalUserFavoriteGame,
-	STORE_USER_FAVORITE_GAME,
-} from "#/features/dal/local/local-db";
+import { STORE_USER_FAVORITE_GAME } from "#/features/dal/local/constants";
+import { getLocalDB } from "#/features/dal/local/local-db";
+import type { LocalUserFavoriteGame } from "#/features/dal/local/types";
 import type { GameId } from "@/prisma";
 
-export async function listLocalFavoriteGames(
+const listLocalFavoriteGames = async (
 	userId: string,
-): Promise<LocalUserFavoriteGame[]> {
+): Promise<LocalUserFavoriteGame[]> => {
 	const db = await getLocalDB();
 	if (!db) return [];
 	return db.getAllFromIndex(STORE_USER_FAVORITE_GAME, "userId", userId);
-}
+};
 
-export async function upsertLocalFavoriteGame(input: {
+const upsertLocalFavoriteGame = async (input: {
 	userId: string;
 	gameId: GameId;
-}): Promise<LocalUserFavoriteGame> {
+}): Promise<LocalUserFavoriteGame> => {
 	const now = new Date().toISOString();
 	const db = await getLocalDB();
 	const record: LocalUserFavoriteGame = {
@@ -35,13 +33,19 @@ export async function upsertLocalFavoriteGame(input: {
 		: record;
 	await db.put(STORE_USER_FAVORITE_GAME, next);
 	return next;
-}
+};
 
-export async function deleteLocalFavoriteGame(input: {
+const deleteLocalFavoriteGame = async (input: {
 	userId: string;
 	gameId: GameId;
-}): Promise<void> {
+}): Promise<void> => {
 	const db = await getLocalDB();
 	if (!db) return;
 	await db.delete(STORE_USER_FAVORITE_GAME, [input.userId, input.gameId]);
-}
+};
+
+export {
+	listLocalFavoriteGames,
+	upsertLocalFavoriteGame,
+	deleteLocalFavoriteGame,
+};

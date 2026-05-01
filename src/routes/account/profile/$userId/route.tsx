@@ -2,8 +2,9 @@ import { Box, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
 import { ProfileHeader } from "#/features/auth/components/ProfileHeader";
 import { ProfileTabNav } from "#/features/auth/components/ProfileTabNav";
+import { getViewerUserIdServerFn } from "#/features/auth/dal/user-profile/user-profile.actions";
+import { getPublicUserProfileServerFn } from "#/features/auth/dal/user-profile/user-profile.server";
 import { resolveAvatar } from "#/features/auth/utils/resolve-avatar";
-import { getPublicUserProfileServerFn, getViewerUserIdServerFn } from "#/features/dal/server/user-profile";
 import type { GameId } from "@/prisma";
 
 export const Route = createFileRoute("/account/profile/$userId")({
@@ -27,8 +28,9 @@ export const Route = createFileRoute("/account/profile/$userId")({
 function ProfileLayout() {
 	const { user, isOwner } = Route.useLoaderData();
 	const { userId } = Route.useParams();
+	if (!user.userProfile) throw notFound();
 
-	const profile = user.userProfile!;
+	const profile = user.userProfile;
 
 	const { avatarUrl: serverAvatarUrl } = resolveAvatar({
 		primaryAvatarId: profile.primaryAvatarId ?? null,
@@ -50,7 +52,10 @@ function ProfileLayout() {
 				serverAvatarUrl={serverAvatarUrl}
 				isOwner={isOwner}
 			/>
-			<ProfileTabNav basePath={`/account/profile/${userId}`} showDataSync={isOwner} />
+			<ProfileTabNav
+				basePath={`/account/profile/${userId}`}
+				showDataSync={isOwner}
+			/>
 			<Box p="md">
 				<Outlet />
 			</Box>

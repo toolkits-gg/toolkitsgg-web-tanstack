@@ -12,14 +12,11 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { resolveWriteAction } from "#/features/dal/actions/registry";
-import {
-	clearSynced,
-	deleteOp,
-	type PendingOp,
-} from "#/features/dal/queue/pending-ops";
+import { clearSynced, deleteOp } from "#/features/dal/queue/pending-ops";
 import { syncOps } from "#/features/dal/queue/sync-runner";
+import type { PendingOp } from "#/features/dal/queue/types";
 import { usePendingOps } from "#/features/dal/queue/use-pending-ops";
+import { resolveWriteAction } from "#/features/dal/registry";
 import { useSession } from "#/integrations/better-auth/auth-client";
 
 export const Route = createFileRoute("/account/profile/$userId/data-sync")({
@@ -109,13 +106,13 @@ function DataSync() {
 	);
 }
 
-function PendingList({
+const PendingList = ({
 	ops,
 	onDelete,
 }: {
 	ops: PendingOp[];
 	onDelete: (id: string) => void;
-}) {
+}) => {
 	if (!ops.length) {
 		return (
 			<Text size="sm" c="dimmed">
@@ -163,7 +160,7 @@ function PendingList({
 			))}
 		</Stack>
 	);
-}
+};
 
 function SyncedList({ ops }: { ops: PendingOp[] }) {
 	if (!ops.length) return null;
@@ -189,7 +186,7 @@ function SyncedList({ ops }: { ops: PendingOp[] }) {
 	);
 }
 
-function statusColor(status: PendingOp["status"]) {
+const statusColor = (status: PendingOp["status"]) => {
 	switch (status) {
 		case "pending":
 			return "gray";
@@ -202,4 +199,4 @@ function statusColor(status: PendingOp["status"]) {
 		case "failed":
 			return "red";
 	}
-}
+};

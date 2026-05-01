@@ -1,39 +1,17 @@
 import { type DBSchema, type IDBPDatabase, openDB } from "idb";
-import type { GameId } from "@/prisma";
+import {
+	STORE_USER_AVATAR_OVERRIDE,
+	STORE_USER_FAVORITE_GAME,
+	STORE_USER_PROFILE,
+} from "#/features/dal/local/constants";
+import type {
+	LocalUserAvatarOverride,
+	LocalUserFavoriteGame,
+	LocalUserProfile,
+} from "#/features/dal/local/types";
 
 const DB_NAME = "toolkitsgg-local";
 const DB_VERSION = 2;
-
-export const STORE_USER_PROFILE = "userProfile";
-export const STORE_USER_FAVORITE_GAME = "userFavoriteGame";
-export const STORE_USER_AVATAR_OVERRIDE = "userAvatarOverride";
-
-export interface LocalUserProfile {
-	userId: string;
-	displayName: string;
-	bio: string;
-	primaryAvatarId: string | null;
-	primaryAvatarGameId: GameId | null;
-	createdAt: string;
-	updatedAt: string;
-}
-
-export interface LocalUserFavoriteGame {
-	userId: string;
-	gameId: GameId;
-	createdAt: string;
-	updatedAt: string;
-}
-
-export interface LocalUserAvatarOverride {
-	id: string;
-	userId: string;
-	gameId: GameId;
-	avatarId: string;
-	avatarGameId: GameId;
-	createdAt: string;
-	updatedAt: string;
-}
 
 interface LocalDB extends DBSchema {
 	userProfile: {
@@ -55,7 +33,7 @@ interface LocalDB extends DBSchema {
 
 let dbPromise: Promise<IDBPDatabase<LocalDB>> | null = null;
 
-export function getLocalDB(): Promise<IDBPDatabase<LocalDB>> | null {
+const getLocalDB = (): Promise<IDBPDatabase<LocalDB>> | null => {
 	if (typeof indexedDB === "undefined") return null;
 	if (!dbPromise) {
 		dbPromise = openDB<LocalDB>(DB_NAME, DB_VERSION, {
@@ -99,9 +77,9 @@ export function getLocalDB(): Promise<IDBPDatabase<LocalDB>> | null {
 		});
 	}
 	return dbPromise;
-}
+};
 
-export async function _resetLocalDBForTests(): Promise<void> {
+const _resetLocalDBForTests = async (): Promise<void> => {
 	if (dbPromise) {
 		const db = await dbPromise;
 		db.close();
@@ -114,4 +92,6 @@ export async function _resetLocalDBForTests(): Promise<void> {
 		req.onerror = () => resolve();
 		req.onblocked = () => resolve();
 	});
-}
+};
+
+export { getLocalDB, _resetLocalDBForTests };

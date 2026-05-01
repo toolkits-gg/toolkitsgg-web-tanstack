@@ -1,7 +1,6 @@
 import { Box } from "@mantine/core";
 import { useQueryStates } from "nuqs";
 import { useCallback, useMemo } from "react";
-import { collectedItemActions } from "#/features/dal/actions/collected-items";
 import { useDalMutation } from "#/features/dal/hooks/use-dal-mutation";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
 import type { ActiveFilter } from "#/features/game/item/components/ItemFilterBar";
@@ -9,6 +8,10 @@ import { ItemFilterBar } from "#/features/game/item/components/ItemFilterBar";
 import { ItemVirtualGrid } from "#/features/game/item/components/ItemVirtualGrid";
 import type { GameFilterConfig } from "#/features/game/item/types/game-filter-config";
 import type { AnyGameConfig } from "#/features/game/registry/game-registry";
+import type {
+	CollectItemInput,
+	GameCollectedItemsDal,
+} from "#/features/game/types/game-config";
 import {
 	dimUncollectedItemsParser,
 	searchParser,
@@ -19,6 +22,7 @@ import {
 
 type AppItemPageProps = {
 	items: AnyGameConfig["ITEMS"];
+	dal: GameCollectedItemsDal;
 	gameFilterConfig?: GameFilterConfig;
 };
 
@@ -30,7 +34,7 @@ const universalParsers = {
 	showCollectableOnly: showCollectableOnlyParser,
 };
 
-const AppItemPage = ({ items, gameFilterConfig }: AppItemPageProps) => {
+const AppItemPage = ({ items, dal, gameFilterConfig }: AppItemPageProps) => {
 	const [universalParams, setUniversalParams] =
 		useQueryStates(universalParsers);
 	const {
@@ -91,24 +95,21 @@ const AppItemPage = ({ items, gameFilterConfig }: AppItemPageProps) => {
 	}, [setUniversalParams, setGameParams, gameFilterConfig]);
 
 	// Collected items
-	const { data: collectedData } = useDalQuery(
-		collectedItemActions.list,
-		undefined,
-	);
+	const { data: collectedData } = useDalQuery(dal.list, undefined);
 	const collectedIds = useMemo(
 		() => (collectedData ?? []).map((r) => r.itemId),
 		[collectedData],
 	);
 
-	const { mutate: collect } = useDalMutation(collectedItemActions.collect);
-	const { mutate: uncollect } = useDalMutation(collectedItemActions.uncollect);
+	const { mutate: collect } = useDalMutation(dal.collect);
+	const { mutate: uncollect } = useDalMutation(dal.uncollect);
 
 	const handleCollect = useCallback(
-		(id: string) => collect({ itemId: id }),
+		({ itemId, itemName }: CollectItemInput) => collect({ itemId, itemName }),
 		[collect],
 	);
 	const handleUncollect = useCallback(
-		(id: string) => uncollect({ itemId: id }),
+		({ itemId, itemName }: CollectItemInput) => uncollect({ itemId, itemName }),
 		[uncollect],
 	);
 
@@ -286,6 +287,7 @@ const AppItemPage = ({ items, gameFilterConfig }: AppItemPageProps) => {
 					uncollectableCategories={items.uncollectableCategories.map(String)}
 					collectedIds={collectedIds}
 					dimUncollected={dimUncollectedItems}
+					dal={dal}
 					onCollect={handleCollect}
 					onUncollect={handleUncollect}
 				/>

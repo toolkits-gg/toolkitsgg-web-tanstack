@@ -1,7 +1,7 @@
-import { useSession } from "#/integrations/better-auth/auth-client";
-import { userProfileActions } from "#/features/dal/actions/user-profile";
+import { userProfileActions } from "#/features/auth/dal/user-profile/user-profile.actions";
 import { useDalMutation } from "#/features/dal/hooks/use-dal-mutation";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
+import { useSession } from "#/integrations/better-auth/auth-client";
 import type { GameId } from "@/prisma";
 
 export function useUserProfile() {
@@ -29,7 +29,9 @@ export function useUserProfile() {
 			targetGameId?: GameId;
 		}) => updateAvatarMutation.mutateAsync(params),
 		removePrimaryAvatar: () =>
-			removePrimaryAvatarMutation.mutateAsync(undefined as unknown as void),
+			removePrimaryAvatarMutation.mutateAsync(
+				undefined as unknown as undefined,
+			),
 		removeAvatarOverride: (targetGameId: GameId) =>
 			removeAvatarOverrideMutation.mutateAsync({ targetGameId }),
 	};

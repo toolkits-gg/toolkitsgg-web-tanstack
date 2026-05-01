@@ -18,9 +18,9 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { LuCheck, LuChevronDown, LuSearch, LuX } from "react-icons/lu";
+import { favoriteGameActions } from "#/features/auth/dal/favorite-games/favorite-games.actions";
 import { useUserProfile } from "#/features/auth/hooks/use-user-profile";
 import { avatarImageUrl } from "#/features/auth/utils/resolve-avatar";
-import { favoriteGameActions } from "#/features/dal/actions/favorite-games";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
 import { useGameId } from "#/features/game/hooks/use-game-id";
 import {

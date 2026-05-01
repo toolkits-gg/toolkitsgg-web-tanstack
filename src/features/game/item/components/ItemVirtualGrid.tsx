@@ -5,6 +5,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ItemCard } from "#/features/game/item/components/ItemCard";
 import { ItemInfoModal } from "#/features/game/item/components/ItemInfoModal";
 import type { AppItem } from "#/features/game/item/types/app-item";
+import type {
+	CollectItemInput,
+	GameCollectedItemsDal,
+} from "#/features/game/types/game-config";
 import classes from "./ItemVirtualGrid.module.css";
 
 const HEADER_HEIGHT = 64;
@@ -22,8 +26,9 @@ type ItemVirtualGridProps = {
 	uncollectableCategories: string[];
 	collectedIds: string[];
 	dimUncollected: boolean;
-	onCollect: (id: string) => void;
-	onUncollect: (id: string) => void;
+	dal: GameCollectedItemsDal;
+	onCollect: ({ itemId, itemName }: CollectItemInput) => void;
+	onUncollect: ({ itemId, itemName }: CollectItemInput) => void;
 };
 
 const ItemVirtualGrid = ({
@@ -32,6 +37,7 @@ const ItemVirtualGrid = ({
 	uncollectableCategories,
 	collectedIds,
 	dimUncollected,
+	dal,
 	onCollect,
 	onUncollect,
 }: ItemVirtualGridProps) => {
@@ -91,6 +97,7 @@ const ItemVirtualGrid = ({
 				children: (
 					<ItemInfoModal
 						item={item}
+						dal={dal}
 						isCollectable={isCollectable(item)}
 						onCollect={onCollect}
 						onUncollect={onUncollect}
@@ -98,7 +105,7 @@ const ItemVirtualGrid = ({
 				),
 			});
 		},
-		[isCollectable, onCollect, onUncollect],
+		[isCollectable, dal, onCollect, onUncollect],
 	);
 
 	if (rowData.length === 0) {

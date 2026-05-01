@@ -20,7 +20,7 @@ import { useState } from "react";
 import { LuChevronRight, LuHouse, LuSearch, LuStar } from "react-icons/lu";
 
 import { DefaultLogo } from "#/components/AppLogo";
-import { favoriteGameActions } from "#/features/dal/actions/favorite-games";
+import { favoriteGameActions } from "#/features/auth/dal/favorite-games/favorite-games.actions";
 import { useDalMutation } from "#/features/dal/hooks/use-dal-mutation";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
 import { useGameId } from "#/features/game/hooks/use-game-id";

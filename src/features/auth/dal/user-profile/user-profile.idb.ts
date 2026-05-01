@@ -1,30 +1,34 @@
 import {
-	getLocalDB,
-	type LocalUserAvatarOverride,
-	type LocalUserProfile,
 	STORE_USER_AVATAR_OVERRIDE,
 	STORE_USER_PROFILE,
-} from "#/features/dal/local/local-db";
+} from "#/features/dal/local/constants";
+import { getLocalDB } from "#/features/dal/local/local-db";
+import type {
+	LocalUserAvatarOverride,
+	LocalUserProfile,
+} from "#/features/dal/local/types";
 import type { GameId } from "@/prisma";
 
-export async function getLocalUserProfile(
+const getLocalUserProfile = async (
 	userId: string,
-): Promise<LocalUserProfile | undefined> {
+): Promise<LocalUserProfile | undefined> => {
 	const db = await getLocalDB();
 	if (!db) return undefined;
 	return db.get(STORE_USER_PROFILE, userId);
-}
+};
 
-export async function upsertLocalUserProfile(data: {
+const upsertLocalUserProfile = async (data: {
 	userId: string;
 	displayName?: string;
 	bio?: string;
 	primaryAvatarId?: string | null;
 	primaryAvatarGameId?: GameId | null;
-}): Promise<LocalUserProfile> {
+}): Promise<LocalUserProfile> => {
 	const now = new Date().toISOString();
 	const db = await getLocalDB();
-	const existing = db ? await db.get(STORE_USER_PROFILE, data.userId) : undefined;
+	const existing = db
+		? await db.get(STORE_USER_PROFILE, data.userId)
+		: undefined;
 
 	const next: LocalUserProfile = {
 		userId: data.userId,
@@ -44,15 +48,15 @@ export async function upsertLocalUserProfile(data: {
 
 	if (db) await db.put(STORE_USER_PROFILE, next);
 	return next;
-}
+};
 
-export async function getLocalAvatarOverrides(
+const getLocalAvatarOverrides = async (
 	userId: string,
-): Promise<LocalUserAvatarOverride[]> {
+): Promise<LocalUserAvatarOverride[]> => {
 	const db = await getLocalDB();
 	if (!db) return [];
 	return db.getAllFromIndex(STORE_USER_AVATAR_OVERRIDE, "userId", userId);
-}
+};
 
 export async function upsertLocalAvatarOverride(data: {
 	userId: string;
@@ -63,7 +67,9 @@ export async function upsertLocalAvatarOverride(data: {
 	const now = new Date().toISOString();
 	const id = `${data.userId}:${data.gameId}`;
 	const db = await getLocalDB();
-	const existing = db ? await db.get(STORE_USER_AVATAR_OVERRIDE, id) : undefined;
+	const existing = db
+		? await db.get(STORE_USER_AVATAR_OVERRIDE, id)
+		: undefined;
 
 	const next: LocalUserAvatarOverride = {
 		id,
@@ -79,11 +85,18 @@ export async function upsertLocalAvatarOverride(data: {
 	return next;
 }
 
-export async function deleteLocalAvatarOverride(
+const deleteLocalAvatarOverride = async (
 	userId: string,
 	gameId: GameId,
-): Promise<void> {
+): Promise<void> => {
 	const db = await getLocalDB();
 	if (!db) return;
 	await db.delete(STORE_USER_AVATAR_OVERRIDE, `${userId}:${gameId}`);
-}
+};
+
+export {
+	getLocalUserProfile,
+	upsertLocalUserProfile,
+	getLocalAvatarOverrides,
+	deleteLocalAvatarOverride,
+};

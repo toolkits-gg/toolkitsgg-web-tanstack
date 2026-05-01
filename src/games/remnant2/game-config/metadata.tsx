@@ -1,7 +1,7 @@
 import type { LogoSize } from "#/components/AppLogo";
 import type { GameMetadata } from "#/features/game/types/game-config";
 import { Remnant2Logo } from "#/games/remnant2/components/Logo";
-import { GAME_ID } from "#/games/slaythespire2/constants/game-id";
+import { GAME_ID } from "#/games/remnant2/constants/game-id";
 
 const METADATA: GameMetadata = {
 	id: GAME_ID,

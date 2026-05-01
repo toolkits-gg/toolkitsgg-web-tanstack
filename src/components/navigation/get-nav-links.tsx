@@ -87,4 +87,4 @@ const getNavLinks = ({
 	return navLinks;
 };
 
-export { getNavLinks };
+export { getNavLinks, type NavLinkSubLink };

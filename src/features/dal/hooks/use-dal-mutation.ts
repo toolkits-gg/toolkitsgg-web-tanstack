@@ -3,15 +3,15 @@ import type { DalContext, DalWriteAction } from "#/features/dal/core/types";
 import { useDalContextSource } from "#/features/dal/hooks/use-dal-context-source";
 import { enqueueOp } from "#/features/dal/queue/pending-ops";
 
-export interface UseDalMutationResult<Output> {
+interface UseDalMutationResult<Output> {
 	result: Output;
 	branch: "remote" | "local";
 	enqueuedOpId: string | null;
 }
 
-export function useDalMutation<Input, Output>(
+const useDalMutation = <Input, Output>(
 	action: DalWriteAction<Input, Output>,
-) {
+) => {
 	const ctxGetter = useDalContextSource();
 	const queryClient = useQueryClient();
 
@@ -34,13 +34,13 @@ export function useDalMutation<Input, Output>(
 			]);
 		},
 	});
-}
+};
 
-async function runLocalWithEnqueue<Input, Output>(
+const runLocalWithEnqueue = async <Input, Output>(
 	action: DalWriteAction<Input, Output>,
 	input: Input,
 	ctx: DalContext,
-): Promise<UseDalMutationResult<Output>> {
+): Promise<UseDalMutationResult<Output>> => {
 	const result = await action.local(input, ctx);
 	const op = await enqueueOp({
 		anonUserId: ctx.anonUserId,
@@ -50,4 +50,6 @@ async function runLocalWithEnqueue<Input, Output>(
 		idempotencyKey: action.buildIdempotencyKey(input, ctx),
 	});
 	return { result, branch: "local", enqueuedOpId: op?.id ?? null };
-}
+};
+
+export { useDalMutation };

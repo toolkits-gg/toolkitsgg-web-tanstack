@@ -1,20 +1,20 @@
-export type LwwComparison = "local-wins" | "server-wins" | "equal";
+type LwwComparison = "local-wins" | "server-wins" | "equal";
 
-export interface HasUpdatedAt {
+interface HasUpdatedAt {
 	updatedAt: string | Date | null | undefined;
 }
 
-function toTime(value: string | Date | null | undefined): number | null {
+const toTime = (value: string | Date | null | undefined): number | null => {
 	if (!value) return null;
 	const date = typeof value === "string" ? new Date(value) : value;
 	const time = date.getTime();
 	return Number.isFinite(time) ? time : null;
-}
+};
 
-export function compareTimestamps(
+const compareTimestamps = (
 	serverRecord: HasUpdatedAt | null | undefined,
 	op: { serverUpdatedAt?: string | null; updatedAt?: string | null },
-): LwwComparison {
+): LwwComparison => {
 	const serverTime = toTime(serverRecord?.updatedAt);
 	const baselineTime = toTime(op.serverUpdatedAt);
 	const opTime = toTime(op.updatedAt);
@@ -29,4 +29,6 @@ export function compareTimestamps(
 	if (serverTime > baselineTime) return "server-wins";
 	if (serverTime < baselineTime) return "local-wins";
 	return "equal";
-}
+};
+
+export { compareTimestamps, type HasUpdatedAt };

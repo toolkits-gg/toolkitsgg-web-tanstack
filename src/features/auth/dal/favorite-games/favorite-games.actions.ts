@@ -1,31 +1,31 @@
 import {
-	defineDalRead,
-	defineDalWrite,
-} from "#/features/dal/core/define-action";
-import type { DalContext } from "#/features/dal/core/types";
-import {
 	deleteLocalFavoriteGame,
 	listLocalFavoriteGames,
 	upsertLocalFavoriteGame,
-} from "#/features/dal/local/favorite-games-idb";
-import type { LocalUserFavoriteGame } from "#/features/dal/local/local-db";
+} from "#/features/auth/dal/favorite-games/favorite-games.idb";
 import {
 	favoriteGameServerFn,
 	listFavoriteGamesServerFn,
 	unfavoriteGameServerFn,
-} from "#/features/dal/server/favorite-games";
-import { applyPendingOpServerFn } from "#/features/dal/server/sync";
+} from "#/features/auth/dal/favorite-games/favorite-games.server";
+import {
+	defineDalRead,
+	defineDalWrite,
+} from "#/features/dal/core/define-action";
+import type { DalContext } from "#/features/dal/core/types";
+import type { LocalUserFavoriteGame } from "#/features/dal/local/types";
+import { applyPendingOpServerFn } from "#/features/dal/server/apply-pending-ops";
 import type { GameId } from "@/prisma";
 
 interface FavoriteGameInput {
 	gameId: GameId;
 }
 
-function resolveLocalUserId(ctx: DalContext): string {
+const resolveLocalUserId = (ctx: DalContext): string => {
 	return ctx.authUserId ?? ctx.anonUserId;
-}
+};
 
-export const favoriteGameActions = {
+const favoriteGameActions = {
 	list: defineDalRead<void, LocalUserFavoriteGame[]>({
 		queryKey: () => ["userFavoriteGame", "list"] as const,
 		remote: async () => {
@@ -81,3 +81,5 @@ export const favoriteGameActions = {
 		sync: (op) => applyPendingOpServerFn({ data: op }),
 	}),
 };
+
+export { favoriteGameActions };

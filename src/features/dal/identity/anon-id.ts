@@ -1,6 +1,6 @@
 const STORAGE_KEY = "toolkitsgg.anonUserId";
 
-export function getOrCreateAnonUserId(): string {
+const getOrCreateAnonUserId = (): string => {
 	if (typeof window === "undefined") return "";
 	let id = window.localStorage.getItem(STORAGE_KEY);
 	if (!id) {
@@ -8,9 +8,11 @@ export function getOrCreateAnonUserId(): string {
 		window.localStorage.setItem(STORAGE_KEY, id);
 	}
 	return id;
-}
+};
 
-export function clearAnonUserId(): void {
+const clearAnonUserId = (): void => {
 	if (typeof window === "undefined") return;
 	window.localStorage.removeItem(STORAGE_KEY);
-}
+};
+
+export { getOrCreateAnonUserId, clearAnonUserId };

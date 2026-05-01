@@ -1,30 +1,13 @@
 import { type DBSchema, type IDBPDatabase, openDB } from "idb";
+import type {
+	ListOpsFilter,
+	PendingOp,
+	PendingOpStatus,
+} from "#/features/dal/queue/types";
 
 const DB_NAME = "toolkitsgg-pending-ops";
 const DB_VERSION = 1;
 const STORE_NAME = "ops";
-
-export type PendingOpOperation = "create" | "update" | "upsert" | "delete";
-export type PendingOpStatus =
-	| "pending"
-	| "syncing"
-	| "synced"
-	| "failed"
-	| "conflict";
-
-export interface PendingOp {
-	id: string;
-	createdAt: string;
-	updatedAt: string;
-	anonUserId: string;
-	entity: string;
-	operation: PendingOpOperation;
-	payload: unknown;
-	idempotencyKey: string;
-	status: PendingOpStatus;
-	lastError?: string;
-	serverUpdatedAt?: string;
-}
 
 interface PendingOpsDB extends DBSchema {
 	ops: {
@@ -40,7 +23,7 @@ interface PendingOpsDB extends DBSchema {
 
 let dbPromise: Promise<IDBPDatabase<PendingOpsDB>> | null = null;
 
-function getDB(): Promise<IDBPDatabase<PendingOpsDB>> | null {
+const getDB = (): Promise<IDBPDatabase<PendingOpsDB>> | null => {
 	if (typeof indexedDB === "undefined") return null;
 	if (!dbPromise) {
 		dbPromise = openDB<PendingOpsDB>(DB_NAME, DB_VERSION, {
@@ -53,9 +36,9 @@ function getDB(): Promise<IDBPDatabase<PendingOpsDB>> | null {
 		});
 	}
 	return dbPromise;
-}
+};
 
-export type EnqueueInput = Omit<
+type EnqueueInput = Omit<
 	PendingOp,
 	"id" | "createdAt" | "updatedAt" | "status"
 > & {
@@ -63,7 +46,7 @@ export type EnqueueInput = Omit<
 	status?: PendingOpStatus;
 };
 
-export async function enqueueOp(input: EnqueueInput): Promise<PendingOp | null> {
+const enqueueOp = async (input: EnqueueInput): Promise<PendingOp | null> => {
 	const db = await getDB();
 	if (!db) return null;
 	const now = new Date().toISOString();
@@ -82,14 +65,9 @@ export async function enqueueOp(input: EnqueueInput): Promise<PendingOp | null> 
 	};
 	await db.put(STORE_NAME, op);
 	return op;
-}
+};
 
-export interface ListOpsFilter {
-	status?: PendingOpStatus;
-	entity?: string;
-}
-
-export async function listOps(filter?: ListOpsFilter): Promise<PendingOp[]> {
+const listOps = async (filter?: ListOpsFilter): Promise<PendingOp[]> => {
 	const db = await getDB();
 	if (!db) return [];
 	const all = await db.getAllFromIndex(STORE_NAME, "createdAt");
@@ -99,19 +77,19 @@ export async function listOps(filter?: ListOpsFilter): Promise<PendingOp[]> {
 		if (filter.entity && op.entity !== filter.entity) return false;
 		return true;
 	});
-}
+};
 
-export async function getOp(id: string): Promise<PendingOp | null> {
+const getOp = async (id: string): Promise<PendingOp | null> => {
 	const db = await getDB();
 	if (!db) return null;
 	return (await db.get(STORE_NAME, id)) ?? null;
-}
+};
 
-export async function markStatus(
+const markStatus = async (
 	id: string,
 	status: PendingOpStatus,
 	lastError?: string,
-): Promise<PendingOp | null> {
+): Promise<PendingOp | null> => {
 	const db = await getDB();
 	if (!db) return null;
 	const existing = await db.get(STORE_NAME, id);
@@ -120,19 +98,20 @@ export async function markStatus(
 		...existing,
 		status,
 		updatedAt: new Date().toISOString(),
-		lastError: lastError ?? (status === "failed" ? existing.lastError : undefined),
+		lastError:
+			lastError ?? (status === "failed" ? existing.lastError : undefined),
 	};
 	await db.put(STORE_NAME, next);
 	return next;
-}
+};
 
-export async function deleteOp(id: string): Promise<void> {
+const deleteOp = async (id: string): Promise<void> => {
 	const db = await getDB();
 	if (!db) return;
 	await db.delete(STORE_NAME, id);
-}
+};
 
-export async function clearSynced(): Promise<number> {
+const clearSynced = async (): Promise<number> => {
 	const db = await getDB();
 	if (!db) return 0;
 	const tx = db.transaction(STORE_NAME, "readwrite");
@@ -146,9 +125,9 @@ export async function clearSynced(): Promise<number> {
 	}
 	await tx.done;
 	return count;
-}
+};
 
-export async function _resetForTests(): Promise<void> {
+const _resetForTests = async (): Promise<void> => {
 	if (dbPromise) {
 		const db = await dbPromise;
 		db.close();
@@ -162,4 +141,14 @@ export async function _resetForTests(): Promise<void> {
 			req.onblocked = () => resolve();
 		});
 	}
-}
+};
+
+export {
+	enqueueOp,
+	listOps,
+	getOp,
+	markStatus,
+	deleteOp,
+	clearSynced,
+	_resetForTests,
+};

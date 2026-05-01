@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { LuCheck, LuInfo, LuPlus, LuX } from "react-icons/lu";
 import { GameImage } from "#/components/GameImage";
 import type { AppItem } from "#/features/game/item/types/app-item";
+import type { CollectItemInput } from "#/features/game/types/game-config";
 import classes from "./ItemCard.module.css";
 
 type ItemCardProps = {
@@ -10,8 +11,8 @@ type ItemCardProps = {
 	collectedIds: string[];
 	isCollectable: boolean;
 	dimUncollected: boolean;
-	onCollect: (id: string) => void;
-	onUncollect: (id: string) => void;
+	onCollect: ({ itemId, itemName }: CollectItemInput) => void;
+	onUncollect: ({ itemId, itemName }: CollectItemInput) => void;
 	onInfo: (item: AppItem) => void;
 };
 
@@ -29,9 +30,9 @@ const ItemCard = ({
 
 	const handleToggleCollect = () => {
 		if (isCollected) {
-			onUncollect(item.id);
+			onUncollect({ itemId: item.id, itemName: item.name });
 		} else {
-			onCollect(item.id);
+			onCollect({ itemId: item.id, itemName: item.name });
 		}
 	};
 

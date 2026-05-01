@@ -1,10 +1,12 @@
-export type Backend = "remote" | "local";
+import type { Backend } from "#/features/dal/core/types";
 
-export interface DispatchInput {
+interface DispatchInput {
 	authed: boolean;
 	online: boolean;
 }
 
-export function chooseBackend({ authed, online }: DispatchInput): Backend {
+const chooseBackend = ({ authed, online }: DispatchInput): Backend => {
 	return authed && online ? "remote" : "local";
-}
+};
+
+export { chooseBackend };

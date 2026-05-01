@@ -93,6 +93,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		<html lang="en" {...mantineHtmlProps}>
 			<head>
 				<ColorSchemeScript />
+				<script
+					suppressHydrationWarning
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: <needed for hydration issue with next-themes>
+					dangerouslySetInnerHTML={{
+						__html: `(function(){try{var t=localStorage.getItem('theme');var s;if(t&&t!=='system'){document.documentElement.setAttribute('data-theme',t);s=t.endsWith('-light')?'light':'dark';}else{var d=window.matchMedia('(prefers-color-scheme: dark)').matches;s=d?'dark':'light';document.documentElement.setAttribute('data-theme','default-'+s);}document.documentElement.setAttribute('data-mantine-color-scheme',s);}catch(e){}})();`,
+					}}
+				/>
 				<HeadContent />
 			</head>
 			<body
