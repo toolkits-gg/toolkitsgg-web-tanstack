@@ -1,9 +1,9 @@
 import type { MantineThemeOverride } from "@mantine/core";
+import { BLACK, RED, WHITE } from "#/features/theme/core/constants";
+import type { ToolkitThemeDefinition } from "#/features/theme/core/types";
+import { createThemeColors } from "#/features/theme/core/utils";
+import { baseTheme } from "#/features/theme/themes/base-theme";
 import { GAME_ID } from "#/games/clairobscur/constants/game-id";
-import { BLACK, RED, WHITE } from "@/features/theme/constants/colors";
-import { baseTheme } from "@/features/theme/themes/base-theme";
-import type { ToolkitThemeDefinition } from "@/features/theme/types/toolkit-theme-definition";
-import { createThemeColors } from "@/features/theme/utils/create-theme-color";
 
 const clairObscurThemeColors = createThemeColors({
 	primary: {

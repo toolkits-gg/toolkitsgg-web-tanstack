@@ -1,7 +1,7 @@
+import { resolveAvatar } from "#/features/auth/core/utils";
 import { userProfileActions } from "#/features/auth/dal/user-profile/user-profile.actions";
-import { resolveAvatar } from "#/features/auth/utils/resolve-avatar";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
-import { useGameId } from "#/features/game/hooks/use-game-id";
+import { useGameId } from "#/features/game/core/use-game-id";
 
 export function useResolvedAvatar() {
 	const gameId = useGameId();

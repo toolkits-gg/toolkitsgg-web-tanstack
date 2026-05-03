@@ -1,4 +1,4 @@
-import type { AppItem } from "#/features/game/item/types/app-item";
+import type { AppItem } from "#/features/game/items/types";
 import type { ClairObscurCharacterItem } from "#/games/clairobscur/item-data.ts/characters";
 import type { ClairObscurItemLocation } from "#/games/clairobscur/types/item-locations";
 import type {

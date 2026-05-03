@@ -1,5 +1,5 @@
 import type { LogoSize } from "#/components/AppLogo";
-import type { GameMetadata } from "#/features/game/types/game-config";
+import type { GameMetadata } from "#/features/game/core/types";
 import { ClairObscurLogo } from "#/games/clairobscur/components/Logo";
 import { GAME_ID } from "#/games/clairobscur/constants/game-id";
 

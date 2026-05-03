@@ -1,8 +1,8 @@
 import { useMediaQuery } from "@mantine/hooks";
-import { useGameId } from "#/features/game/hooks/use-game-id";
-import { LOCALSTORAGE_KEY_PREFIX } from "@/components/wizards/getting-started/constants/localstorage-keys";
-import { GETTING_STARTED_STEPS } from "@/components/wizards/getting-started/constants/steps";
-import { Wizard } from "@/features/wizard/components/Wizard";
+import { LOCALSTORAGE_KEY_PREFIX } from "#/components/wizards/getting-started/constants/localstorage-keys";
+import { GETTING_STARTED_STEPS } from "#/components/wizards/getting-started/constants/steps";
+import { useGameId } from "#/features/game/core/use-game-id";
+import { Wizard } from "#/features/wizard/Wizard";
 
 type GettingStartedWizardProps = {
 	navbarOpened: boolean;

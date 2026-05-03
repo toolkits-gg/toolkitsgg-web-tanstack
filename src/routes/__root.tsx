@@ -33,7 +33,7 @@ import { AppNavbar } from "#/components/navigation/AppNavbar";
 import { SocialMedia } from "#/components/SocialMedia";
 import { GettingStartedWizard } from "#/components/wizards/getting-started/components/GettingStartedWizard";
 import { useGettingStartedWizard } from "#/components/wizards/getting-started/hooks/use-getting-started-wizard";
-import { GameSwitcher } from "#/features/game/components/GameSwitcher";
+import { GameSwitcher } from "#/features/game/core/GameSwitcher";
 import classes from "./Root.module.css";
 
 interface MyRouterContext {

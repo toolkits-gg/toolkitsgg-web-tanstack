@@ -1,9 +1,9 @@
-import type { GameConfig } from "#/features/game/types/game-config";
+import type { GameConfig } from "#/features/game/core/types";
+import { clairObscurCollectedItemsDal } from "#/games/clairobscur/dal/collected-items";
 import { ITEMS } from "#/games/clairobscur/game-config/items";
 import { METADATA } from "#/games/clairobscur/game-config/metadata";
 import { PAGES } from "#/games/clairobscur/game-config/pages";
 import { THEME } from "#/games/clairobscur/game-config/theme";
-import { clairObscurCollectedItemsDal } from "#/games/clairobscur/dal/collected-items";
 import type { ClairObscurLocalItem } from "#/games/clairobscur/types/local-item";
 import type { ClairObscurItemCategory } from "@/prisma";
 

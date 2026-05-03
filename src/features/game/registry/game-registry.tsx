@@ -1,12 +1,11 @@
 import type { LogoSize } from "#/components/AppLogo";
-import type { AppItem } from "#/features/game/item/types/app-item";
-import type { GameAvatar } from "#/features/game/types/game-avatar";
-import type { GameConfig } from "#/features/game/types/game-config";
+import type { GameAvatar, GameConfig } from "#/features/game/core/types";
+import type { AppItem } from "#/features/game/items/types";
+import type { ToolkitThemeDefinition } from "#/features/theme/core/types";
 import { defaultTheme } from "#/features/theme/themes/default-theme";
-import type { ToolkitThemeDefinition } from "#/features/theme/types/toolkit-theme-definition";
 import { GAME_CONFIG as CLAIROBSCUR_CONFIG } from "#/games/clairobscur/game-config";
-import { GAME_CONFIG as REMNANT2_CONFIG } from "#/games/remnant2/game-config";
-import { GAME_CONFIG as SLAYTHESPIRE2_CONFIG } from "#/games/slaythespire2/game-config";
+import { GAME_CONFIG as REMNANT2_CONFIG } from "#/games/remnant2/core/game-config";
+import { GAME_CONFIG as SLAYTHESPIRE2_CONFIG } from "#/games/slaythespire2/core/game-config";
 import type { GameId } from "@/prisma";
 
 // Widened type for runtime-keyed access (base AppItem, string category)

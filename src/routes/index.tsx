@@ -1,7 +1,7 @@
 import { Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { setGame } from "#/features/game/store/game-store";
+import { setGame } from "#/features/game/core/store";
 
 export const Route = createFileRoute("/")({ component: App });
 

@@ -10,7 +10,6 @@
     "module": "ESNext",
     "paths": {
       "#/*": ["./src/*"],
-      "@/*": ["./src/*"],
       "@/prisma": ["./prisma/client"]
     },
     "lib": ["ES2022", "DOM", "DOM.Iterable"],

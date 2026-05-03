@@ -1,19 +1,20 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { clientEnv, serverEnv } from "#/config/env";
+import EmailPasswordReset from "#/emails/auth/email-password-reset";
+import EmailVerification from "#/emails/auth/email-verification";
 import { resend } from "#/integrations/resend/resend";
-import EmailPasswordReset from "@/emails/auth/email-password-reset";
-import EmailVerification from "@/emails/auth/email-verification";
 import { prisma } from "@/prisma";
 
 const auth = betterAuth({
 	database: prismaAdapter(prisma, {
 		provider: "postgresql",
 	}),
-	secret: process.env.BETTER_AUTH_SECRET!,
+	secret: serverEnv.BETTER_AUTH_SECRET,
 	baseURL:
-		process.env.BETTER_AUTH_URL ||
-		process.env.NEXT_PUBLIC_APP_URL ||
+		serverEnv.BETTER_AUTH_URL ||
+		clientEnv.VITE_APP_URL ||
 		"http://localhost:3000",
 	emailAndPassword: {
 		enabled: true,
@@ -64,8 +65,8 @@ const auth = betterAuth({
 	},
 	socialProviders: {
 		discord: {
-			clientId: process.env.DISCORD_CLIENT_ID!,
-			clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+			clientId: serverEnv.DISCORD_CLIENT_ID,
+			clientSecret: serverEnv.DISCORD_CLIENT_SECRET,
 			mapProfileToUser: (profile) => {
 				// Discord provides a username field - use it as the default username
 				// Better Auth will handle uniqueness by appending numbers if needed

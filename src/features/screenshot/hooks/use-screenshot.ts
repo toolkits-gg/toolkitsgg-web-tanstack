@@ -1,7 +1,7 @@
 import { useMantineTheme } from "@mantine/core";
 import { domToBlob } from "modern-screenshot";
 import { useRef } from "react";
-import { useScreenshotPreviewStore } from "#/features/screenshot/store/screenshot-preview-store";
+import { useScreenshotPreviewStore } from "#/features/screenshot/core/store";
 import { logger } from "#/integrations/pino/logger";
 
 type ScreenshotResult = {
@@ -14,7 +14,10 @@ type UseScreenshotProps = {
 	filename?: string;
 };
 
-function useScreenshot({ ref, filename }: UseScreenshotProps): ScreenshotResult {
+function useScreenshot({
+	ref,
+	filename,
+}: UseScreenshotProps): ScreenshotResult {
 	const {
 		screenshotLoading,
 		setScreenshotLoading,

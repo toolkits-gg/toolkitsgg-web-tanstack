@@ -7,7 +7,7 @@ import type {
 	CollectedItemRecord,
 	CollectItemInput,
 	GameCollectedItemsDal,
-} from "#/features/game/types/game-config";
+} from "#/features/game/items/types";
 import { getIDBClient } from "#/integrations/prisma-idb/idb-client";
 
 interface CollectedItemIDBDelegate {

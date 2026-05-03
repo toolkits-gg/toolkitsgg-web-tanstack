@@ -1,6 +1,6 @@
 import type { ImageProps } from "@mantine/core";
 import { AppImage } from "#/components/AppImage";
-import { useGameId } from "#/features/game/hooks/use-game-id";
+import { useGameId } from "#/features/game/core/use-game-id";
 
 type GameImageProps = ImageProps & {};
 

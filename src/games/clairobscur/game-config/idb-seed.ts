@@ -1,4 +1,4 @@
-import type { GameIDBSeed } from "#/features/game/types/game-seeds";
+import type { GameIDBSeed } from "#/features/game/core/types";
 import { ITEMS } from "#/games/clairobscur/game-config/items";
 import { getIDBClient } from "#/integrations/prisma-idb/idb-client";
 

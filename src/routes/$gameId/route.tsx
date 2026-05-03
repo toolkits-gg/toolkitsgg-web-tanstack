@@ -3,8 +3,8 @@
 import { Box, Text, Title } from "@mantine/core";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { setGame } from "#/features/game/core/store";
 import { isRegisteredGameId } from "#/features/game/registry/game-registry";
-import { setGame } from "#/features/game/store/game-store";
 import type { GameId } from "@/prisma";
 
 export const Route = createFileRoute("/$gameId")({

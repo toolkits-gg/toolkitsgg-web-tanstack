@@ -2,7 +2,7 @@ import { Text } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { SupportButtons } from "#/components/SupportButtons";
 import { DISCORD_URL, GITHUB_URL } from "#/constants/paths";
-import type { WizardStep } from "@/features/wizard/types/wizard-step";
+import type { WizardStep } from "#/features/wizard/types";
 import { SocialMediaContent } from "../components/SocialMediaContent";
 
 const GETTING_STARTED_STEPS: WizardStep[] = [

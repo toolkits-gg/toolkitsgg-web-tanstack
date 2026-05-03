@@ -14,14 +14,14 @@ import {
 	Tooltip,
 } from "@mantine/core";
 
-import { GREEN, RED } from "@/features/theme/constants/colors";
+import { GREEN, RED } from "#/features/theme/core/constants";
 
-import inputClasses from "./modules/Input.module.css";
-import modalClasses from "./modules/Modal.module.css";
-import multiSelectClasses from "./modules/MultiSelect.module.css";
-import paperClasses from "./modules/Paper.module.css";
-import selectClasses from "./modules/Select.module.css";
-import tooltipClasses from "./modules/Tooltip.module.css";
+import inputClasses from "../modules/Input.module.css";
+import modalClasses from "../modules/Modal.module.css";
+import multiSelectClasses from "../modules/MultiSelect.module.css";
+import paperClasses from "../modules/Paper.module.css";
+import selectClasses from "../modules/Select.module.css";
+import tooltipClasses from "../modules/Tooltip.module.css";
 
 const CONTAINER_SIZES: Record<string, string> = {
 	xxs: rem("200px"),

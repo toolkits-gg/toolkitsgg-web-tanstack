@@ -1,7 +1,7 @@
 import { Box, Stack } from "@mantine/core";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { ProfileHeader } from "#/features/auth/components/ProfileHeader";
-import { ProfileTabNav } from "#/features/auth/components/ProfileTabNav";
+import { ProfileHeader } from "#/features/auth/core/ProfileHeader";
+import { ProfileTabNav } from "#/features/auth/core/ProfileTabNav";
 import { useUserProfile } from "#/features/auth/hooks/use-user-profile";
 
 export const Route = createFileRoute("/profile")({

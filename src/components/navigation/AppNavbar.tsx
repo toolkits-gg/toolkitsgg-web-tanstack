@@ -2,9 +2,9 @@ import { Flex, ScrollArea } from "@mantine/core";
 import { ClientOnly } from "@tanstack/react-router";
 import { getNavLinks } from "#/components/navigation/get-nav-links";
 import { NavbarLinksGroup } from "#/components/navigation/NavbarLinksGroup";
-import { UserMenu } from "#/features/auth/components/UserMenu";
-import { useGameId } from "#/features/game/hooks/use-game-id";
-import { ChangeThemeButton } from "#/features/theme/components/ChangeThemeButton";
+import { UserMenu } from "#/features/auth/core/UserMenu";
+import { useGameId } from "#/features/game/core/use-game-id";
+import { ChangeThemeButton } from "#/features/theme/core/ChangeThemeButton";
 import classes from "./AppNavbar.module.css";
 
 type AppNavbarProps = {

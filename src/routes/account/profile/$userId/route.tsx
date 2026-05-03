@@ -1,10 +1,10 @@
 import { Box, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
-import { ProfileHeader } from "#/features/auth/components/ProfileHeader";
-import { ProfileTabNav } from "#/features/auth/components/ProfileTabNav";
+import { ProfileHeader } from "#/features/auth/core/ProfileHeader";
+import { ProfileTabNav } from "#/features/auth/core/ProfileTabNav";
+import { resolveAvatar } from "#/features/auth/core/utils";
+import { getPublicUserProfileServerFn } from "#/features/auth/dal/user-profile/user-profile";
 import { getViewerUserIdServerFn } from "#/features/auth/dal/user-profile/user-profile.actions";
-import { getPublicUserProfileServerFn } from "#/features/auth/dal/user-profile/user-profile.server";
-import { resolveAvatar } from "#/features/auth/utils/resolve-avatar";
 import type { GameId } from "@/prisma";
 
 export const Route = createFileRoute("/account/profile/$userId")({

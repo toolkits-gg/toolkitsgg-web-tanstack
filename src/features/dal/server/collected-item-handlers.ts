@@ -1,4 +1,4 @@
-import type { CollectedItemRecord } from "#/features/game/types/game-config";
+import type { CollectedItemRecord } from "#/features/game/items/types";
 
 interface CollectedItemPrismaDelegate {
 	upsert(args: {
@@ -9,14 +9,17 @@ interface CollectedItemPrismaDelegate {
 	deleteMany(args: {
 		where: { userId: string; itemId: string };
 	}): Promise<unknown>;
-	findMany(args: {
-		where: { userId: string };
-	}): Promise<CollectedItemRecord[]>;
+	findMany(args: { where: { userId: string } }): Promise<CollectedItemRecord[]>;
 }
 
-export function createCollectedItemHandlers(model: CollectedItemPrismaDelegate) {
+export function createCollectedItemHandlers(
+	model: CollectedItemPrismaDelegate,
+) {
 	return {
-		async collect(itemId: string, userId: string): Promise<CollectedItemRecord> {
+		async collect(
+			itemId: string,
+			userId: string,
+		): Promise<CollectedItemRecord> {
 			return model.upsert({
 				where: { userId_itemId: { userId, itemId } },
 				update: {},

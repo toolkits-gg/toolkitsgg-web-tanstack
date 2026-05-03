@@ -5,17 +5,17 @@ import {
 	requireUserId,
 } from "#/features/auth/dal/require-user.server";
 import {
+	removeAvatarOverrideServerFn,
+	removePrimaryAvatarServerFn,
+	updateAvatarServerFn,
+} from "#/features/auth/dal/user-profile/user-profile";
+import {
 	deleteLocalAvatarOverride,
 	getLocalAvatarOverrides,
 	getLocalUserProfile,
 	upsertLocalAvatarOverride,
 	upsertLocalUserProfile,
 } from "#/features/auth/dal/user-profile/user-profile.idb";
-import {
-	removeAvatarOverrideServerFn,
-	removePrimaryAvatarServerFn,
-	updateAvatarServerFn,
-} from "#/features/auth/dal/user-profile/user-profile.server";
 import {
 	defineDalRead,
 	defineDalWrite,

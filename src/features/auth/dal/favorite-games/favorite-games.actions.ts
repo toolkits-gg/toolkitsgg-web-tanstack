@@ -1,13 +1,13 @@
 import {
+	favoriteGameServerFn,
+	listFavoriteGamesServerFn,
+	unfavoriteGameServerFn,
+} from "#/features/auth/dal/favorite-games/favorite-games";
+import {
 	deleteLocalFavoriteGame,
 	listLocalFavoriteGames,
 	upsertLocalFavoriteGame,
 } from "#/features/auth/dal/favorite-games/favorite-games.idb";
-import {
-	favoriteGameServerFn,
-	listFavoriteGamesServerFn,
-	unfavoriteGameServerFn,
-} from "#/features/auth/dal/favorite-games/favorite-games.server";
 import {
 	defineDalRead,
 	defineDalWrite,
