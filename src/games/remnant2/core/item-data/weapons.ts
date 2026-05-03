@@ -1910,7 +1910,7 @@ const WEAPONS: Remnant2WeaponItem[] = [
 		id: "a88cg7",
 		dlc: "BASE",
 		description: [
-			"A large, heavy warhammer cobbled together from engine components. It is a slow-but-devastating weapon meant to destroy anything it hits.",
+			"A large, heavy warhammer cobbled together from engine core. It is a slow-but-devastating weapon meant to destroy anything it hits.",
 		],
 		wikiUrl: `https://remnant2.wiki.gg/Scrap_Hammer`,
 		weaponModifiers: {

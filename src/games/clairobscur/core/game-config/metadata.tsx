@@ -1,7 +1,7 @@
 import type { LogoSize } from "#/components/AppLogo";
 import type { GameMetadata } from "#/features/game/core/types";
-import { ClairObscurLogo } from "#/games/clairobscur/components/Logo";
-import { GAME_ID } from "#/games/clairobscur/constants/game-id";
+import { GAME_ID } from "#/games/clairobscur/core/constants";
+import { ClairObscurLogo } from "#/games/clairobscur/core/Logo";
 
 const METADATA: GameMetadata = {
 	id: GAME_ID,

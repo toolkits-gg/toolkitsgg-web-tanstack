@@ -352,7 +352,7 @@ const sharedOpts = formOptions({
   defaultValues: { firstName: '', lastName: '' },
 })
 
-// Reuse across components
+// Reuse across core
 const form = useForm({
   ...sharedOpts,
   onSubmit: async ({ value }) => { /* ... */ },

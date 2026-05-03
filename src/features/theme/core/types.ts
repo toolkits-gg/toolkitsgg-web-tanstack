@@ -65,7 +65,7 @@ type ToolkitThemeColorName =
  * For this reason, we define three values for each semantic color:
  * - The dark variant (e.g., 'primaryDark')
  * - The light variant (e.g., 'primaryLight')
- * - The virtual color (e.g., 'primary') - this is the one used in components
+ * - The virtual color (e.g., 'primary') - this is the one used in core
  *
  * Additionally, each color has foreground variants for text/icon colors:
  * - The dark foreground (e.g., 'primaryFgDark')

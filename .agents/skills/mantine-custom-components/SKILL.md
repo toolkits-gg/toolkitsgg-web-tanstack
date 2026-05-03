@@ -1,5 +1,5 @@
 ---
-name: mantine-custom-components
+name: mantine-custom-core
 description: >
   Build custom components that integrate with Mantine's theming, Styles API, and core features.
   Use this skill when: (1) creating a new component using factory(), polymorphicFactory(), or
@@ -80,7 +80,7 @@ Factory<{
   stylesNames: 'root' | 'inner'; // union of Styles API selectors
   vars: { root: '--my-var' };    // CSS variable map per selector
   variant: 'filled' | 'outline'; // accepted variant strings
-  staticComponents: {            // sub-components (compound pattern)
+  staticComponents: {            // sub-core (compound pattern)
     Item: typeof MyComponentItem;
   };
   compound?: boolean;            // true = sub-component; disables theme classNames/styles/vars

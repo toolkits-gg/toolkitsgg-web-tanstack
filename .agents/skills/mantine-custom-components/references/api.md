@@ -131,13 +131,13 @@ Factory<{
   // Accepted values for the variant prop
   variant: 'filled' | 'outline' | 'subtle';
 
-  // Sub-components for compound pattern
+  // Sub-core for compound pattern
   staticComponents: {
     Item: typeof MyItem;
     Label: typeof MyLabel;
   };
 
-  // Set to true for sub-components — disables theme classNames/styles/vars for this component
+  // Set to true for sub-core — disables theme classNames/styles/vars for this component
   compound: true;
 
   // Context type passed as 3rd argument to styles/vars resolvers
@@ -159,7 +159,7 @@ Merges default props from three sources in priority order (highest → lowest):
 
 ```ts
 useProps<T extends Record<string, any>>(
-  componentName: string,    // must match the name used in theme.components
+  componentName: string,    // must match the name used in theme.core
   defaultProps: Partial<T>, // use 'satisfies Partial<T>' for correct inference
   props: T
 ): T
@@ -399,7 +399,7 @@ MyComponent.displayName = '@mantine/core/MyComponent'; // or '@mantine/package/N
 MyComponent.classes = classes;                          // CSS module classes object
 MyComponent.varsResolver = varsResolver;               // only if component defines vars
 
-// Sub-components (compound pattern)
+// Sub-core (compound pattern)
 MyComponent.Item = MyItem;
 MyComponent.Label = MyLabel;
 ```

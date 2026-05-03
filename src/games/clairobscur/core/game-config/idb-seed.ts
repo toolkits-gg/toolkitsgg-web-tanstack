@@ -1,5 +1,5 @@
 import type { GameIDBSeed } from "#/features/game/core/types";
-import { ITEMS } from "#/games/clairobscur/game-config/items";
+import { ITEMS } from "#/games/clairobscur/core/game-config/items";
 import { getIDBClient } from "#/integrations/prisma-idb/idb-client";
 
 const clairObscurIDBSeed: GameIDBSeed = {

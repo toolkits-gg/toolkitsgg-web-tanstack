@@ -1,5 +1,5 @@
 import type { GameIDBSeed } from "#/features/game/core/types";
-import { clairObscurIDBSeed } from "#/games/clairobscur/game-config/idb-seed";
+import { clairObscurIDBSeed } from "#/games/clairobscur/core/game-config/idb-seed";
 import { remnant2IDBSeed } from "#/games/remnant2/core/game-config/idb-seed";
 import { slayTheSpire2IDBSeed } from "#/games/slaythespire2/core/game-config/idb-seed";
 import type { GameId } from "@/prisma";
