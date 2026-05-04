@@ -14,7 +14,7 @@ import {
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { LuSwords } from "react-icons/lu";
-import { authClient } from "#/integrations/better-auth/auth-client";
+import { authClient } from "#/integrations/better-auth/auth.client";
 
 export const Route = createFileRoute("/sign-up")({ component: SignUpPage });
 

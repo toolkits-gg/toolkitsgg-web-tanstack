@@ -1,6 +1,6 @@
 import { allGameDBSeeds } from "#/features/game/registry/game-db-seed-registry";
 
-import { auth } from "../src/integrations/better-auth/auth";
+import { auth } from "#/integrations/better-auth/auth";
 import { prisma } from "./client";
 
 const seededUsers = [

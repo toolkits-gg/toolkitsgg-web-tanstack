@@ -3,12 +3,13 @@ import { useCallback, useRef } from "react";
 import { chooseBackend } from "#/features/dal/core/choose-backend";
 import type { DalContext } from "#/features/dal/core/types";
 import { getOrCreateAnonUserId } from "#/features/dal/identity/anon-id";
-import { useSession } from "#/integrations/better-auth/auth-client";
+import { useSession } from "#/integrations/better-auth/auth.client";
 
 type DalContextGetter = () => DalContext;
 
 const useDalContextSource = (): DalContextGetter => {
 	const { data } = useSession();
+
 	const { online } = useNetwork();
 	const sourceRef = useRef<DalContext>({
 		anonUserId: "",

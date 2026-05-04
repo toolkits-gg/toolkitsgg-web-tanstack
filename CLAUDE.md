@@ -240,7 +240,7 @@ Three aliases resolve to the same place — use the one already in the file:
 
 ### Env vars
 
-Validated with zod in `src/config/env.ts` (server) and `src/config/client-env.ts` (client). `.env.local.example` is the template.
+Validated with zod in `src/config/env.ts` (server) and `import.meta.env` (client). `.env.local.example` is the template.
 
 Server keys (from `process.env`): `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `IMAGEKIT_CLIENT_ID`, `IMAGEKIT_CLIENT_SECRET`, `IMAGEKIT_ENDPOINT_URL`, `RESEND_KEY`.
 
