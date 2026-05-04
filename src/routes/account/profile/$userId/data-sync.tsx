@@ -17,7 +17,7 @@ import { syncOps } from "#/features/dal/queue/sync-runner";
 import type { PendingOp } from "#/features/dal/queue/types";
 import { usePendingOps } from "#/features/dal/queue/use-pending-ops";
 import { resolveWriteAction } from "#/features/dal/registry";
-import { useSession } from "#/integrations/better-auth/auth.client";
+import { useSession } from "#/integrations/better-auth/auth-client";
 
 export const Route = createFileRoute("/account/profile/$userId/data-sync")({
 	component: DataSync,

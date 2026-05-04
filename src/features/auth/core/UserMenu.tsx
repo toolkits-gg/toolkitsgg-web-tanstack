@@ -24,7 +24,7 @@ import {
 import { AvatarPicker } from "#/features/auth/core/AvatarPicker";
 import { useResolvedAvatar } from "#/features/auth/hooks/use-resolved-avatar";
 import { useUserProfile } from "#/features/auth/hooks/use-user-profile";
-import { signOut } from "#/integrations/better-auth/auth.client";
+import { signOut } from "#/integrations/better-auth/auth-client";
 import classes from "./UserMenu.module.css";
 
 export function UserMenu() {

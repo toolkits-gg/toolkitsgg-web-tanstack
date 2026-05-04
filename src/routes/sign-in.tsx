@@ -14,7 +14,7 @@ import {
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiDiscord } from "react-icons/si";
-import { authClient } from "#/integrations/better-auth/auth.client";
+import { authClient } from "#/integrations/better-auth/auth-client";
 
 export const Route = createFileRoute("/sign-in")({ component: SignInPage });
 

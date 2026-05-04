@@ -1,7 +1,7 @@
 import { userProfileActions } from "#/features/auth/dal/user-profile/user-profile.actions";
 import { useDalMutation } from "#/features/dal/hooks/use-dal-mutation";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
-import { useSession } from "#/integrations/better-auth/auth.client";
+import { useSession } from "#/integrations/better-auth/auth-client";
 import type { GameId } from "@/prisma";
 
 export function useUserProfile() {
