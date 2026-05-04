@@ -20,7 +20,7 @@ const categoryParser = parseAsArrayOf(
 ).withDefault([]);
 
 /**
- * stores as JSON string in URL, eg. ?dlc={"BASE":"include","DLC1":"exclude"}
+ * stores as JSON string in URL, e.g. ?dlc={"BASE":"include","DLC1":"exclude"}
  */
 const dlcFilterParser = createParser<TriStateFilterValue>({
 	parse: (value) => {
