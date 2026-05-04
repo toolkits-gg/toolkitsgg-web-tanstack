@@ -8,6 +8,7 @@ import {
 	formatCategoryLabel,
 	getItemSubcategories,
 	itemMatchesCategory,
+	resolveLinkedItems,
 } from "#/features/game/items/utils";
 import { ITEMS } from "#/games/slaythespire2/core/game-config/items";
 import { slayTheSpire2CollectedItemsDal } from "#/games/slaythespire2/dal/collected-items";
@@ -73,6 +74,7 @@ const PAGES: GamePages = {
 	renderItemLookup: () => (
 		<AppItemPage
 			items={ITEMS}
+			resolveLinkedItems={(item) => resolveLinkedItems(item, ITEMS.all)}
 			dal={slayTheSpire2CollectedItemsDal}
 			gameFilterConfig={slayTheSpire2FilterConfig}
 		/>

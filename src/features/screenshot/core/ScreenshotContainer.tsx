@@ -53,7 +53,9 @@ const ScreenshotContainer = forwardRef<
 			<Box
 				ref={ref}
 				p={screenshotMode ? "md" : undefined}
-				className={cx(screenshotMode && classes.container, className)}
+				className={cx(className, {
+					[classes.screenshotContainer]: screenshotMode,
+				})}
 				{...boxProps}
 			>
 				{avatarUrl && title ? (

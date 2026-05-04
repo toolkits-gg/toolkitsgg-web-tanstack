@@ -5,13 +5,14 @@ import {
 	Button,
 	Divider,
 	Flex,
+	Grid,
 	Group,
 	ScrollArea,
 	Stack,
 	Text,
 	Tooltip,
 } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { LuCamera, LuCheck, LuPlus } from "react-icons/lu";
 import { GameImage } from "#/components/GameImage";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
@@ -30,6 +31,7 @@ import { useScreenshot } from "#/features/screenshot/hooks/use-screenshot";
 
 type ItemInfoModalProps = {
 	item: AppItem;
+	resolveLinkedItems: (item: AppItem) => AppItem[];
 	dal: GameCollectedItemsDal;
 	isCollectable: boolean;
 	onCollect: ({ itemId, itemName }: CollectItemInput) => void;
@@ -38,12 +40,14 @@ type ItemInfoModalProps = {
 
 const ItemInfoModal = ({
 	item,
+	resolveLinkedItems,
 	dal,
 	isCollectable,
 	onCollect,
 	onUncollect,
 }: ItemInfoModalProps) => {
-	const [screenshotMode, setScreenshotMode] = useState(false);
+	const [_screenshotMode, setScreenshotMode] = useState(false);
+	const screenshotMode = true; // TODO REVERT
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const gameId = useGameId();
@@ -88,6 +92,8 @@ const ItemInfoModal = ({
 			onCollect({ itemId: item.id, itemName: item.name });
 		}
 	};
+
+	const linkedItems = resolveLinkedItems(item);
 
 	const itemContent = (
 		<Stack gap="md" p="md">
@@ -146,36 +152,33 @@ const ItemInfoModal = ({
 				</>
 			)}
 
-			{item.linkedItems && Object.keys(item.linkedItems).length > 0 && (
+			{linkedItems.length > 0 && (
 				<>
 					<Divider label="Linked Items" />
-					<Stack gap="xs">
-						{Object.entries(item.linkedItems).map(([key, value]) => {
-							const linkedArr = Array.isArray(value) ? value : [value];
-							return linkedArr.map((linked) => {
-								const imageUrl =
-									screenshotMode &&
-									"imageUrl" in linked &&
-									typeof linked.imageUrl === "string"
-										? linked.imageUrl
-										: null;
-								return (
-									<Flex key={`${key}-${linked.name}`} align="center" gap="xs">
+					<Grid align="center" gap="xs">
+						{linkedItems.map((linkedItem) => {
+							return (
+								<Fragment key={`${linkedItem.id}-${linkedItem.name}`}>
+									<Grid.Col span={3}>
 										<Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-											{key}:
+											{linkedItem.category}:
 										</Text>
-										{imageUrl && (
-											<GameImage
-												src={imageUrl}
-												style={{ width: 24, height: 24, objectFit: "contain" }}
-											/>
-										)}
-										<Text size="sm">{linked.name}</Text>
-									</Flex>
-								);
-							});
+										<GameImage
+											src={linkedItem.imageUrl}
+											style={{
+												width: 24,
+												height: 24,
+												objectFit: "contain",
+											}}
+										/>
+									</Grid.Col>
+									<Grid.Col span={3}>
+										<Text size="xs">{linkedItem.name}</Text>
+									</Grid.Col>
+								</Fragment>
+							);
 						})}
-					</Stack>
+					</Grid>
 				</>
 			)}
 		</Stack>

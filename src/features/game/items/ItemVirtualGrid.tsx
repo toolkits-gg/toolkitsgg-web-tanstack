@@ -1,7 +1,7 @@
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ItemCard } from "#/features/game/items/ItemCard";
 import { ItemInfoModal } from "#/features/game/items/ItemInfoModal";
 import type {
@@ -22,6 +22,7 @@ type RowData =
 
 type ItemVirtualGridProps = {
 	items: AppItem[];
+	resolveLinkedItems: (item: AppItem) => AppItem[];
 	categories: string[];
 	uncollectableCategories: string[];
 	collectedIds: string[];
@@ -33,6 +34,7 @@ type ItemVirtualGridProps = {
 
 const ItemVirtualGrid = ({
 	items,
+	resolveLinkedItems,
 	categories,
 	uncollectableCategories,
 	collectedIds,
@@ -54,13 +56,10 @@ const ItemVirtualGrid = ({
 		return () => observer.disconnect();
 	}, []);
 
-	const isCollectable = useCallback(
-		(item: AppItem) =>
-			!uncollectableCategories.some(
-				(uc) => String(item.category).toLowerCase() === uc.toLowerCase(),
-			),
-		[uncollectableCategories],
-	);
+	const isCollectable = (item: AppItem) =>
+		!uncollectableCategories.some(
+			(uc) => String(item.category).toLowerCase() === uc.toLowerCase(),
+		);
 
 	const rowData: RowData[] = [];
 	for (const category of categories) {
@@ -88,25 +87,23 @@ const ItemVirtualGrid = ({
 		scrollMargin: containerRef.current?.offsetTop ?? 0,
 	});
 
-	const handleInfo = useCallback(
-		(item: AppItem) => {
-			modals.open({
-				title: item.name,
-				size: "md",
-				centered: true,
-				children: (
-					<ItemInfoModal
-						item={item}
-						dal={dal}
-						isCollectable={isCollectable(item)}
-						onCollect={onCollect}
-						onUncollect={onUncollect}
-					/>
-				),
-			});
-		},
-		[isCollectable, dal, onCollect, onUncollect],
-	);
+	const handleInfo = (item: AppItem) => {
+		modals.open({
+			title: item.name,
+			size: "md",
+			centered: true,
+			children: (
+				<ItemInfoModal
+					item={item}
+					resolveLinkedItems={resolveLinkedItems}
+					dal={dal}
+					isCollectable={isCollectable(item)}
+					onCollect={onCollect}
+					onUncollect={onUncollect}
+				/>
+			),
+		});
+	};
 
 	if (rowData.length === 0) {
 		return (

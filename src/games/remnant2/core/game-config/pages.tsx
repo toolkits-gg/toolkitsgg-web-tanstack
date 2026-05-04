@@ -12,6 +12,7 @@ import {
 	formatCategoryLabel,
 	getItemSubcategories,
 	itemMatchesCategory,
+	resolveLinkedItems,
 } from "#/features/game/items/utils";
 import { ITEMS } from "#/games/remnant2/core/game-config/items";
 import { remnant2CollectedItemsDal } from "#/games/remnant2/dal/collected-items";
@@ -140,9 +141,7 @@ const remnant2FilterConfig: GameFilterConfig = {
 			result = result.filter((item) => {
 				const itemDlc = (item as { dlc?: string }).dlc ?? "";
 				if (excludedDlcs.includes(itemDlc)) return false;
-				if (includedDlcs.length > 0 && !includedDlcs.includes(itemDlc))
-					return false;
-				return true;
+				return !(includedDlcs.length > 0 && !includedDlcs.includes(itemDlc));
 			});
 		}
 
@@ -154,6 +153,7 @@ const PAGES: GamePages = {
 	renderItemLookup: () => (
 		<AppItemPage
 			items={ITEMS}
+			resolveLinkedItems={(item) => resolveLinkedItems(item, ITEMS.all)}
 			dal={remnant2CollectedItemsDal}
 			gameFilterConfig={remnant2FilterConfig}
 		/>

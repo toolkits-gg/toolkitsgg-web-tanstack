@@ -38,7 +38,7 @@ type GroupedOption = {
 	items: CategoryOption[];
 };
 
-function getItemSubcategories(items: AppItem[]): GroupedOption[] {
+const getItemSubcategories = (items: AppItem[]): GroupedOption[] => {
 	const categoryMap = new Map<string, Set<string>>();
 
 	for (const item of items) {
@@ -77,13 +77,51 @@ function getItemSubcategories(items: AppItem[]): GroupedOption[] {
 	}
 
 	return groupedOptions.sort((a, b) => a.group.localeCompare(b.group));
-}
+};
 
-function titleCase(str: string): string {
+const titleCase = (str: string): string => {
 	return str
 		.split(/[_ ]/)
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
 		.join(" ");
-}
+};
 
-export { getItemSubcategories, formatCategoryLabel, itemMatchesCategory };
+/**
+ * Resolves linked items for a given item by matching names
+ * from the item's linkedItems field against a list of all items.
+ */
+const resolveLinkedItems = <TItem extends AppItem>(
+	item: TItem,
+	allItems: TItem[],
+): TItem[] => {
+	if (!item.linkedItems) return [];
+
+	const results: TItem[] = [];
+
+	for (const [_key, values] of Object.entries(item.linkedItems)) {
+		const itemsToProcess = Array.isArray(values) ? values : [values];
+
+		for (const value of itemsToProcess) {
+			if (!value || !(value as { name?: string }).name) continue;
+
+			const foundItem = allItems.find(
+				(i) =>
+					i.name.toLowerCase() ===
+					(value as { name: string }).name.toLowerCase(),
+			);
+
+			if (foundItem && !results.some((r) => r.id === foundItem.id)) {
+				results.push(foundItem);
+			}
+		}
+	}
+
+	return results;
+};
+
+export {
+	getItemSubcategories,
+	formatCategoryLabel,
+	itemMatchesCategory,
+	resolveLinkedItems,
+};

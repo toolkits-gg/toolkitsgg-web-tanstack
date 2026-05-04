@@ -1,6 +1,5 @@
 import { Box } from "@mantine/core";
 import { useQueryStates } from "nuqs";
-import { useCallback, useMemo } from "react";
 import { useDalMutation } from "#/features/dal/hooks/use-dal-mutation";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
 import {
@@ -9,6 +8,7 @@ import {
 } from "#/features/game/items/ItemFilterBar";
 import { ItemVirtualGrid } from "#/features/game/items/ItemVirtualGrid";
 import type {
+	AppItem,
 	CollectItemInput,
 	GameCollectedItemsDal,
 	GameFilterConfig,
@@ -24,6 +24,7 @@ import {
 
 type AppItemPageProps = {
 	items: AnyGameConfig["ITEMS"];
+	resolveLinkedItems: (item: AppItem) => AppItem[];
 	dal: GameCollectedItemsDal;
 	gameFilterConfig?: GameFilterConfig;
 };
@@ -36,7 +37,12 @@ const universalParsers = {
 	showCollectableOnly: showCollectableOnlyParser,
 };
 
-const AppItemPage = ({ items, dal, gameFilterConfig }: AppItemPageProps) => {
+const AppItemPage = ({
+	items,
+	resolveLinkedItems,
+	dal,
+	gameFilterConfig,
+}: AppItemPageProps) => {
 	const [universalParams, setUniversalParams] =
 		useQueryStates(universalParsers);
 	const {
@@ -51,7 +57,7 @@ const AppItemPage = ({ items, dal, gameFilterConfig }: AppItemPageProps) => {
 		gameFilterConfig?.parsers ?? {},
 	);
 
-	const activeGameParams: Record<string, string> = useMemo(() => {
+	const getActiveGameParams = (): Record<string, string> => {
 		if (!gameFilterConfig) return {};
 		return Object.fromEntries(
 			gameFilterConfig.defs.map((def) => [
@@ -59,27 +65,25 @@ const AppItemPage = ({ items, dal, gameFilterConfig }: AppItemPageProps) => {
 				(gameParams as Record<string, string>)[def.key] ?? def.defaultValue,
 			]),
 		);
-	}, [gameFilterConfig, gameParams]);
+	};
+	const activeGameParams = getActiveGameParams();
 
-	const setParam = useCallback(
-		(key: string, value: string | undefined) => {
-			setGameParams({ [key]: value ?? null } as Parameters<
-				typeof setGameParams
-			>[0]);
-		},
-		[setGameParams],
-	);
+	const setParam = (key: string, value: string | undefined) => {
+		return setGameParams({ [key]: value ?? null } as Parameters<
+			typeof setGameParams
+		>[0]);
+	};
 
-	const setUniversalParam = useCallback(
-		(key: keyof typeof universalParams, value: string | boolean) => {
-			setUniversalParams({ [key]: value } as Parameters<
-				typeof setUniversalParams
-			>[0]);
-		},
-		[setUniversalParams],
-	);
+	const setUniversalParam = (
+		key: keyof typeof universalParams,
+		value: string | boolean,
+	): Promise<URLSearchParams> => {
+		return setUniversalParams({ [key]: value } as Parameters<
+			typeof setUniversalParams
+		>[0]);
+	};
 
-	const clearAllFilters = useCallback(() => {
+	const clearAllFilters = () => {
 		setUniversalParams({
 			search: "",
 			showCollectedItems: true,
@@ -94,37 +98,28 @@ const AppItemPage = ({ items, dal, gameFilterConfig }: AppItemPageProps) => {
 				) as Parameters<typeof setGameParams>[0],
 			);
 		}
-	}, [setUniversalParams, setGameParams, gameFilterConfig]);
+	};
 
 	// Collected items
 	const { data: collectedData } = useDalQuery(dal.list, undefined);
-	const collectedIds = useMemo(
-		() => (collectedData ?? []).map((r) => r.itemId),
-		[collectedData],
-	);
+	const collectedIds = (collectedData ?? []).map((r) => r.itemId);
 
 	const { mutate: collect } = useDalMutation(dal.collect);
 	const { mutate: uncollect } = useDalMutation(dal.uncollect);
 
-	const handleCollect = useCallback(
-		({ itemId, itemName }: CollectItemInput) => collect({ itemId, itemName }),
-		[collect],
-	);
-	const handleUncollect = useCallback(
-		({ itemId, itemName }: CollectItemInput) => uncollect({ itemId, itemName }),
-		[uncollect],
-	);
+	const handleCollect = ({ itemId, itemName }: CollectItemInput) =>
+		collect({ itemId, itemName });
+
+	const handleUncollect = ({ itemId, itemName }: CollectItemInput) =>
+		uncollect({ itemId, itemName });
 
 	// Filtering
-	const isUncollectable = useCallback(
-		(category: string) =>
-			items.uncollectableCategories.some(
-				(uc) => String(category).toLowerCase() === String(uc).toLowerCase(),
-			),
-		[items.uncollectableCategories],
-	);
+	const isUncollectable = (category: string) =>
+		items.uncollectableCategories.some(
+			(uc) => String(category).toLowerCase() === String(uc).toLowerCase(),
+		);
 
-	const filteredItems = useMemo(() => {
+	const getFilteredItems = () => {
 		let result = items.all;
 
 		// Search filter
@@ -147,8 +142,7 @@ const AppItemPage = ({ items, dal, gameFilterConfig }: AppItemPageProps) => {
 		result = result.filter((item) => {
 			const collected = collectedIds.includes(item.id);
 			if (collected && !showCollectedItems) return false;
-			if (!collected && !showUncollectedItems) return false;
-			return true;
+			return !(!collected && !showUncollectedItems);
 		});
 
 		// Game-specific filters
@@ -157,27 +151,19 @@ const AppItemPage = ({ items, dal, gameFilterConfig }: AppItemPageProps) => {
 		}
 
 		return result;
-	}, [
-		items.all,
-		search,
-		showCollectableOnly,
-		showCollectedItems,
-		showUncollectedItems,
-		collectedIds,
-		isUncollectable,
-		gameFilterConfig,
-		activeGameParams,
-	]);
+	};
+	const filteredItems = getFilteredItems();
 
-	const filteredCategories = useMemo(() => {
+	const getFilteredCategories = () => {
 		const catSet = new Set(filteredItems.map((item) => String(item.category)));
 		return items.categories.map((c) => String(c)).filter((c) => catSet.has(c));
-	}, [filteredItems, items.categories]);
+	};
+	const filteredCategories = getFilteredCategories();
 
 	const hasCollectableItems = items.collectable.length > 0;
 
 	// Active filter chips
-	const activeFilters: ActiveFilter[] = useMemo(() => {
+	const getActiveFilters = (): ActiveFilter[] => {
 		const filters: ActiveFilter[] = [];
 
 		if (search) {
@@ -237,17 +223,8 @@ const AppItemPage = ({ items, dal, gameFilterConfig }: AppItemPageProps) => {
 		}
 
 		return filters;
-	}, [
-		search,
-		showCollectedItems,
-		showUncollectedItems,
-		dimUncollectedItems,
-		showCollectableOnly,
-		gameFilterConfig,
-		activeGameParams,
-		setUniversalParam,
-		setParam,
-	]);
+	};
+	const activeFilters = getActiveFilters();
 
 	const renderGameFilters =
 		gameFilterConfig?.renderControls(
@@ -285,6 +262,7 @@ const AppItemPage = ({ items, dal, gameFilterConfig }: AppItemPageProps) => {
 			<Box p="md">
 				<ItemVirtualGrid
 					items={filteredItems}
+					resolveLinkedItems={resolveLinkedItems}
 					categories={filteredCategories}
 					uncollectableCategories={items.uncollectableCategories.map(String)}
 					collectedIds={collectedIds}
