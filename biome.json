@@ -19,13 +19,21 @@
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab",
-    "formatWithErrors": true
+		"formatWithErrors": true
 	},
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"correctness": {
+				"noUnusedVariables": {
+					"level": "error",
+					"options": {
+						"ignoreRestSiblings": true
+					}
+				}
+			}
 		}
 	},
 	"javascript": {
@@ -34,4 +42,3 @@
 		}
 	}
 }
-
