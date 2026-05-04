@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getOrCreateAnonUserId } from "#/features/dal/identity/anon-id";
-import { useSession } from "#/integrations/better-auth/auth-client";
+import { useSession } from "#/integrations/better-auth/auth.client";
 
 type EffectiveUserId = {
 	id: string;
