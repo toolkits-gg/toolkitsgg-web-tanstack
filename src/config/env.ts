@@ -15,5 +15,3 @@ const envSchema = z.object({
 
 // Validate server environment
 export const serverEnv = envSchema.parse(process.env);
-
-export { clientEnv } from "./client-env";

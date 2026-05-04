@@ -9,6 +9,7 @@ type DalContextGetter = () => DalContext;
 
 const useDalContextSource = (): DalContextGetter => {
 	const { data } = useSession();
+
 	const { online } = useNetwork();
 	const sourceRef = useRef<DalContext>({
 		anonUserId: "",

@@ -1,7 +1,5 @@
-import { clientEnv } from "#/config/client-env";
 import { getGameAvatars } from "#/features/game/registry/game-registry";
 import type { GameId } from "@/prisma";
-
 
 type ResolveAvatarParams = {
 	primaryAvatarId: string | null | undefined;
@@ -13,12 +11,16 @@ type ResolveAvatarParams = {
 
 function avatarImageUrl(imageUrl: string, gameId: GameId): string {
 	if (imageUrl.startsWith("http")) return imageUrl;
-	return `${clientEnv.VITE_CLOUDFRONT_URL}/games/${gameId}/${imageUrl.replace(/^\//, "")}`;
+	return `${import.meta.env.VITE_CLOUDFRONT_URL}/games/${gameId}/${imageUrl.replace(/^\//, "")}`;
 }
 
 const resolveAvatar = (
 	params: ResolveAvatarParams,
-): { avatarUrl: string | null; avatarId: string | null; gameId: GameId | null } => {
+): {
+	avatarUrl: string | null;
+	avatarId: string | null;
+	gameId: GameId | null;
+} => {
 	const {
 		primaryAvatarId,
 		primaryAvatarGameId,
