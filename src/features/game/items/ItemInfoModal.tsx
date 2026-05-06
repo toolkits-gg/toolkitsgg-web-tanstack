@@ -151,7 +151,7 @@ const ItemInfoModal = ({
 				</>
 			)}
 
-			{linkedItems.length > 0 && (
+			{linkedItems.length > 0 && screenshotMode && (
 				<>
 					<Divider label="Linked Items" />
 					<SimpleGrid cols={2} spacing="sm">
