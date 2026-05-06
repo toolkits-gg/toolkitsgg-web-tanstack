@@ -34,10 +34,7 @@ const AnimatedLogo = ({
 	size?: AppLogoProps["size"];
 }) => {
 	return (
-		<AppLogo
-			path={`logos/${size === 64 ? 64 : 128}GradientTK.gif`}
-			size={size}
-		/>
+		<AppLogo path={`logos/${size === 64 ? 64 : 128}GradientTK.gif`} size={size} />
 	);
 };
 

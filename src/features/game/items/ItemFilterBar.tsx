@@ -71,7 +71,6 @@ const ItemFilterBar = ({
 					key={search}
 					searchValue={search}
 					onSearchChange={(e) => onSearchChange(e)}
-					color="primary"
 				/>
 				<ActionIcon
 					variant="subtle"
