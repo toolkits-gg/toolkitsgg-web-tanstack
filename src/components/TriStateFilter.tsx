@@ -2,7 +2,6 @@ import {
 	Checkbox,
 	CloseButton,
 	Group,
-	type MantineColor,
 	Pill,
 	Popover,
 	Stack,
@@ -22,7 +21,6 @@ type TriStateFilterProps = {
 	value: TriStateFilterValue;
 	onChange: (value: TriStateFilterValue) => void;
 	placeholder?: string;
-	color?: MantineColor;
 };
 
 const TriStateFilter = ({
@@ -31,7 +29,6 @@ const TriStateFilter = ({
 	value,
 	onChange,
 	placeholder,
-	color = "primary",
 }: TriStateFilterProps) => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [opened, setOpened] = useState(false);
@@ -110,9 +107,6 @@ const TriStateFilter = ({
 				position="bottom-start"
 				opened={opened}
 				onChange={setOpened}
-				classNames={{
-					dropdown: classes.dropdown,
-				}}
 			>
 				<Popover.Target>
 					<div>
@@ -131,16 +125,6 @@ const TriStateFilter = ({
 									setOpened((o) => !o);
 								}
 							}}
-							style={
-								{
-									"--tri-state-filter-color": `var(--mantine-color-${color}-6)`,
-									"--tri-state-filter-color-hover": `var(--mantine-color-${color}-5)`,
-									"--tri-state-filter-option-hover-light": `var(--mantine-color-${color}-0)`,
-									"--tri-state-filter-option-hover-dark": `var(--mantine-color-${color}-7)`,
-									"--tri-state-filter-option-active-hover-light": `var(--mantine-color-${color}-1)`,
-									"--tri-state-filter-option-active-hover-dark": `var(--mantine-color-${color}-8)`,
-								} as React.CSSProperties
-							}
 						>
 							{totalActive === 0 ? (
 								<Text size="sm" c="dimmed">
@@ -191,7 +175,6 @@ const TriStateFilter = ({
 								onChange={(e) => setSearchQuery(e.currentTarget.value)}
 								size="xs"
 								style={{ flex: 1 }}
-								classNames={{ input: classes.searchInput }}
 							/>
 							<Group gap="2xs">
 								{totalActive > 0 && (

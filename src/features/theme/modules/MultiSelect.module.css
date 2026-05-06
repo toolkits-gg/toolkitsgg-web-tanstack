@@ -12,7 +12,6 @@
     var(--mantine-color-input-1),
     var(--mantine-color-input-9)
   );
-  border: 1px solid var(--mantine-color-border-4);
   color: var(--mantine-color-inputFg-5);
 }
 
@@ -23,7 +22,7 @@
     background-color: var(--mantine-primary-color-light);
   }
 
-  @mixin hover {
+  &:hover {
     background-color: var(--mantine-primary-color-light-hover);
   }
 }
@@ -38,5 +37,5 @@
 .label {
   font-size: var(--mantine-font-size-sm);
   font-weight: 500;
-  margin-bottom: var(--mantine-spacing-2xs);
+  margin-bottom: var(--mantine-spacing-xs);
 }

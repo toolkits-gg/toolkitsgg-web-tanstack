@@ -18,7 +18,7 @@
 
 .option {
   background-color: transparent;
-  @mixin hover {
+  &:hover {
     background-color: light-dark(var(--mantine-color-primary-3), var(--mantine-color-primary-5));
   }
 }

@@ -6,7 +6,7 @@
   font-size: var(--mantine-font-size-sm);
   color: var(--mantine-color-primary-3);
 
-  @mixin hover {
+  &:hover {
     background-color: var(--mantine-color-primary-5);
     color: var(--mantine-color-primaryFg-5);
   }
@@ -31,7 +31,7 @@
   text-align: left;
   cursor: pointer;
 
-  @mixin hover {
+  &:hover {
     background-color: var(--mantine-color-primary-5);
     color: var(--mantine-color-primaryFg-5);
   }
@@ -40,7 +40,7 @@
 .label {
   color: var(--mantine-color-primaryFg-5);
 
-  @mixin hover {
+  &:hover {
     background-color: var(--mantine-color-primary-5);
   }
 }
