@@ -89,6 +89,8 @@ const remnant2FilterConfig: GameFilterConfig = {
 					<MultiSelect
 						label="Categories"
 						placeholder="Select categories"
+						searchable
+						nothingFoundMessage="No categories found"
 						data={groupedSubcategories}
 						value={selectedCategories}
 						onChange={(val) =>
