@@ -7,7 +7,6 @@ import { ItemInfoModal } from "#/features/game/items/ItemInfoModal";
 import type {
 	AppItem,
 	CollectItemInput,
-	GameCollectedItemsDal,
 } from "#/features/game/items/types";
 import classes from "./ItemVirtualGrid.module.css";
 
@@ -27,9 +26,9 @@ type ItemVirtualGridProps = {
 	uncollectableCategories: string[];
 	collectedIds: string[];
 	dimUncollected: boolean;
-	dal: GameCollectedItemsDal;
 	onCollect: ({ itemId, itemName }: CollectItemInput) => void;
 	onUncollect: ({ itemId, itemName }: CollectItemInput) => void;
+	readOnly?: boolean;
 };
 
 const ItemVirtualGrid = ({
@@ -39,9 +38,9 @@ const ItemVirtualGrid = ({
 	uncollectableCategories,
 	collectedIds,
 	dimUncollected,
-	dal,
 	onCollect,
 	onUncollect,
+	readOnly = false,
 }: ItemVirtualGridProps) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [columns, setColumns] = useState(1);
@@ -96,35 +95,33 @@ const ItemVirtualGrid = ({
 				<ItemInfoModal
 					item={item}
 					resolveLinkedItems={resolveLinkedItems}
-					dal={dal}
+					isCollected={collectedIds.includes(item.id)}
 					isCollectable={isCollectable(item)}
 					onCollect={onCollect}
 					onUncollect={onUncollect}
+					readOnly={readOnly}
 				/>
 			),
 		});
 	};
 
-	if (rowData.length === 0) {
-		return (
-			<div className={classes.emptyState}>
-				<Text size="xl" fw={600} c="dimmed">
-					No items found
-				</Text>
-				<Text size="sm" c="dimmed" ta="center">
-					Try adjusting your filters or search query
-				</Text>
-			</div>
-		);
-	}
-
 	return (
 		<div ref={containerRef} className={classes.container}>
-			<div
-				className={classes.inner}
-				style={{ height: virtualizer.getTotalSize() }}
-			>
-				{virtualizer.getVirtualItems().map((virtualRow) => {
+			{rowData.length === 0 ? (
+				<div className={classes.emptyState}>
+					<Text size="xl" fw={600} c="dimmed">
+						No items found
+					</Text>
+					<Text size="sm" c="dimmed" ta="center">
+						Try adjusting your filters or search query
+					</Text>
+				</div>
+			) : (
+				<div
+					className={classes.inner}
+					style={{ height: virtualizer.getTotalSize() }}
+				>
+					{virtualizer.getVirtualItems().map((virtualRow) => {
 					const row = rowData[virtualRow.index];
 					if (!row) return null;
 
@@ -203,13 +200,15 @@ const ItemVirtualGrid = ({
 										onCollect={onCollect}
 										onUncollect={onUncollect}
 										onInfo={handleInfo}
+										readOnly={readOnly}
 									/>
 								))}
 							</div>
 						</div>
 					);
 				})}
-			</div>
+				</div>
+			)}
 		</div>
 	);
 };

@@ -1,5 +1,6 @@
 import { Box } from "@mantine/core";
-import { useQueryStates } from "nuqs";
+import { useQuery } from "@tanstack/react-query";
+import { parseAsBoolean, useQueryStates } from "nuqs";
 import { useDalMutation } from "#/features/dal/hooks/use-dal-mutation";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
 import {
@@ -9,6 +10,7 @@ import {
 import { ItemVirtualGrid } from "#/features/game/items/ItemVirtualGrid";
 import type {
 	AppItem,
+	CollectedItemsViewMode,
 	CollectItemInput,
 	GameCollectedItemsDal,
 	GameFilterConfig,
@@ -27,9 +29,10 @@ type AppItemPageProps = {
 	resolveLinkedItems: (item: AppItem) => AppItem[];
 	dal: GameCollectedItemsDal;
 	gameFilterConfig?: GameFilterConfig;
+	viewMode?: CollectedItemsViewMode;
 };
 
-const universalParsers = {
+const itemLookupParsers = {
 	search: searchParser,
 	showCollectedItems: showCollectedItemsParser,
 	showUncollectedItems: showUncollectedItemsParser,
@@ -37,14 +40,28 @@ const universalParsers = {
 	showCollectableOnly: showCollectableOnlyParser,
 };
 
+// Hide uncollected items by default on the Profile collected items tab
+const collectedItemsTabParsers = {
+	...itemLookupParsers,
+	showUncollectedItems: parseAsBoolean.withDefault(false).withOptions({
+		shallow: true,
+		clearOnDefault: true,
+	}),
+};
+
 const AppItemPage = ({
 	items,
 	resolveLinkedItems,
 	dal,
 	gameFilterConfig,
+	viewMode,
 }: AppItemPageProps) => {
-	const [universalParams, setUniversalParams] =
-		useQueryStates(universalParsers);
+	const isCollectedItemsTab = viewMode !== undefined;
+	const isPublicView = viewMode?.kind === "public";
+	const publicUserId = viewMode?.kind === "public" ? viewMode.userId : null;
+	const [universalParams, setUniversalParams] = useQueryStates(
+		isCollectedItemsTab ? collectedItemsTabParsers : itemLookupParsers,
+	);
 	const {
 		search,
 		showCollectedItems,
@@ -87,7 +104,7 @@ const AppItemPage = ({
 		setUniversalParams({
 			search: "",
 			showCollectedItems: true,
-			showUncollectedItems: true,
+			showUncollectedItems: !isCollectedItemsTab,
 			dimUncollectedItems: false,
 			showCollectableOnly: false,
 		});
@@ -100,8 +117,17 @@ const AppItemPage = ({
 		}
 	};
 
-	// Collected items
-	const { data: collectedData } = useDalQuery(dal.list, undefined);
+	// Collected items: own vs. public
+	const selfQuery = useDalQuery(dal.list, undefined);
+	const publicQuery = useQuery({
+		queryKey: [...dal.list.queryKey(undefined), "byUserId", publicUserId],
+		queryFn: () =>
+			publicUserId
+				? dal.listByUserIdServerFn({ data: { userId: publicUserId } })
+				: Promise.resolve([]),
+		enabled: isPublicView && !!publicUserId,
+	});
+	const collectedData = isPublicView ? publicQuery.data : selfQuery.data;
 	const collectedIds = (collectedData ?? []).map((r) => r.itemId);
 
 	const { mutate: collect } = useDalMutation(dal.collect);
@@ -182,7 +208,16 @@ const AppItemPage = ({
 				onRemove: () => setUniversalParam("showCollectedItems", true),
 			});
 		}
-		if (!showUncollectedItems) {
+		if (isCollectedItemsTab) {
+			if (showUncollectedItems) {
+				filters.push({
+					key: "showUncollectedItems",
+					label: "Uncollected",
+					value: "Visible",
+					onRemove: () => setUniversalParam("showUncollectedItems", false),
+				});
+			}
+		} else if (!showUncollectedItems) {
 			filters.push({
 				key: "showUncollectedItems",
 				label: "Uncollected",
@@ -267,9 +302,9 @@ const AppItemPage = ({
 					uncollectableCategories={items.uncollectableCategories.map(String)}
 					collectedIds={collectedIds}
 					dimUncollected={dimUncollectedItems}
-					dal={dal}
 					onCollect={handleCollect}
 					onUncollect={handleUncollect}
+					readOnly={isPublicView}
 				/>
 			</Box>
 		</Box>

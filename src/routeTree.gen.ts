@@ -19,6 +19,7 @@ import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as ProfileLikedBuildsRouteImport } from './routes/profile/liked-builds'
 import { Route as ProfileCreatedBuildsRouteImport } from './routes/profile/created-builds'
 import { Route as ProfileCollectionStatsRouteImport } from './routes/profile/collection-stats'
+import { Route as ProfileCollectedItemsRouteImport } from './routes/profile/collected-items'
 import { Route as ProfileBuildCollectionsRouteImport } from './routes/profile/build-collections'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as GameIdItemsRouteImport } from './routes/$gameId/items'
@@ -29,6 +30,7 @@ import { Route as AccountProfileUserIdLikedBuildsRouteImport } from './routes/ac
 import { Route as AccountProfileUserIdDataSyncRouteImport } from './routes/account/profile/$userId/data-sync'
 import { Route as AccountProfileUserIdCreatedBuildsRouteImport } from './routes/account/profile/$userId/created-builds'
 import { Route as AccountProfileUserIdCollectionStatsRouteImport } from './routes/account/profile/$userId/collection-stats'
+import { Route as AccountProfileUserIdCollectedItemsRouteImport } from './routes/account/profile/$userId/collected-items'
 import { Route as AccountProfileUserIdBuildCollectionsRouteImport } from './routes/account/profile/$userId/build-collections'
 
 const SignUpRoute = SignUpRouteImport.update({
@@ -79,6 +81,11 @@ const ProfileCreatedBuildsRoute = ProfileCreatedBuildsRouteImport.update({
 const ProfileCollectionStatsRoute = ProfileCollectionStatsRouteImport.update({
   id: '/collection-stats',
   path: '/collection-stats',
+  getParentRoute: () => ProfileRouteRoute,
+} as any)
+const ProfileCollectedItemsRoute = ProfileCollectedItemsRouteImport.update({
+  id: '/collected-items',
+  path: '/collected-items',
   getParentRoute: () => ProfileRouteRoute,
 } as any)
 const ProfileBuildCollectionsRoute = ProfileBuildCollectionsRouteImport.update({
@@ -137,6 +144,12 @@ const AccountProfileUserIdCollectionStatsRoute =
     path: '/collection-stats',
     getParentRoute: () => AccountProfileUserIdRouteRoute,
   } as any)
+const AccountProfileUserIdCollectedItemsRoute =
+  AccountProfileUserIdCollectedItemsRouteImport.update({
+    id: '/collected-items',
+    path: '/collected-items',
+    getParentRoute: () => AccountProfileUserIdRouteRoute,
+  } as any)
 const AccountProfileUserIdBuildCollectionsRoute =
   AccountProfileUserIdBuildCollectionsRouteImport.update({
     id: '/build-collections',
@@ -154,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/$gameId/items': typeof GameIdItemsRoute
   '/api/health': typeof ApiHealthRoute
   '/profile/build-collections': typeof ProfileBuildCollectionsRoute
+  '/profile/collected-items': typeof ProfileCollectedItemsRoute
   '/profile/collection-stats': typeof ProfileCollectionStatsRoute
   '/profile/created-builds': typeof ProfileCreatedBuildsRoute
   '/profile/liked-builds': typeof ProfileLikedBuildsRoute
@@ -161,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/account/profile/$userId': typeof AccountProfileUserIdRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/account/profile/$userId/build-collections': typeof AccountProfileUserIdBuildCollectionsRoute
+  '/account/profile/$userId/collected-items': typeof AccountProfileUserIdCollectedItemsRoute
   '/account/profile/$userId/collection-stats': typeof AccountProfileUserIdCollectionStatsRoute
   '/account/profile/$userId/created-builds': typeof AccountProfileUserIdCreatedBuildsRoute
   '/account/profile/$userId/data-sync': typeof AccountProfileUserIdDataSyncRoute
@@ -176,12 +191,14 @@ export interface FileRoutesByTo {
   '/$gameId/items': typeof GameIdItemsRoute
   '/api/health': typeof ApiHealthRoute
   '/profile/build-collections': typeof ProfileBuildCollectionsRoute
+  '/profile/collected-items': typeof ProfileCollectedItemsRoute
   '/profile/collection-stats': typeof ProfileCollectionStatsRoute
   '/profile/created-builds': typeof ProfileCreatedBuildsRoute
   '/profile/liked-builds': typeof ProfileLikedBuildsRoute
   '/profile': typeof ProfileIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/account/profile/$userId/build-collections': typeof AccountProfileUserIdBuildCollectionsRoute
+  '/account/profile/$userId/collected-items': typeof AccountProfileUserIdCollectedItemsRoute
   '/account/profile/$userId/collection-stats': typeof AccountProfileUserIdCollectionStatsRoute
   '/account/profile/$userId/created-builds': typeof AccountProfileUserIdCreatedBuildsRoute
   '/account/profile/$userId/data-sync': typeof AccountProfileUserIdDataSyncRoute
@@ -199,6 +216,7 @@ export interface FileRoutesById {
   '/$gameId/items': typeof GameIdItemsRoute
   '/api/health': typeof ApiHealthRoute
   '/profile/build-collections': typeof ProfileBuildCollectionsRoute
+  '/profile/collected-items': typeof ProfileCollectedItemsRoute
   '/profile/collection-stats': typeof ProfileCollectionStatsRoute
   '/profile/created-builds': typeof ProfileCreatedBuildsRoute
   '/profile/liked-builds': typeof ProfileLikedBuildsRoute
@@ -206,6 +224,7 @@ export interface FileRoutesById {
   '/account/profile/$userId': typeof AccountProfileUserIdRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/account/profile/$userId/build-collections': typeof AccountProfileUserIdBuildCollectionsRoute
+  '/account/profile/$userId/collected-items': typeof AccountProfileUserIdCollectedItemsRoute
   '/account/profile/$userId/collection-stats': typeof AccountProfileUserIdCollectionStatsRoute
   '/account/profile/$userId/created-builds': typeof AccountProfileUserIdCreatedBuildsRoute
   '/account/profile/$userId/data-sync': typeof AccountProfileUserIdDataSyncRoute
@@ -224,6 +243,7 @@ export interface FileRouteTypes {
     | '/$gameId/items'
     | '/api/health'
     | '/profile/build-collections'
+    | '/profile/collected-items'
     | '/profile/collection-stats'
     | '/profile/created-builds'
     | '/profile/liked-builds'
@@ -231,6 +251,7 @@ export interface FileRouteTypes {
     | '/account/profile/$userId'
     | '/api/auth/$'
     | '/account/profile/$userId/build-collections'
+    | '/account/profile/$userId/collected-items'
     | '/account/profile/$userId/collection-stats'
     | '/account/profile/$userId/created-builds'
     | '/account/profile/$userId/data-sync'
@@ -246,12 +267,14 @@ export interface FileRouteTypes {
     | '/$gameId/items'
     | '/api/health'
     | '/profile/build-collections'
+    | '/profile/collected-items'
     | '/profile/collection-stats'
     | '/profile/created-builds'
     | '/profile/liked-builds'
     | '/profile'
     | '/api/auth/$'
     | '/account/profile/$userId/build-collections'
+    | '/account/profile/$userId/collected-items'
     | '/account/profile/$userId/collection-stats'
     | '/account/profile/$userId/created-builds'
     | '/account/profile/$userId/data-sync'
@@ -268,6 +291,7 @@ export interface FileRouteTypes {
     | '/$gameId/items'
     | '/api/health'
     | '/profile/build-collections'
+    | '/profile/collected-items'
     | '/profile/collection-stats'
     | '/profile/created-builds'
     | '/profile/liked-builds'
@@ -275,6 +299,7 @@ export interface FileRouteTypes {
     | '/account/profile/$userId'
     | '/api/auth/$'
     | '/account/profile/$userId/build-collections'
+    | '/account/profile/$userId/collected-items'
     | '/account/profile/$userId/collection-stats'
     | '/account/profile/$userId/created-builds'
     | '/account/profile/$userId/data-sync'
@@ -366,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileCollectionStatsRouteImport
       parentRoute: typeof ProfileRouteRoute
     }
+    '/profile/collected-items': {
+      id: '/profile/collected-items'
+      path: '/collected-items'
+      fullPath: '/profile/collected-items'
+      preLoaderRoute: typeof ProfileCollectedItemsRouteImport
+      parentRoute: typeof ProfileRouteRoute
+    }
     '/profile/build-collections': {
       id: '/profile/build-collections'
       path: '/build-collections'
@@ -436,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountProfileUserIdCollectionStatsRouteImport
       parentRoute: typeof AccountProfileUserIdRouteRoute
     }
+    '/account/profile/$userId/collected-items': {
+      id: '/account/profile/$userId/collected-items'
+      path: '/collected-items'
+      fullPath: '/account/profile/$userId/collected-items'
+      preLoaderRoute: typeof AccountProfileUserIdCollectedItemsRouteImport
+      parentRoute: typeof AccountProfileUserIdRouteRoute
+    }
     '/account/profile/$userId/build-collections': {
       id: '/account/profile/$userId/build-collections'
       path: '/build-collections'
@@ -460,6 +499,7 @@ const GameIdRouteRouteWithChildren = GameIdRouteRoute._addFileChildren(
 
 interface ProfileRouteRouteChildren {
   ProfileBuildCollectionsRoute: typeof ProfileBuildCollectionsRoute
+  ProfileCollectedItemsRoute: typeof ProfileCollectedItemsRoute
   ProfileCollectionStatsRoute: typeof ProfileCollectionStatsRoute
   ProfileCreatedBuildsRoute: typeof ProfileCreatedBuildsRoute
   ProfileLikedBuildsRoute: typeof ProfileLikedBuildsRoute
@@ -468,6 +508,7 @@ interface ProfileRouteRouteChildren {
 
 const ProfileRouteRouteChildren: ProfileRouteRouteChildren = {
   ProfileBuildCollectionsRoute: ProfileBuildCollectionsRoute,
+  ProfileCollectedItemsRoute: ProfileCollectedItemsRoute,
   ProfileCollectionStatsRoute: ProfileCollectionStatsRoute,
   ProfileCreatedBuildsRoute: ProfileCreatedBuildsRoute,
   ProfileLikedBuildsRoute: ProfileLikedBuildsRoute,
@@ -480,6 +521,7 @@ const ProfileRouteRouteWithChildren = ProfileRouteRoute._addFileChildren(
 
 interface AccountProfileUserIdRouteRouteChildren {
   AccountProfileUserIdBuildCollectionsRoute: typeof AccountProfileUserIdBuildCollectionsRoute
+  AccountProfileUserIdCollectedItemsRoute: typeof AccountProfileUserIdCollectedItemsRoute
   AccountProfileUserIdCollectionStatsRoute: typeof AccountProfileUserIdCollectionStatsRoute
   AccountProfileUserIdCreatedBuildsRoute: typeof AccountProfileUserIdCreatedBuildsRoute
   AccountProfileUserIdDataSyncRoute: typeof AccountProfileUserIdDataSyncRoute
@@ -491,6 +533,8 @@ const AccountProfileUserIdRouteRouteChildren: AccountProfileUserIdRouteRouteChil
   {
     AccountProfileUserIdBuildCollectionsRoute:
       AccountProfileUserIdBuildCollectionsRoute,
+    AccountProfileUserIdCollectedItemsRoute:
+      AccountProfileUserIdCollectedItemsRoute,
     AccountProfileUserIdCollectionStatsRoute:
       AccountProfileUserIdCollectionStatsRoute,
     AccountProfileUserIdCreatedBuildsRoute:

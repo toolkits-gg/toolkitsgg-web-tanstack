@@ -160,6 +160,15 @@ const PAGES: GamePages = {
 			gameFilterConfig={remnant2FilterConfig}
 		/>
 	),
+	renderCollectedItems: ({ mode }) => (
+		<AppItemPage
+			items={ITEMS}
+			resolveLinkedItems={(item) => resolveLinkedItems(item, ITEMS.all)}
+			dal={remnant2CollectedItemsDal}
+			gameFilterConfig={remnant2FilterConfig}
+			viewMode={mode}
+		/>
+	),
 };
 
 export { PAGES };

@@ -2,6 +2,7 @@ import type { createSearchParamsCache } from "nuqs/server";
 import type { LogoSize } from "#/components/AppLogo";
 import type {
 	AppItem,
+	CollectedItemsViewMode,
 	GameCollectedItemsDal,
 } from "#/features/game/items/types";
 import type { ToolkitThemeDefinition } from "#/features/theme/core/types";
@@ -45,6 +46,9 @@ type GameMetadata = {
 
 type GamePages = {
 	renderItemLookup: () => React.ReactNode;
+	renderCollectedItems: (args: {
+		mode: CollectedItemsViewMode;
+	}) => React.ReactNode;
 };
 
 type GameConfig<

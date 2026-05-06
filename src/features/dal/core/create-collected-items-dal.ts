@@ -34,6 +34,9 @@ interface CollectedItemServerFns {
 		data: CollectItemInput;
 	}): Promise<{ ok: true }>;
 	listCollectedItemsServerFn(): Promise<CollectedItemRecord[]>;
+	listCollectedItemsByUserIdServerFn(opts: {
+		data: { userId: string };
+	}): Promise<CollectedItemRecord[]>;
 }
 
 const createCollectedItemsDal = (config: {
@@ -101,6 +104,8 @@ const createCollectedItemsDal = (config: {
 			},
 			sync: (op) => applyPendingOpServerFn({ data: op }),
 		}),
+
+		listByUserIdServerFn: serverFns.listCollectedItemsByUserIdServerFn,
 	};
 };
 

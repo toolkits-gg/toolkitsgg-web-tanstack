@@ -15,12 +15,10 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { LuCamera, LuCheck, LuPlus } from "react-icons/lu";
 import { GameImage } from "#/components/GameImage";
-import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
 import { useGameId } from "#/features/game/core/use-game-id";
 import type {
 	AppItem,
 	CollectItemInput,
-	GameCollectedItemsDal,
 } from "#/features/game/items/types";
 import { getGameMetadata } from "#/features/game/registry/game-registry";
 import {
@@ -32,19 +30,21 @@ import { useScreenshot } from "#/features/screenshot/hooks/use-screenshot";
 type ItemInfoModalProps = {
 	item: AppItem;
 	resolveLinkedItems: (item: AppItem) => AppItem[];
-	dal: GameCollectedItemsDal;
+	isCollected: boolean;
 	isCollectable: boolean;
 	onCollect: ({ itemId, itemName }: CollectItemInput) => void;
 	onUncollect: ({ itemId, itemName }: CollectItemInput) => void;
+	readOnly?: boolean;
 };
 
 const ItemInfoModal = ({
 	item,
 	resolveLinkedItems,
-	dal,
+	isCollected,
 	isCollectable,
 	onCollect,
 	onUncollect,
+	readOnly = false,
 }: ItemInfoModalProps) => {
 	const [screenshotMode, setScreenshotMode] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -79,8 +79,6 @@ const ItemInfoModal = ({
 		triggerScreenshot();
 	};
 
-	const { data: collectedData } = useDalQuery(dal.list, undefined);
-	const isCollected = (collectedData ?? []).some((r) => r.itemId === item.id);
 	const hasDescription =
 		item.description.length > 0 && item.description[0] !== "";
 
@@ -120,21 +118,35 @@ const ItemInfoModal = ({
 							</Badge>
 						)}
 					</Group>
-					{!screenshotMode && isCollectable && (
-						<Box mt="xs">
-							<Button
-								size="compact-sm"
-								variant={isCollected ? "filled" : "light"}
-								color={isCollected ? "green" : "primary"}
-								leftSection={
-									isCollected ? <LuCheck size={14} /> : <LuPlus size={14} />
-								}
-								onClick={handleToggleCollect}
-							>
-								{isCollected ? "Collected" : "Mark as Collected"}
-							</Button>
-						</Box>
-					)}
+					{!screenshotMode &&
+						isCollectable &&
+						(readOnly ? (
+							isCollected ? (
+								<Box mt="xs">
+									<Badge
+										size="lg"
+										color="green"
+										leftSection={<LuCheck size={12} />}
+									>
+										Collected
+									</Badge>
+								</Box>
+							) : null
+						) : (
+							<Box mt="xs">
+								<Button
+									size="compact-sm"
+									variant={isCollected ? "filled" : "light"}
+									color={isCollected ? "green" : "primary"}
+									leftSection={
+										isCollected ? <LuCheck size={14} /> : <LuPlus size={14} />
+									}
+									onClick={handleToggleCollect}
+								>
+									{isCollected ? "Collected" : "Mark as Collected"}
+								</Button>
+							</Box>
+						))}
 				</Stack>
 			</Flex>
 

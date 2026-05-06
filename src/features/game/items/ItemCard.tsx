@@ -13,6 +13,7 @@ type ItemCardProps = {
 	onCollect: ({ itemId, itemName }: CollectItemInput) => void;
 	onUncollect: ({ itemId, itemName }: CollectItemInput) => void;
 	onInfo: (item: AppItem) => void;
+	readOnly?: boolean;
 };
 
 const ItemCard = ({
@@ -23,6 +24,7 @@ const ItemCard = ({
 	onCollect,
 	onUncollect,
 	onInfo,
+	readOnly = false,
 }: ItemCardProps) => {
 	const isCollected = collectedIds.includes(item.id);
 	const isDimmed = !isCollected && dimUncollected && isCollectable;
@@ -54,7 +56,20 @@ const ItemCard = ({
 				>
 					<LuInfo size={16} />
 				</ActionIcon>
-				{isCollectable ? (
+				{readOnly ? (
+					isCollected ? (
+						<ActionIcon
+							size={28}
+							radius="sm"
+							variant="transparent"
+							color="white"
+							disabled
+							title="Collected"
+						>
+							<LuCheck size={16} />
+						</ActionIcon>
+					) : null
+				) : isCollectable ? (
 					<ActionIcon
 						size={28}
 						radius="sm"

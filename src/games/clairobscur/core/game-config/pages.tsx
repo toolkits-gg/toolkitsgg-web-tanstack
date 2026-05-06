@@ -12,6 +12,14 @@ const PAGES: GamePages = {
 			dal={clairObscurCollectedItemsDal}
 		/>
 	),
+	renderCollectedItems: ({ mode }) => (
+		<AppItemPage
+			items={ITEMS}
+			resolveLinkedItems={(item) => resolveLinkedItems(item, ITEMS.all)}
+			dal={clairObscurCollectedItemsDal}
+			viewMode={mode}
+		/>
+	),
 };
 
 export { PAGES };

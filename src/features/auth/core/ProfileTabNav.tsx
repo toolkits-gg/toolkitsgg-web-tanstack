@@ -8,6 +8,7 @@ type ProfileTabNavProps = {
 
 const TABS = [
 	{ label: "Home", path: "" },
+	{ label: "Collected Items", path: "collected-items" },
 	{ label: "Collection Stats", path: "collection-stats" },
 	{ label: "Liked Builds", path: "liked-builds" },
 	{ label: "Build Collections", path: "build-collections" },

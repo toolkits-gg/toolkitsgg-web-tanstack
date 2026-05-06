@@ -1,6 +1,7 @@
 import { createCollectedItemsDal } from "#/features/dal/core/create-collected-items-dal";
 import {
 	collectItemServerFn,
+	listCollectedItemsByUserIdServerFn,
 	listCollectedItemsServerFn,
 	uncollectItemServerFn,
 } from "#/games/clairobscur/dal/server/collected-items";
@@ -8,5 +9,10 @@ import {
 export const clairObscurCollectedItemsDal = createCollectedItemsDal({
 	entityName: "clairObscurCollectedItem",
 	getModel: (idb) => idb.clairObscurCollectedItem,
-	serverFns: { collectItemServerFn, uncollectItemServerFn, listCollectedItemsServerFn },
+	serverFns: {
+		collectItemServerFn,
+		uncollectItemServerFn,
+		listCollectedItemsServerFn,
+		listCollectedItemsByUserIdServerFn,
+	},
 });

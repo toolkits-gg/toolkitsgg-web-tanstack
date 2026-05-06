@@ -88,10 +88,17 @@ type GameFilterConfig = {
 type CollectItemInput = { itemId: string; itemName: string };
 type CollectedItemRecord = { userId: string; itemId: string };
 
+type CollectedItemsViewMode =
+	| { kind: "self" }
+	| { kind: "public"; userId: string };
+
 type GameCollectedItemsDal = {
 	list: DalReadAction<void, CollectedItemRecord[]>;
 	collect: DalWriteAction<CollectItemInput, CollectedItemRecord>;
 	uncollect: DalWriteAction<CollectItemInput, { ok: true }>;
+	listByUserIdServerFn: (input: {
+		data: { userId: string };
+	}) => Promise<CollectedItemRecord[]>;
 };
 
 export type {
@@ -101,4 +108,5 @@ export type {
 	GameCollectedItemsDal,
 	CollectItemInput,
 	CollectedItemRecord,
+	CollectedItemsViewMode,
 };

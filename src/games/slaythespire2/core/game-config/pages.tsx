@@ -81,6 +81,15 @@ const PAGES: GamePages = {
 			gameFilterConfig={slayTheSpire2FilterConfig}
 		/>
 	),
+	renderCollectedItems: ({ mode }) => (
+		<AppItemPage
+			items={ITEMS}
+			resolveLinkedItems={(item) => resolveLinkedItems(item, ITEMS.all)}
+			dal={slayTheSpire2CollectedItemsDal}
+			gameFilterConfig={slayTheSpire2FilterConfig}
+			viewMode={mode}
+		/>
+	),
 };
 
 export { PAGES };

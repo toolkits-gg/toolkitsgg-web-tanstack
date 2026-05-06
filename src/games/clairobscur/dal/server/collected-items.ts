@@ -5,6 +5,7 @@ import { createCollectedItemHandlers } from "#/features/dal/server/collected-ite
 import { prisma } from "@/prisma";
 
 const CollectInput = z.object({ itemId: z.string().min(1) });
+const ListByUserIdInput = z.object({ userId: z.string().min(1) });
 const h = createCollectedItemHandlers(prisma.clairObscurCollectedItem);
 
 export const collectItemServerFn = createServerFn({ method: "POST" })
@@ -18,3 +19,9 @@ export const uncollectItemServerFn = createServerFn({ method: "POST" })
 export const listCollectedItemsServerFn = createServerFn({
 	method: "GET",
 }).handler(async () => h.list(await requireUserId()));
+
+export const listCollectedItemsByUserIdServerFn = createServerFn({
+	method: "POST",
+})
+	.inputValidator((v: unknown) => ListByUserIdInput.parse(v))
+	.handler(async ({ data }) => h.list(data.userId));
