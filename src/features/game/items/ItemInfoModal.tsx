@@ -5,14 +5,14 @@ import {
 	Button,
 	Divider,
 	Flex,
-	Grid,
 	Group,
 	ScrollArea,
+	SimpleGrid,
 	Stack,
 	Text,
 	Tooltip,
 } from "@mantine/core";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LuCamera, LuCheck, LuPlus } from "react-icons/lu";
 import { GameImage } from "#/components/GameImage";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
@@ -46,8 +46,7 @@ const ItemInfoModal = ({
 	onCollect,
 	onUncollect,
 }: ItemInfoModalProps) => {
-	const [_screenshotMode, setScreenshotMode] = useState(false);
-	const screenshotMode = true; // TODO REVERT
+	const [screenshotMode, setScreenshotMode] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const gameId = useGameId();
@@ -155,30 +154,35 @@ const ItemInfoModal = ({
 			{linkedItems.length > 0 && (
 				<>
 					<Divider label="Linked Items" />
-					<Grid align="center" gap="xs">
-						{linkedItems.map((linkedItem) => {
-							return (
-								<Fragment key={`${linkedItem.id}-${linkedItem.name}`}>
-									<Grid.Col span={3}>
-										<Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-											{linkedItem.category}:
-										</Text>
-										<GameImage
-											src={linkedItem.imageUrl}
-											style={{
-												width: 24,
-												height: 24,
-												objectFit: "contain",
-											}}
-										/>
-									</Grid.Col>
-									<Grid.Col span={3}>
-										<Text size="xs">{linkedItem.name}</Text>
-									</Grid.Col>
-								</Fragment>
-							);
-						})}
-					</Grid>
+					<SimpleGrid cols={2} spacing="sm">
+						{linkedItems.map((linkedItem) => (
+							<Stack
+								key={`${linkedItem.id}-${linkedItem.name}`}
+								align="center"
+								gap={6}
+								p="xs"
+								style={{
+									borderRadius: "var(--mantine-radius-md)",
+									border: "1px solid var(--mantine-color-default-border)",
+								}}
+							>
+								{linkedItem.imageUrl && (
+									<GameImage
+										src={linkedItem.imageUrl}
+										style={{ width: 56, height: 56, objectFit: "contain" }}
+									/>
+								)}
+								<Stack gap={2} align="center">
+									<Text size="xs" fw={600} ta="center" lh={1.3}>
+										{linkedItem.name}
+									</Text>
+									<Badge variant="light" size="xs">
+										{String(linkedItem.category)}
+									</Badge>
+								</Stack>
+							</Stack>
+						))}
+					</SimpleGrid>
 				</>
 			)}
 		</Stack>
@@ -202,6 +206,7 @@ const ItemInfoModal = ({
 				ref={containerRef}
 				screenshotMode={screenshotMode}
 				watermark={watermark}
+				miw={screenshotMode ? 500 : undefined}
 			>
 				{screenshotMode ? (
 					itemContent
