@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
 	LuCamera,
 	LuChevronRight,
@@ -188,10 +188,20 @@ export function UserMenu() {
 							</Button>
 						) : (
 							<Flex align="center" justify="space-between" w="100%" gap="md">
-								<Button component="a" href="/sign-up" w="100%" variant="filled">
+								<Button
+									component={Link}
+									href="/sign-up"
+									w="100%"
+									variant="filled"
+								>
 									Sign up
 								</Button>
-								<Button component="a" href="/sign-in" w="100%" variant="subtle">
+								<Button
+									component={Link}
+									href="/sign-in"
+									w="100%"
+									variant="subtle"
+								>
 									Sign in
 								</Button>
 							</Flex>
