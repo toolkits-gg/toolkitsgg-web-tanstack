@@ -38,7 +38,9 @@ type GroupedOption = {
 	items: CategoryOption[];
 };
 
-const getItemSubcategories = (items: AppItem[]): GroupedOption[] => {
+const getItemSubcategories = (
+	items: AppItem[],
+): (CategoryOption | GroupedOption)[] => {
 	const categoryMap = new Map<string, Set<string>>();
 
 	for (const item of items) {
@@ -53,30 +55,34 @@ const getItemSubcategories = (items: AppItem[]): GroupedOption[] => {
 		}
 	}
 
-	const groupedOptions: GroupedOption[] = [];
+	const result: (CategoryOption | GroupedOption)[] = [];
 
-	for (const [category, subcategories] of categoryMap.entries()) {
-		const options: CategoryOption[] = [];
+	const sortedEntries = Array.from(categoryMap.entries()).sort(([a], [b]) =>
+		a.localeCompare(b),
+	);
 
-		options.push({
-			label: `All ${titleCase(category)}`,
-			value: category,
-		});
-
-		if (subcategories.size > 0) {
-			for (const subcategory of Array.from(subcategories).sort()) {
-				const [, type] = subcategory.split(":");
-				options.push({
-					label: `Only ${titleCase(type ?? "")} ${titleCase(category)}`,
-					value: subcategory,
-				});
-			}
+	for (const [category, subcategories] of sortedEntries) {
+		if (subcategories.size === 0) {
+			result.push({ label: titleCase(category), value: category });
+			continue;
 		}
 
-		groupedOptions.push({ group: titleCase(category), items: options });
+		const options: CategoryOption[] = [
+			{ label: `All ${titleCase(category)}`, value: category },
+		];
+
+		for (const subcategory of Array.from(subcategories).sort()) {
+			const [, type] = subcategory.split(":");
+			options.push({
+				label: `Only ${titleCase(type ?? "")} ${titleCase(category)}`,
+				value: subcategory,
+			});
+		}
+
+		result.push({ group: titleCase(category), items: options });
 	}
 
-	return groupedOptions.sort((a, b) => a.group.localeCompare(b.group));
+	return result;
 };
 
 const titleCase = (str: string): string => {
