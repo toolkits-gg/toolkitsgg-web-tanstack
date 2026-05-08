@@ -3,6 +3,10 @@ import { toQueryOptions } from "#/features/dal/core/to-query-options";
 import type { DalReadAction } from "#/features/dal/core/types";
 import { useDalContextSource } from "#/features/dal/hooks/use-dal-context-source";
 
+/**
+ * Executes a DAL read action via TanStack Query.
+ * The context getter ensures the backend (remote vs local) is chosen at query execution time.
+ */
 function useDalQuery<Input, Output>(
 	action: DalReadAction<Input, Output>,
 	input: Input,
@@ -11,6 +15,7 @@ function useDalQuery<Input, Output>(
 	return useQuery(toQueryOptions(action, input, ctxGetter));
 }
 
+/** Suspense-enabled variant of useDalQuery. */
 function useDalSuspenseQuery<Input, Output>(
 	action: DalReadAction<Input, Output>,
 	input: Input,

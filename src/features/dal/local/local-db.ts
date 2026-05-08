@@ -11,6 +11,7 @@ import type {
 } from "#/features/dal/local/types";
 
 const DB_NAME = "toolkitsgg-local";
+/** Increment whenever the schema changes; migrations run in the `upgrade` callback on next open. */
 const DB_VERSION = 2;
 
 interface LocalDB extends DBSchema {
@@ -31,8 +32,13 @@ interface LocalDB extends DBSchema {
 	};
 }
 
+/** Lazy singleton — one DB connection per page load. Null until first access. */
 let dbPromise: Promise<IDBPDatabase<LocalDB>> | null = null;
 
+/**
+ * Opens (or returns the cached) toolkitsgg-local IndexedDB connection.
+ * Returns null during SSR where IndexedDB is unavailable.
+ */
 const getLocalDB = (): Promise<IDBPDatabase<LocalDB>> | null => {
 	if (typeof indexedDB === "undefined") return null;
 	if (!dbPromise) {
@@ -55,7 +61,8 @@ const getLocalDB = (): Promise<IDBPDatabase<LocalDB>> | null => {
 				}
 
 				if (oldVersion < 2) {
-					// Recreate userAvatarOverride with avatarId/avatarGameId schema
+					// v1 → v2: avatar schema changed from imageUrl to avatarId/avatarGameId.
+					// The old store must be dropped and recreated because IDB can't alter key paths.
 					if (db.objectStoreNames.contains(STORE_USER_AVATAR_OVERRIDE)) {
 						db.deleteObjectStore(STORE_USER_AVATAR_OVERRIDE);
 					}
@@ -65,7 +72,7 @@ const getLocalDB = (): Promise<IDBPDatabase<LocalDB>> | null => {
 					);
 					overrideStore.createIndex("userId", "userId");
 
-					// Add userProfile store
+					// Add userProfile store (new in v2)
 					if (!db.objectStoreNames.contains(STORE_USER_PROFILE)) {
 						const profileStore = db.createObjectStore(STORE_USER_PROFILE, {
 							keyPath: "userId",
@@ -79,6 +86,7 @@ const getLocalDB = (): Promise<IDBPDatabase<LocalDB>> | null => {
 	return dbPromise;
 };
 
+/** Closes and deletes the database. Only exported for test teardown. */
 const _resetLocalDBForTests = async (): Promise<void> => {
 	if (dbPromise) {
 		const db = await dbPromise;

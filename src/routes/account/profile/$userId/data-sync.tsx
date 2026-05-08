@@ -1,6 +1,7 @@
 import {
 	Badge,
 	Button,
+	Code,
 	Divider,
 	Group,
 	Stack,
@@ -12,11 +13,12 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { resolveWriteAction } from "#/features/dal/core/registry";
 import { clearSynced, deleteOp } from "#/features/dal/queue/pending-ops";
-import { syncOps } from "#/features/dal/queue/sync-runner";
+import { forceSyncOp, syncOps } from "#/features/dal/queue/sync-runner";
 import type { PendingOp } from "#/features/dal/queue/types";
 import { usePendingOps } from "#/features/dal/queue/use-pending-ops";
-import { resolveWriteAction } from "#/features/dal/registry";
+import { getGameMetadata } from "#/features/game/registry/game-registry";
 import { useSession } from "#/integrations/better-auth/auth-client";
 
 export const Route = createFileRoute("/account/profile/$userId/data-sync")({
@@ -64,6 +66,46 @@ function DataSync() {
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["dal-queue"] }),
 	});
 
+	const keepMine = useMutation({
+		mutationFn: async (op: PendingOp) => {
+			const action = resolveWriteAction(op.entity);
+			if (!action) throw new Error(`No action for ${op.entity}`);
+			return forceSyncOp(op, action);
+		},
+		onSuccess: (result) => {
+			const ok = result.status === "applied" || result.status === "noop";
+			notifications.show({
+				title: ok ? "Local change kept" : "Could not keep local change",
+				message:
+					result.status === "error"
+						? result.message
+						: result.status === "conflict"
+							? "Server still reports a conflict."
+							: "",
+				color: ok ? "green" : "orange",
+			});
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
+			queryClient.invalidateQueries({ queryKey: ["dal"] });
+		},
+	});
+
+	const acceptServer = useMutation({
+		mutationFn: async (opId: string) => deleteOp(opId),
+		onSuccess: () => {
+			notifications.show({
+				title: "Server change accepted",
+				message: "Your local change was discarded.",
+				color: "blue",
+			});
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
+			queryClient.invalidateQueries({ queryKey: ["dal"] });
+		},
+	});
+
 	return (
 		<Stack gap="sm">
 			<Group justify="space-between">
@@ -98,6 +140,16 @@ function DataSync() {
 						queryClient.invalidateQueries({ queryKey: ["dal-queue"] }),
 					);
 				}}
+				onKeepMine={(op) => keepMine.mutate(op)}
+				onAcceptServer={(id) => acceptServer.mutate(id)}
+				canResolve={canSync}
+				resolvingOpId={
+					keepMine.isPending
+						? (keepMine.variables?.id ?? null)
+						: acceptServer.isPending
+							? (acceptServer.variables ?? null)
+							: null
+				}
 			/>
 			<SyncedList
 				ops={(pending.data ?? []).filter((op) => op.status === "synced")}
@@ -109,9 +161,17 @@ function DataSync() {
 const PendingList = ({
 	ops,
 	onDelete,
+	onKeepMine,
+	onAcceptServer,
+	canResolve,
+	resolvingOpId,
 }: {
 	ops: PendingOp[];
 	onDelete: (id: string) => void;
+	onKeepMine: (op: PendingOp) => void;
+	onAcceptServer: (id: string) => void;
+	canResolve: boolean;
+	resolvingOpId: string | null;
 }) => {
 	if (!ops.length) {
 		return (
@@ -124,42 +184,106 @@ const PendingList = ({
 	return (
 		<Stack gap="xs">
 			{ops.map((op) => (
-				<Group
-					key={op.id}
-					justify="space-between"
-					wrap="nowrap"
-					align="center"
-					gap="sm"
-				>
-					<Stack gap={0}>
-						<Group gap="xs">
-							<Badge>{op.entity}</Badge>
-							<Badge variant="light">{op.operation}</Badge>
-							<Badge color={statusColor(op.status)} variant="outline">
-								{op.status}
-							</Badge>
-						</Group>
-						<Text size="xs" c="dimmed">
-							{op.idempotencyKey}
-						</Text>
-						{op.lastError ? (
-							<Text size="xs" c="red">
-								{op.lastError}
-							</Text>
-						) : null}
-					</Stack>
-					<Button
-						size="xs"
-						variant="subtle"
-						color="red"
-						onClick={() => onDelete(op.id)}
-					>
-						Discard
-					</Button>
-				</Group>
+				<Stack key={op.id} gap={4}>
+					<Group justify="space-between" wrap="nowrap" align="center" gap="sm">
+						<Stack gap={2}>
+							<Group gap="xs">
+								<Badge>{op.entity}</Badge>
+								<Badge variant="light">{op.operation}</Badge>
+								<Badge color={statusColor(op.status)} variant="outline">
+									{op.status}
+								</Badge>
+							</Group>
+							<OpSummary op={op} />
+							{op.lastError ? (
+								<Text size="xs" c="red">
+									{op.lastError}
+								</Text>
+							) : null}
+						</Stack>
+						<Button
+							size="xs"
+							variant="subtle"
+							color="red"
+							onClick={() => onDelete(op.id)}
+						>
+							Discard
+						</Button>
+					</Group>
+					{op.status === "conflict" && op.conflictInfo ? (
+						<ConflictPanel
+							op={op}
+							onKeepMine={onKeepMine}
+							onAcceptServer={onAcceptServer}
+							canResolve={canResolve}
+							busy={resolvingOpId === op.id}
+						/>
+					) : null}
+				</Stack>
 			))}
 		</Stack>
 	);
+};
+
+function ConflictPanel({
+	op,
+	onKeepMine,
+	onAcceptServer,
+	canResolve,
+	busy,
+}: {
+	op: PendingOp;
+	onKeepMine: (op: PendingOp) => void;
+	onAcceptServer: (id: string) => void;
+	canResolve: boolean;
+	busy: boolean;
+}) {
+	const json = formatJson(op.conflictInfo?.serverRecordJson);
+	return (
+		<Stack
+			gap="xs"
+			p="xs"
+			style={{
+				borderLeft: "2px solid var(--mantine-color-orange-6)",
+				marginLeft: 4,
+			}}
+		>
+			<Text size="xs" c="dimmed">
+				Server has a newer record for this change. Pick one:
+			</Text>
+			{json ? (
+				<Code block style={{ fontSize: 11, maxHeight: 160, overflow: "auto" }}>
+					{json}
+				</Code>
+			) : null}
+			<Group gap="xs">
+				<Button
+					size="xs"
+					onClick={() => onKeepMine(op)}
+					disabled={!canResolve || busy}
+				>
+					Keep mine
+				</Button>
+				<Button
+					size="xs"
+					variant="default"
+					onClick={() => onAcceptServer(op.id)}
+					disabled={busy}
+				>
+					Accept server
+				</Button>
+			</Group>
+		</Stack>
+	);
+}
+
+const formatJson = (raw: string | undefined): string | null => {
+	if (!raw) return null;
+	try {
+		return JSON.stringify(JSON.parse(raw), null, 2);
+	} catch {
+		return raw;
+	}
 };
 
 function SyncedList({ ops }: { ops: PendingOp[] }) {
@@ -170,18 +294,44 @@ function SyncedList({ ops }: { ops: PendingOp[] }) {
 			<Divider label="Completed" labelPosition="left" />
 			<Stack gap="xs">
 				{ops.map((op) => (
-					<Group key={op.id} gap="xs" wrap="nowrap" align="center">
-						<Badge>{op.entity}</Badge>
-						<Badge variant="light">{op.operation}</Badge>
-						<Badge color="green" variant="outline">
-							synced
-						</Badge>
-						<Text size="xs" c="dimmed" style={{ flex: 1 }}>
-							{op.idempotencyKey}
-						</Text>
-					</Group>
+					<Stack key={op.id} gap={2}>
+						<Group gap="xs" wrap="nowrap" align="center">
+							<Badge>{op.entity}</Badge>
+							<Badge variant="light">{op.operation}</Badge>
+							<Badge color="green" variant="outline">
+								synced
+							</Badge>
+						</Group>
+						<OpSummary op={op} />
+					</Stack>
 				))}
 			</Stack>
+		</>
+	);
+}
+
+function OpSummary({ op }: { op: PendingOp }) {
+	if (!op.summary) {
+		return (
+			<Text size="xs" c="dimmed">
+				{op.idempotencyKey}
+			</Text>
+		);
+	}
+	const gameLabel = op.summary.gameId
+		? getGameMetadata(op.summary.gameId)?.label
+		: undefined;
+	return (
+		<>
+			<Group gap="xs" align="center" wrap="nowrap">
+				{gameLabel ? <Badge variant="light">{gameLabel}</Badge> : null}
+				<Text size="sm">{op.summary.title}</Text>
+			</Group>
+			{op.summary.details ? (
+				<Text size="xs" c="dimmed">
+					{op.summary.details}
+				</Text>
+			) : null}
 		</>
 	);
 }

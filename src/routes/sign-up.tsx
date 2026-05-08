@@ -11,6 +11,7 @@ import {
 	TextInput,
 	Title,
 } from "@mantine/core";
+import { useForm } from "@tanstack/react-form";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { LuSwords } from "react-icons/lu";
@@ -20,43 +21,34 @@ export const Route = createFileRoute("/sign-up")({ component: SignUpPage });
 
 function SignUpPage() {
 	const navigate = useNavigate();
-	const [email, setEmail] = useState("");
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
-	const [error, setError] = useState<string | null>(null);
-	const [isPending, setIsPending] = useState(false);
+	const [serverError, setServerError] = useState<string | null>(null);
 
 	const handleDiscord = async () => {
 		await authClient.signIn.social({ provider: "discord", callbackURL: "/" });
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setError(null);
-		if (password !== confirmPassword) {
-			setError("Passwords do not match");
-			return;
-		}
-		setIsPending(true);
-		try {
+	const form = useForm({
+		defaultValues: {
+			email: "",
+			username: "",
+			password: "",
+			confirmPassword: "",
+		},
+		onSubmit: async ({ value }) => {
+			setServerError(null);
 			const result = await authClient.signUp.email({
-				email,
-				password,
-				name: username,
+				email: value.email,
+				password: value.password,
+				name: value.username,
 				callbackURL: "/",
 			});
 			if (result.error) {
-				setError(result.error.message ?? "Sign up failed");
+				setServerError(result.error.message ?? "Sign up failed");
 			} else {
 				await navigate({ to: "/" });
 			}
-		} catch {
-			setError("An unexpected error occurred");
-		} finally {
-			setIsPending(false);
-		}
-	};
+		},
+	});
 
 	return (
 		<Flex align="center" justify="center" p="xl" style={{ minHeight: "60vh" }}>
@@ -76,52 +68,147 @@ function SignUpPage() {
 
 					<Divider label="Or continue with email" labelPosition="center" />
 
-					<form onSubmit={handleSubmit}>
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							form.handleSubmit();
+						}}
+					>
 						<Stack>
-							<TextInput
-								required
-								label="Email"
-								placeholder="you@example.com"
-								value={email}
-								onChange={(e) => setEmail(e.currentTarget.value)}
-								radius="md"
-							/>
-							<TextInput
-								required
-								label="Username"
-								placeholder="Username"
-								value={username}
-								onChange={(e) => setUsername(e.currentTarget.value)}
-								radius="md"
-							/>
-							<PasswordInput
-								required
-								label="Password"
-								placeholder="Password"
-								value={password}
-								onChange={(e) => setPassword(e.currentTarget.value)}
-								radius="md"
-							/>
-							<PasswordInput
-								required
-								label="Confirm Password"
-								placeholder="Confirm password"
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.currentTarget.value)}
-								radius="md"
-							/>
-							{error && (
+							<form.Field
+								name="email"
+								validators={{
+									onBlur: ({ value }) => {
+										if (!value) return "Email is required";
+										if (!value.includes("@")) return "Enter a valid email";
+										return undefined;
+									},
+								}}
+							>
+								{(field) => (
+									<TextInput
+										label="Email"
+										placeholder="you@example.com"
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.currentTarget.value)}
+										onBlur={field.handleBlur}
+										error={
+											field.state.meta.isTouched &&
+											field.state.meta.errors.length > 0
+												? field.state.meta.errors[0]
+												: undefined
+										}
+										radius="md"
+									/>
+								)}
+							</form.Field>
+							<form.Field
+								name="username"
+								validators={{
+									onChange: ({ value }) =>
+										!value ? "Username is required" : undefined,
+								}}
+							>
+								{(field) => (
+									<TextInput
+										label="Username"
+										placeholder="Username"
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.currentTarget.value)}
+										onBlur={field.handleBlur}
+										error={
+											field.state.meta.isTouched &&
+											field.state.meta.errors.length > 0
+												? field.state.meta.errors[0]
+												: undefined
+										}
+										radius="md"
+									/>
+								)}
+							</form.Field>
+							<form.Field
+								name="password"
+								validators={{
+									onChange: ({ value }) => {
+										if (!value) return "Password is required";
+										if (value.length < 8)
+											return "Password must be at least 8 characters";
+										return undefined;
+									},
+								}}
+							>
+								{(field) => (
+									<PasswordInput
+										label="Password"
+										placeholder="Password"
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.currentTarget.value)}
+										onBlur={field.handleBlur}
+										error={
+											field.state.meta.isTouched &&
+											field.state.meta.errors.length > 0
+												? field.state.meta.errors[0]
+												: undefined
+										}
+										radius="md"
+									/>
+								)}
+							</form.Field>
+							<form.Field
+								name="confirmPassword"
+								validators={{
+									onChangeListenTo: ["password"],
+									onChange: ({ value, fieldApi }) => {
+										const password = fieldApi.form.getFieldValue("password");
+										if (value !== password) return "Passwords do not match";
+										return undefined;
+									},
+								}}
+							>
+								{(field) => (
+									<PasswordInput
+										label="Confirm Password"
+										placeholder="Confirm password"
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.currentTarget.value)}
+										onBlur={field.handleBlur}
+										error={
+											field.state.meta.isTouched &&
+											field.state.meta.errors.length > 0
+												? field.state.meta.errors[0]
+												: undefined
+										}
+										radius="md"
+									/>
+								)}
+							</form.Field>
+							{serverError && (
 								<Text size="sm" c="red">
-									{error}
+									{serverError}
 								</Text>
 							)}
 							<Group justify="space-between" mt="xs">
 								<Anchor component={Link} to="/sign-in" c="dimmed" size="xs">
 									Already have an account? Sign in
 								</Anchor>
-								<Button type="submit" loading={isPending} radius="md">
-									Create account
-								</Button>
+								<form.Subscribe
+									selector={(state) => ({
+										isSubmitting: state.isSubmitting,
+										canSubmit: state.canSubmit,
+									})}
+								>
+									{({ isSubmitting, canSubmit }) => (
+										<Button
+											type="submit"
+											loading={isSubmitting}
+											disabled={!canSubmit}
+											radius="md"
+										>
+											Create account
+										</Button>
+									)}
+								</form.Subscribe>
 							</Group>
 						</Stack>
 					</form>

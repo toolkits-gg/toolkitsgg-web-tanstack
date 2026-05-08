@@ -6,7 +6,7 @@ import type {
 } from "#/features/dal/queue/types";
 
 const DB_NAME = "toolkitsgg-pending-ops";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = "ops";
 
 interface PendingOpsDB extends DBSchema {
@@ -17,27 +17,42 @@ interface PendingOpsDB extends DBSchema {
 			createdAt: string;
 			entity: string;
 			status: PendingOpStatus;
+			idempotencyKey: string;
 		};
 	};
 }
 
+/** Lazy singleton — initialized on first access. Setting to null forces a fresh open (used in tests). */
 let dbPromise: Promise<IDBPDatabase<PendingOpsDB>> | null = null;
 
+/** Returns the pending-ops DB connection, or null when IndexedDB is unavailable (SSR). */
 const getDB = (): Promise<IDBPDatabase<PendingOpsDB>> | null => {
 	if (typeof indexedDB === "undefined") return null;
 	if (!dbPromise) {
 		dbPromise = openDB<PendingOpsDB>(DB_NAME, DB_VERSION, {
-			upgrade(db) {
-				const store = db.createObjectStore(STORE_NAME, { keyPath: "id" });
-				store.createIndex("createdAt", "createdAt");
-				store.createIndex("entity", "entity");
-				store.createIndex("status", "status");
+			upgrade(db, oldVersion, _newVersion, tx) {
+				if (oldVersion < 1) {
+					const store = db.createObjectStore(STORE_NAME, { keyPath: "id" });
+					store.createIndex("createdAt", "createdAt");
+					store.createIndex("entity", "entity");
+					store.createIndex("status", "status");
+				}
+				if (oldVersion < 2) {
+					tx.objectStore(STORE_NAME).createIndex(
+						"idempotencyKey",
+						"idempotencyKey",
+					);
+				}
 			},
 		});
 	}
 	return dbPromise;
 };
 
+/**
+ * Input for enqueueOp. The `id` and `status` overrides exist for test seeding only;
+ * normal callers should omit them to get an auto-generated UUID and "pending" status.
+ */
 type EnqueueInput = Omit<
 	PendingOp,
 	"id" | "createdAt" | "updatedAt" | "status"
@@ -46,9 +61,24 @@ type EnqueueInput = Omit<
 	status?: PendingOpStatus;
 };
 
+/** Stores a new pending op in IndexedDB. Returns null if IndexedDB is unavailable. */
 const enqueueOp = async (input: EnqueueInput): Promise<PendingOp | null> => {
 	const db = await getDB();
 	if (!db) return null;
+
+	// Skip if an equivalent op is already waiting — prevents duplicates from rapid mutations.
+	const existing = await db.getFromIndex(
+		STORE_NAME,
+		"idempotencyKey",
+		input.idempotencyKey,
+	);
+	if (
+		existing &&
+		(existing.status === "pending" || existing.status === "syncing")
+	) {
+		return existing;
+	}
+
 	const now = new Date().toISOString();
 	const op: PendingOp = {
 		id: input.id ?? crypto.randomUUID(),
@@ -62,11 +92,17 @@ const enqueueOp = async (input: EnqueueInput): Promise<PendingOp | null> => {
 		idempotencyKey: input.idempotencyKey,
 		lastError: input.lastError,
 		serverUpdatedAt: input.serverUpdatedAt,
+		summary: input.summary,
 	};
 	await db.put(STORE_NAME, op);
 	return op;
 };
 
+/**
+ * Returns all ops ordered by createdAt (FIFO).
+ * FIFO ordering matters during sync — ops must be applied in the order they were created
+ * to preserve causal relationships (e.g. create before delete).
+ */
 const listOps = async (filter?: ListOpsFilter): Promise<PendingOp[]> => {
 	const db = await getDB();
 	if (!db) return [];
@@ -79,12 +115,20 @@ const listOps = async (filter?: ListOpsFilter): Promise<PendingOp[]> => {
 	});
 };
 
+/** Fetches a single op by id. Returns null if not found or IndexedDB unavailable. */
 const getOp = async (id: string): Promise<PendingOp | null> => {
 	const db = await getDB();
 	if (!db) return null;
 	return (await db.get(STORE_NAME, id)) ?? null;
 };
 
+/**
+ * Updates an op's status and optionally its lastError.
+ * `lastError` is preserved across transitions only when the new status is "failed";
+ * any other transition clears it unless a new error string is explicitly provided.
+ * `conflictInfo` is preserved only when the new status is "conflict"; any other
+ * transition clears it so a stale server snapshot isn't shown after the op moves on.
+ */
 const markStatus = async (
 	id: string,
 	status: PendingOpStatus,
@@ -100,17 +144,51 @@ const markStatus = async (
 		updatedAt: new Date().toISOString(),
 		lastError:
 			lastError ?? (status === "failed" ? existing.lastError : undefined),
+		conflictInfo: status === "conflict" ? existing.conflictInfo : undefined,
 	};
 	await db.put(STORE_NAME, next);
 	return next;
 };
 
+/**
+ * Transitions an op to "conflict" and stores the server record snapshot.
+ * Used by the sync runner when a handler reports `{ status: "conflict", serverRecordJson }`,
+ * so the data-sync UI can show the user what the server has and offer a resolution path.
+ */
+const markConflict = async (
+	id: string,
+	serverRecordJson: string,
+): Promise<PendingOp | null> => {
+	const db = await getDB();
+	if (!db) return null;
+	const existing = await db.get(STORE_NAME, id);
+	if (!existing) return null;
+	const next: PendingOp = {
+		...existing,
+		status: "conflict",
+		updatedAt: new Date().toISOString(),
+		lastError: undefined,
+		conflictInfo: {
+			serverRecordJson,
+			detectedAt: new Date().toISOString(),
+		},
+	};
+	await db.put(STORE_NAME, next);
+	return next;
+};
+
+/** Permanently removes a single op. Used for noop results during sync. */
 const deleteOp = async (id: string): Promise<void> => {
 	const db = await getDB();
 	if (!db) return;
 	await db.delete(STORE_NAME, id);
 };
 
+/**
+ * Removes all ops with status "synced". Returns the number deleted.
+ * This is a housekeeping operation — not part of the sync flow itself.
+ * Run periodically to prevent the queue from growing without bound.
+ */
 const clearSynced = async (): Promise<number> => {
 	const db = await getDB();
 	if (!db) return 0;
@@ -127,6 +205,10 @@ const clearSynced = async (): Promise<number> => {
 	return count;
 };
 
+/**
+ * Closes and deletes the database. Only exported for test teardown.
+ * The DB must be closed before deletion; an open connection blocks the delete request.
+ */
 const _resetForTests = async (): Promise<void> => {
 	if (dbPromise) {
 		const db = await dbPromise;
@@ -148,6 +230,7 @@ export {
 	listOps,
 	getOp,
 	markStatus,
+	markConflict,
 	deleteOp,
 	clearSynced,
 	_resetForTests,

@@ -11,6 +11,7 @@ import {
 	TextInput,
 	Title,
 } from "@mantine/core";
+import { useForm } from "@tanstack/react-form";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiDiscord } from "react-icons/si";
@@ -20,36 +21,28 @@ export const Route = createFileRoute("/sign-in")({ component: SignInPage });
 
 function SignInPage() {
 	const navigate = useNavigate();
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [error, setError] = useState<string | null>(null);
-	const [isPending, setIsPending] = useState(false);
+	const [serverError, setServerError] = useState<string | null>(null);
 
 	const handleDiscord = async () => {
 		await authClient.signIn.social({ provider: "discord", callbackURL: "/" });
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setError(null);
-		setIsPending(true);
-		try {
+	const form = useForm({
+		defaultValues: { email: "", password: "" },
+		onSubmit: async ({ value }) => {
+			setServerError(null);
 			const result = await authClient.signIn.email({
-				email,
-				password,
+				email: value.email,
+				password: value.password,
 				callbackURL: "/",
 			});
 			if (result.error) {
-				setError(result.error.message ?? "Sign in failed");
+				setServerError(result.error.message ?? "Sign in failed");
 			} else {
 				await navigate({ to: "/" });
 			}
-		} catch {
-			setError("An unexpected error occurred");
-		} finally {
-			setIsPending(false);
-		}
-	};
+		},
+	});
 
 	return (
 		<Flex align="center" justify="center" p="xl" style={{ minHeight: "60vh" }}>
@@ -69,36 +62,91 @@ function SignInPage() {
 
 					<Divider label="Or continue with email" labelPosition="center" />
 
-					<form onSubmit={handleSubmit}>
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							form.handleSubmit();
+						}}
+					>
 						<Stack>
-							<TextInput
-								required
-								label="Email"
-								placeholder="you@example.com"
-								value={email}
-								onChange={(e) => setEmail(e.currentTarget.value)}
-								radius="md"
-							/>
-							<PasswordInput
-								required
-								label="Password"
-								placeholder="Password"
-								value={password}
-								onChange={(e) => setPassword(e.currentTarget.value)}
-								radius="md"
-							/>
-							{error && (
+							<form.Field
+								name="email"
+								validators={{
+									onBlur: ({ value }) => {
+										if (!value) return "Email is required";
+										if (!value.includes("@")) return "Enter a valid email";
+										return undefined;
+									},
+								}}
+							>
+								{(field) => (
+									<TextInput
+										label="Email"
+										placeholder="you@example.com"
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.currentTarget.value)}
+										onBlur={field.handleBlur}
+										error={
+											field.state.meta.isTouched &&
+											field.state.meta.errors.length > 0
+												? field.state.meta.errors[0]
+												: undefined
+										}
+										radius="md"
+									/>
+								)}
+							</form.Field>
+							<form.Field
+								name="password"
+								validators={{
+									onBlur: ({ value }) =>
+										!value ? "Password is required" : undefined,
+								}}
+							>
+								{(field) => (
+									<PasswordInput
+										label="Password"
+										placeholder="Password"
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.currentTarget.value)}
+										onBlur={field.handleBlur}
+										error={
+											field.state.meta.isTouched &&
+											field.state.meta.errors.length > 0
+												? field.state.meta.errors[0]
+												: undefined
+										}
+										radius="md"
+									/>
+								)}
+							</form.Field>
+							{serverError && (
 								<Text size="sm" c="red">
-									{error}
+									{serverError}
 								</Text>
 							)}
 							<Group justify="space-between" mt="xs">
 								<Anchor component={Link} to="/sign-up" c="dimmed" size="xs">
 									{"Don't have an account? Register"}
 								</Anchor>
-								<Button type="submit" loading={isPending} radius="md">
-									Sign in
-								</Button>
+								<form.Subscribe
+									selector={(state) => ({
+										isSubmitting: state.isSubmitting,
+										canSubmit: state.canSubmit,
+									})}
+								>
+									{({ isSubmitting, canSubmit }) => (
+										<Button
+											type="submit"
+											loading={isSubmitting}
+											disabled={!canSubmit}
+											radius="md"
+										>
+											Sign in
+										</Button>
+									)}
+								</form.Subscribe>
 							</Group>
 						</Stack>
 					</form>

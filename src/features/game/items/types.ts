@@ -86,7 +86,11 @@ type GameFilterConfig = {
 };
 
 type CollectItemInput = { itemId: string; itemName: string };
-type CollectedItemRecord = { userId: string; itemId: string };
+type CollectedItemRecord = {
+	userId: string;
+	itemId: string;
+	updatedAt?: Date | string | null;
+};
 
 type CollectedItemsViewMode =
 	| { kind: "self" }

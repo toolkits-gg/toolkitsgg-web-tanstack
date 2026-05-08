@@ -8,6 +8,7 @@ import {
 	removeAvatarOverrideServerFn,
 	removePrimaryAvatarServerFn,
 	updateAvatarServerFn,
+	updateProfileServerFn,
 } from "#/features/auth/dal/user-profile/user-profile";
 import {
 	deleteLocalAvatarOverride,
@@ -22,6 +23,7 @@ import {
 } from "#/features/dal/core/define-action";
 import type { DalContext } from "#/features/dal/core/types";
 import { applyPendingOpServerFn } from "#/features/dal/server/apply-pending-ops";
+import { getGameMetadata } from "#/features/game/registry/game-registry";
 import type { GameId } from "@/prisma";
 
 type UserProfileData = {
@@ -86,6 +88,16 @@ const userProfileActions = {
 		invalidates: ["userProfile"],
 		buildIdempotencyKey: (input, ctx) =>
 			`userAvatarOverride:upsert:${ctx.anonUserId}:${input.targetGameId ?? "primary"}:${input.avatarId}`,
+		describe: (input) =>
+			input.targetGameId
+				? {
+						title: "Set avatar override",
+						details: `For ${getGameMetadata(input.targetGameId)?.label ?? input.targetGameId}`,
+						gameId: input.targetGameId,
+					}
+				: {
+						title: "Updated primary avatar",
+					},
 		remote: async (input) => updateAvatarServerFn({ data: input }),
 		local: async (input, ctx) => {
 			const userId = resolveLocalUserId(ctx);
@@ -105,7 +117,8 @@ const userProfileActions = {
 			}
 			return { ok: true as const };
 		},
-		sync: (op) => applyPendingOpServerFn({ data: op }),
+		sync: (op, options) =>
+			applyPendingOpServerFn({ data: { op, force: options?.force } }),
 	}),
 
 	removePrimaryAvatar: defineDalWrite<void, { ok: true }>({
@@ -114,6 +127,9 @@ const userProfileActions = {
 		invalidates: ["userProfile"],
 		buildIdempotencyKey: (_input, ctx) =>
 			`userProfile:removePrimary:${ctx.anonUserId}`,
+		describe: () => ({
+			title: "Removed primary avatar",
+		}),
 		remote: async () => removePrimaryAvatarServerFn(),
 		local: async (_input, ctx) => {
 			const userId = resolveLocalUserId(ctx);
@@ -124,7 +140,8 @@ const userProfileActions = {
 			});
 			return { ok: true as const };
 		},
-		sync: (op) => applyPendingOpServerFn({ data: op }),
+		sync: (op, options) =>
+			applyPendingOpServerFn({ data: { op, force: options?.force } }),
 	}),
 
 	removeAvatarOverride: defineDalWrite<{ targetGameId: GameId }, { ok: true }>({
@@ -133,13 +150,46 @@ const userProfileActions = {
 		invalidates: ["userProfile"],
 		buildIdempotencyKey: (input, ctx) =>
 			`userAvatarOverride:delete:${ctx.anonUserId}:${input.targetGameId}`,
+		describe: (input) => ({
+			title: "Removed avatar override",
+			details: `For ${getGameMetadata(input.targetGameId)?.label ?? input.targetGameId}`,
+			gameId: input.targetGameId,
+		}),
 		remote: async (input) => removeAvatarOverrideServerFn({ data: input }),
 		local: async (input, ctx) => {
 			const userId = resolveLocalUserId(ctx);
 			await deleteLocalAvatarOverride(userId, input.targetGameId);
 			return { ok: true as const };
 		},
-		sync: (op) => applyPendingOpServerFn({ data: op }),
+		sync: (op, options) =>
+			applyPendingOpServerFn({ data: { op, force: options?.force } }),
+	}),
+
+	updateProfile: defineDalWrite<
+		{ displayName: string; bio: string },
+		{ ok: true }
+	>({
+		entity: "userProfile",
+		operation: "upsert",
+		invalidates: ["userProfile"],
+		buildIdempotencyKey: (_input, ctx) =>
+			`userProfile:update:${ctx.anonUserId}`,
+		describe: (input) => ({
+			title: "Updated profile",
+			details: `Display name → ${input.displayName}`,
+		}),
+		remote: async (input) => updateProfileServerFn({ data: input }),
+		local: async (input, ctx) => {
+			const userId = resolveLocalUserId(ctx);
+			await upsertLocalUserProfile({
+				userId,
+				displayName: input.displayName,
+				bio: input.bio,
+			});
+			return { ok: true as const };
+		},
+		sync: (op, options) =>
+			applyPendingOpServerFn({ data: { op, force: options?.force } }),
 	}),
 };
 

@@ -15,6 +15,7 @@ import {
 import type { DalContext } from "#/features/dal/core/types";
 import type { LocalUserFavoriteGame } from "#/features/dal/local/types";
 import { applyPendingOpServerFn } from "#/features/dal/server/apply-pending-ops";
+import { getGameMetadata } from "#/features/game/registry/game-registry";
 import type { GameId } from "@/prisma";
 
 interface FavoriteGameInput {
@@ -50,6 +51,11 @@ const favoriteGameActions = {
 		invalidates: ["userFavoriteGame"],
 		buildIdempotencyKey: (input, ctx) =>
 			`userFavoriteGame:upsert:${ctx.anonUserId}:${input.gameId}`,
+		describe: (input) => ({
+			title: "Favorited game",
+			details: getGameMetadata(input.gameId)?.label,
+			gameId: input.gameId,
+		}),
 		remote: async (input) => {
 			const row = await favoriteGameServerFn({ data: input });
 			return {
@@ -63,7 +69,8 @@ const favoriteGameActions = {
 			const userId = resolveLocalUserId(ctx);
 			return upsertLocalFavoriteGame({ userId, gameId: input.gameId });
 		},
-		sync: (op) => applyPendingOpServerFn({ data: op }),
+		sync: (op, options) =>
+			applyPendingOpServerFn({ data: { op, force: options?.force } }),
 	}),
 
 	unfavorite: defineDalWrite<FavoriteGameInput, { ok: true }>({
@@ -72,13 +79,19 @@ const favoriteGameActions = {
 		invalidates: ["userFavoriteGame"],
 		buildIdempotencyKey: (input, ctx) =>
 			`userFavoriteGame:delete:${ctx.anonUserId}:${input.gameId}`,
+		describe: (input) => ({
+			title: "Unfavorited game",
+			details: getGameMetadata(input.gameId)?.label,
+			gameId: input.gameId,
+		}),
 		remote: async (input) => unfavoriteGameServerFn({ data: input }),
 		local: async (input, ctx) => {
 			const userId = resolveLocalUserId(ctx);
 			await deleteLocalFavoriteGame({ userId, gameId: input.gameId });
 			return { ok: true as const };
 		},
-		sync: (op) => applyPendingOpServerFn({ data: op }),
+		sync: (op, options) =>
+			applyPendingOpServerFn({ data: { op, force: options?.force } }),
 	}),
 };
 

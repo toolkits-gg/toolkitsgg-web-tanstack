@@ -2,7 +2,7 @@ import type { SyncHandler } from "#/features/dal/core/types";
 import { compareTimestamps } from "#/features/dal/queue/last-write-wins";
 import { GameId, prisma } from "@/prisma";
 
-const userFavoriteGameHandler: SyncHandler = async (op, userId) => {
+const userFavoriteGameHandler: SyncHandler = async (op, userId, options) => {
 	const payload = op.payload as { gameId?: string } | null;
 	const rawGameId = payload?.gameId;
 	if (!rawGameId) return { status: "error", message: "missing gameId" };
@@ -13,17 +13,21 @@ const userFavoriteGameHandler: SyncHandler = async (op, userId) => {
 	const record = await prisma.userFavoriteGame.findUnique({
 		where: { userId_gameId: { userId, gameId } },
 	});
+	const force = options?.force ?? false;
 
 	if (op.operation === "delete") {
 		if (!record) return { status: "noop" };
-		const cmp = compareTimestamps(record, op);
-		if (cmp === "server-wins")
-			return { status: "conflict", serverRecordJson: JSON.stringify(record) };
+		if (!force) {
+			const cmp = compareTimestamps(record, op);
+			if (cmp === "server-wins")
+				return { status: "conflict", serverRecordJson: JSON.stringify(record) };
+		}
 		await prisma.userFavoriteGame.deleteMany({ where: { userId, gameId } });
 		return { status: "applied" };
 	}
 
 	if (record) {
+		if (force) return { status: "noop" };
 		const cmp = compareTimestamps(record, op);
 		if (cmp === "server-wins")
 			return { status: "conflict", serverRecordJson: JSON.stringify(record) };

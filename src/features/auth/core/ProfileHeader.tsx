@@ -1,7 +1,8 @@
 import { ActionIcon, Avatar, Box, Group, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { LuCamera } from "react-icons/lu";
+import { LuCamera, LuPencil } from "react-icons/lu";
 import { AvatarPicker } from "#/features/auth/core/AvatarPicker";
+import { ProfileEditForm } from "#/features/auth/core/ProfileEditForm";
 import { useResolvedAvatar } from "#/features/auth/hooks/use-resolved-avatar";
 import classes from "./ProfileHeader.module.css";
 
@@ -17,6 +18,15 @@ function openAvatarPicker() {
 		title: "Choose avatar",
 		size: "lg",
 		children: <AvatarPicker />,
+	});
+}
+
+function openProfileEdit(displayName: string, bio: string) {
+	modals.open({
+		title: "Edit profile",
+		children: (
+			<ProfileEditForm initialDisplayName={displayName} initialBio={bio} />
+		),
 	});
 }
 
@@ -65,9 +75,22 @@ export function ProfileHeader({
 						)}
 					</Box>
 					<Stack className={classes.info} gap={4}>
-						<Text fw={700} size="xl">
-							{displayName}
-						</Text>
+						<Group gap="xs" align="center">
+							<Text fw={700} size="xl">
+								{displayName}
+							</Text>
+							{isOwner && (
+								<ActionIcon
+									variant="subtle"
+									size="sm"
+									radius="xl"
+									onClick={() => openProfileEdit(displayName, bio)}
+									aria-label="Edit profile"
+								>
+									<LuPencil size={14} />
+								</ActionIcon>
+							)}
+						</Group>
 						<Text size="sm" c="dimmed">
 							{bio}
 						</Text>
