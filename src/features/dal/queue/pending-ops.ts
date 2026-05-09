@@ -110,8 +110,7 @@ const listOps = async (filter?: ListOpsFilter): Promise<PendingOp[]> => {
 	if (!filter) return all;
 	return all.filter((op) => {
 		if (filter.status && op.status !== filter.status) return false;
-		if (filter.entity && op.entity !== filter.entity) return false;
-		return true;
+		return !(filter.entity && op.entity !== filter.entity);
 	});
 };
 
