@@ -95,12 +95,14 @@ const ItemCard = ({
 				)}
 			</Box>
 
-			<Flex gap="xs" align="flex-start" h="100%">
+			<Flex gap="xs" align="center" h="100%">
 				{item.imageUrl ? (
 					<Box style={{ flexShrink: 0, width: 48, height: 48 }}>
 						<GameImage
 							src={item.imageUrl}
 							style={{ width: 48, height: 48, objectFit: "contain" }}
+							width={48}
+							height={48}
 						/>
 					</Box>
 				) : null}
@@ -121,8 +123,8 @@ const ItemCard = ({
 						<Text
 							size="xs"
 							c="dimmed"
-							lh={1.3}
-							mt={2}
+							lh={1.15}
+							mt={0}
 							className={classes.description}
 						>
 							{item.description[0]}

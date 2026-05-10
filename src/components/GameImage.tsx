@@ -1,8 +1,7 @@
-import type { ImageProps } from "@mantine/core";
-import { AppImage } from "#/components/AppImage";
+import { AppImage, type AppImageProps } from "#/components/AppImage";
 import { useGameId } from "#/features/game/core/use-game-id";
 
-type GameImageProps = ImageProps & {};
+type GameImageProps = AppImageProps & {};
 
 /**
  * Small AppImage wrapper that automatically resolves the image URL

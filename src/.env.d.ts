@@ -12,7 +12,6 @@ declare global {
 			readonly DISCORD_CLIENT_SECRET: string;
 			readonly IMAGEKIT_CLIENT_ID: string;
 			readonly IMAGEKIT_CLIENT_SECRET: string;
-			readonly IMAGEKIT_ENDPOINT_URL: string;
 			readonly RESEND_KEY: string;
 		}
 	}

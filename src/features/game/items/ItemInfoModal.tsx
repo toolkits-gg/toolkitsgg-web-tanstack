@@ -16,10 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { LuCamera, LuCheck, LuPlus } from "react-icons/lu";
 import { GameImage } from "#/components/GameImage";
 import { useGameId } from "#/features/game/core/use-game-id";
-import type {
-	AppItem,
-	CollectItemInput,
-} from "#/features/game/items/types";
+import type { AppItem, CollectItemInput } from "#/features/game/items/types";
 import { getGameMetadata } from "#/features/game/registry/game-registry";
 import {
 	ScreenshotContainer,
@@ -100,6 +97,8 @@ const ItemInfoModal = ({
 						<GameImage
 							src={item.imageUrl}
 							style={{ width: 96, height: 96, objectFit: "contain" }}
+							width={96}
+							height={96}
 						/>
 					</Box>
 				) : null}
@@ -182,6 +181,8 @@ const ItemInfoModal = ({
 									<GameImage
 										src={linkedItem.imageUrl}
 										style={{ width: 56, height: 56, objectFit: "contain" }}
+										width={56}
+										height={56}
 									/>
 								)}
 								<Stack gap={2} align="center">

@@ -6,7 +6,6 @@ const requiredServerEnv = [
 	"DISCORD_CLIENT_SECRET",
 	"IMAGEKIT_CLIENT_ID",
 	"IMAGEKIT_CLIENT_SECRET",
-	"IMAGEKIT_ENDPOINT_URL",
 	"RESEND_KEY",
 ] as const;
 
@@ -14,6 +13,7 @@ const requiredClientEnv = [
 	"VITE_APP_NAME",
 	"VITE_APP_URL",
 	"VITE_CLOUDFRONT_URL",
+	"IMAGEKIT_IMAGEKIT_ENDPOINT_URL",
 ] as const;
 
 // Validate on server startup

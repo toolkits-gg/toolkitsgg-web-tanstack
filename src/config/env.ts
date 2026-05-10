@@ -9,7 +9,6 @@ const envSchema = z.object({
 	DISCORD_CLIENT_SECRET: z.string(),
 	IMAGEKIT_CLIENT_ID: z.string(),
 	IMAGEKIT_CLIENT_SECRET: z.string(),
-	IMAGEKIT_ENDPOINT_URL: z.url(),
 	RESEND_KEY: z.string(),
 });
 
