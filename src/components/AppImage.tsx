@@ -7,7 +7,6 @@ const AppImage = ({ width, height, ...rest }: AppImageProps) => {
 	return (
 		<MantineImage
 			component={IKImage}
-			urlEndpoint={import.meta.env.VITE_IMAGEKIT_ENDPOINT_URL}
 			transformation={[{ width, height }]}
 			{...rest}
 		/>

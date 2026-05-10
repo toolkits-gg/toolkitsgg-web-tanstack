@@ -1,3 +1,4 @@
+import { ImageKitProvider } from "@imagekit/react";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import type { PropsWithChildren } from "react";
 import { GameProvider } from "#/features/game/core/GameProvider";
@@ -8,10 +9,14 @@ const AppProviders = ({ children }: PropsWithChildren) => {
 	return (
 		<NuqsAdapter>
 			<GameProvider>
-				<MantineProviderWithTheme>
-					<ScreenshotPreviewProvider />
-					{children}
-				</MantineProviderWithTheme>
+				<ImageKitProvider
+					urlEndpoint={import.meta.env.VITE_IMAGEKIT_ENDPOINT_URL}
+				>
+					<MantineProviderWithTheme>
+						<ScreenshotPreviewProvider />
+						{children}
+					</MantineProviderWithTheme>
+				</ImageKitProvider>
 			</GameProvider>
 		</NuqsAdapter>
 	);
