@@ -77,7 +77,7 @@ Skills live in `.claude/skills/`. Use the `/skill-name` slash command or referen
 
 ### Game registry pattern
 
-Everything game-specific hangs off a central registry. Each game under `src/games/<gameId>/` exposes a `core/game-config/index.ts` that exports:
+Everything game-specific hangs off a central registry. Each game under `src/games/<gameId>/` exposes a `core/game-config/generate-palette.ts` that exports:
 
 ```typescript
 export const GAME_CONFIG = {
@@ -127,7 +127,7 @@ Follow these steps in order. The registry is the single place to check; no other
    ```
    core/
      game-config/
-       index.ts          # exports GAME_CONFIG satisfies GameConfig<LocalItem, CategoryEnum>
+       generate-palette.ts          # exports GAME_CONFIG satisfies GameConfig<LocalItem, CategoryEnum>
        metadata.tsx      # id, name, label, description, faviconSourcePath, renderLogo()
        pages.tsx         # GamePages with renderItemLookup()
        theme.ts          # ToolkitThemeDefinition (colors, Mantine overrides)
@@ -279,3 +279,5 @@ const appUrl = import.meta.env.VITE_APP_URL;
 - **Tabs** for indentation, double quotes (Biome config). Organize-imports runs on save in VS Code.
 - TypeScript is strict with `noUnusedLocals`, `noUnusedParameters`, `verbatimModuleSyntax` — always use `import type` for type-only imports.
 - `routeTree.gen.ts` and `styles.css` are excluded from Biome; don't hand-edit them.
+- **Arrow functions over `function` declarations.** Prefer `const foo = () => {}` over `function foo() {}` for all module-level functions. Do not use `function` declarations except where required (e.g. generators, or framework APIs that demand them).
+- **Exports at the bottom of the file.** Declare everything (`const`, `type`, `class`, etc.) without an `export` keyword inline, then put a single `export { ... }` block (and `export type { ... }` if needed) at the very end of the file. No `export const`, `export function`, `export type`, or `export default` at the declaration site. This keeps the public surface area of each file visible in one place.

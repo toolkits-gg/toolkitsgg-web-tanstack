@@ -7,10 +7,6 @@ import { ProfileTabNav } from "#/features/auth/core/ProfileTabNav";
 import { useUserProfile } from "#/features/auth/hooks/use-user-profile";
 import { useSession } from "#/integrations/better-auth/auth-client";
 
-export const Route = createFileRoute("/profile")({
-	component: LocalProfileLayout,
-});
-
 function LocalProfileLayout() {
 	const { profile } = useUserProfile();
 	const { data: session } = useSession();
@@ -43,3 +39,9 @@ function LocalProfileLayout() {
 		</Stack>
 	);
 }
+
+const Route = createFileRoute("/profile")({
+	component: LocalProfileLayout,
+});
+
+export { Route };

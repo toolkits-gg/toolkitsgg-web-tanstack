@@ -26,6 +26,9 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
+			"complexity": {
+				"useArrowFunction": "error"
+			},
 			"correctness": {
 				"noUnusedVariables": {
 					"level": "error",
@@ -33,6 +36,10 @@
 						"ignoreRestSiblings": true
 					}
 				}
+			},
+			"style": {
+				"useExportsLast": "error",
+				"noDefaultExport": "error"
 			}
 		}
 	},

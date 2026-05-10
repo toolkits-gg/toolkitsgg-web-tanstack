@@ -17,9 +17,7 @@ import { useState } from "react";
 import { LuSwords } from "react-icons/lu";
 import { authClient } from "#/integrations/better-auth/auth-client";
 
-export const Route = createFileRoute("/sign-up")({ component: SignUpPage });
-
-function SignUpPage() {
+const SignUpPage = () => {
 	const navigate = useNavigate();
 	const [serverError, setServerError] = useState<string | null>(null);
 
@@ -216,4 +214,7 @@ function SignUpPage() {
 			</Paper>
 		</Flex>
 	);
-}
+};
+
+const Route = createFileRoute("/sign-up")({ component: SignUpPage });
+export { Route };

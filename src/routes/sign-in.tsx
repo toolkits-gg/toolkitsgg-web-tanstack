@@ -17,9 +17,7 @@ import { useState } from "react";
 import { SiDiscord } from "react-icons/si";
 import { authClient } from "#/integrations/better-auth/auth-client";
 
-export const Route = createFileRoute("/sign-in")({ component: SignInPage });
-
-function SignInPage() {
+const SignInPage = () => {
 	const navigate = useNavigate();
 	const [serverError, setServerError] = useState<string | null>(null);
 
@@ -154,4 +152,7 @@ function SignInPage() {
 			</Paper>
 		</Flex>
 	);
-}
+};
+
+const Route = createFileRoute("/sign-in")({ component: SignInPage });
+export { Route };

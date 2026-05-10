@@ -1,10 +1,6 @@
 import { Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/account/profile/$userId/")({
-	component: ProfileHome,
-});
-
 function ProfileHome() {
 	return (
 		<Stack gap="sm">
@@ -13,3 +9,9 @@ function ProfileHome() {
 		</Stack>
 	);
 }
+
+const Route = createFileRoute("/account/profile/$userId/")({
+	component: ProfileHome,
+});
+
+export { Route };

@@ -21,143 +21,6 @@ import { usePendingOps } from "#/features/dal/queue/use-pending-ops";
 import { getGameMetadata } from "#/features/game/registry/game-registry";
 import { useSession } from "#/integrations/better-auth/auth-client";
 
-export const Route = createFileRoute("/account/profile/$userId/data-sync")({
-	component: DataSync,
-});
-
-function DataSync() {
-	const { data: session } = useSession();
-	const { online } = useNetwork();
-	const queryClient = useQueryClient();
-
-	const [mounted, setMounted] = useState(false);
-	useEffect(() => setMounted(true), []);
-
-	const pending = usePendingOps();
-	const canSync = !!session?.user?.id && online;
-
-	const syncAll = useMutation({
-		mutationFn: async () => {
-			if (!pending.data) return null;
-			return syncOps(pending.data, { resolveAction: resolveWriteAction });
-		},
-		onSuccess: (report) => {
-			if (!report) return;
-			const parts: string[] = [];
-			if (report.applied) parts.push(`${report.applied} applied`);
-			if (report.noops) parts.push(`${report.noops} already up-to-date`);
-			if (report.conflicts) parts.push(`${report.conflicts} conflicts`);
-			if (report.errors) parts.push(`${report.errors} errors`);
-			const hasIssues = report.conflicts > 0 || report.errors > 0;
-			notifications.show({
-				title: hasIssues ? "Sync completed with issues" : "Sync complete",
-				message: parts.length ? parts.join(", ") : "Nothing to sync.",
-				color: hasIssues ? "orange" : "green",
-			});
-		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
-			queryClient.invalidateQueries({ queryKey: ["dal"] });
-		},
-	});
-
-	const clear = useMutation({
-		mutationFn: () => clearSynced(),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["dal-queue"] }),
-	});
-
-	const keepMine = useMutation({
-		mutationFn: async (op: PendingOp) => {
-			const action = resolveWriteAction(op.entity);
-			if (!action) throw new Error(`No action for ${op.entity}`);
-			return forceSyncOp(op, action);
-		},
-		onSuccess: (result) => {
-			const ok = result.status === "applied" || result.status === "noop";
-			notifications.show({
-				title: ok ? "Local change kept" : "Could not keep local change",
-				message:
-					result.status === "error"
-						? result.message
-						: result.status === "conflict"
-							? "Server still reports a conflict."
-							: "",
-				color: ok ? "green" : "orange",
-			});
-		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
-			queryClient.invalidateQueries({ queryKey: ["dal"] });
-		},
-	});
-
-	const acceptServer = useMutation({
-		mutationFn: async (opId: string) => deleteOp(opId),
-		onSuccess: () => {
-			notifications.show({
-				title: "Server change accepted",
-				message: "Your local change was discarded.",
-				color: "blue",
-			});
-		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
-			queryClient.invalidateQueries({ queryKey: ["dal"] });
-		},
-	});
-
-	return (
-		<Stack gap="sm">
-			<Group justify="space-between">
-				<Title order={3}>Data Sync</Title>
-				<Group gap="xs">
-					<Button
-						size="xs"
-						variant="default"
-						onClick={() => clear.mutate()}
-						disabled={clear.isPending}
-					>
-						Clear synced
-					</Button>
-					<Button
-						size="xs"
-						onClick={() => syncAll.mutate()}
-						disabled={!canSync || syncAll.isPending || !pending.data?.length}
-					>
-						{syncAll.isPending ? "Syncing…" : "Sync all"}
-					</Button>
-				</Group>
-			</Group>
-			{mounted && !canSync ? (
-				<Text size="sm" c="dimmed">
-					Sign in and come online to push pending changes.
-				</Text>
-			) : null}
-			<PendingList
-				ops={(pending.data ?? []).filter((op) => op.status !== "synced")}
-				onDelete={(id) => {
-					deleteOp(id).then(() =>
-						queryClient.invalidateQueries({ queryKey: ["dal-queue"] }),
-					);
-				}}
-				onKeepMine={(op) => keepMine.mutate(op)}
-				onAcceptServer={(id) => acceptServer.mutate(id)}
-				canResolve={canSync}
-				resolvingOpId={
-					keepMine.isPending
-						? (keepMine.variables?.id ?? null)
-						: acceptServer.isPending
-							? (acceptServer.variables ?? null)
-							: null
-				}
-			/>
-			<SyncedList
-				ops={(pending.data ?? []).filter((op) => op.status === "synced")}
-			/>
-		</Stack>
-	);
-}
-
 const PendingList = ({
 	ops,
 	onDelete,
@@ -350,3 +213,142 @@ const statusColor = (status: PendingOp["status"]) => {
 			return "red";
 	}
 };
+
+function DataSync() {
+	const { data: session } = useSession();
+	const { online } = useNetwork();
+	const queryClient = useQueryClient();
+
+	const [mounted, setMounted] = useState(false);
+	useEffect(() => setMounted(true), []);
+
+	const pending = usePendingOps();
+	const canSync = !!session?.user?.id && online;
+
+	const syncAll = useMutation({
+		mutationFn: async () => {
+			if (!pending.data) return null;
+			return syncOps(pending.data, { resolveAction: resolveWriteAction });
+		},
+		onSuccess: (report) => {
+			if (!report) return;
+			const parts: string[] = [];
+			if (report.applied) parts.push(`${report.applied} applied`);
+			if (report.noops) parts.push(`${report.noops} already up-to-date`);
+			if (report.conflicts) parts.push(`${report.conflicts} conflicts`);
+			if (report.errors) parts.push(`${report.errors} errors`);
+			const hasIssues = report.conflicts > 0 || report.errors > 0;
+			notifications.show({
+				title: hasIssues ? "Sync completed with issues" : "Sync complete",
+				message: parts.length ? parts.join(", ") : "Nothing to sync.",
+				color: hasIssues ? "orange" : "green",
+			});
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
+			queryClient.invalidateQueries({ queryKey: ["dal"] });
+		},
+	});
+
+	const clear = useMutation({
+		mutationFn: () => clearSynced(),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["dal-queue"] }),
+	});
+
+	const keepMine = useMutation({
+		mutationFn: async (op: PendingOp) => {
+			const action = resolveWriteAction(op.entity);
+			if (!action) throw new Error(`No action for ${op.entity}`);
+			return forceSyncOp(op, action);
+		},
+		onSuccess: (result) => {
+			const ok = result.status === "applied" || result.status === "noop";
+			notifications.show({
+				title: ok ? "Local change kept" : "Could not keep local change",
+				message:
+					result.status === "error"
+						? result.message
+						: result.status === "conflict"
+							? "Server still reports a conflict."
+							: "",
+				color: ok ? "green" : "orange",
+			});
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
+			queryClient.invalidateQueries({ queryKey: ["dal"] });
+		},
+	});
+
+	const acceptServer = useMutation({
+		mutationFn: async (opId: string) => deleteOp(opId),
+		onSuccess: () => {
+			notifications.show({
+				title: "Server change accepted",
+				message: "Your local change was discarded.",
+				color: "blue",
+			});
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
+			queryClient.invalidateQueries({ queryKey: ["dal"] });
+		},
+	});
+
+	return (
+		<Stack gap="sm">
+			<Group justify="space-between">
+				<Title order={3}>Data Sync</Title>
+				<Group gap="xs">
+					<Button
+						size="xs"
+						variant="default"
+						onClick={() => clear.mutate()}
+						disabled={clear.isPending}
+					>
+						Clear synced
+					</Button>
+					<Button
+						size="xs"
+						onClick={() => syncAll.mutate()}
+						disabled={!canSync || syncAll.isPending || !pending.data?.length}
+					>
+						{syncAll.isPending ? "Syncing…" : "Sync all"}
+					</Button>
+				</Group>
+			</Group>
+			{mounted && !canSync ? (
+				<Text size="sm" c="dimmed">
+					Sign in and come online to push pending changes.
+				</Text>
+			) : null}
+			<PendingList
+				ops={(pending.data ?? []).filter((op) => op.status !== "synced")}
+				onDelete={(id) => {
+					deleteOp(id).then(() =>
+						queryClient.invalidateQueries({ queryKey: ["dal-queue"] }),
+					);
+				}}
+				onKeepMine={(op) => keepMine.mutate(op)}
+				onAcceptServer={(id) => acceptServer.mutate(id)}
+				canResolve={canSync}
+				resolvingOpId={
+					keepMine.isPending
+						? (keepMine.variables?.id ?? null)
+						: acceptServer.isPending
+							? (acceptServer.variables ?? null)
+							: null
+				}
+			/>
+			<SyncedList
+				ops={(pending.data ?? []).filter((op) => op.status === "synced")}
+			/>
+		</Stack>
+	);
+}
+
+const Route = createFileRoute("/account/profile/$userId/data-sync")({
+	component: DataSync,
+});
+
+export { Route };

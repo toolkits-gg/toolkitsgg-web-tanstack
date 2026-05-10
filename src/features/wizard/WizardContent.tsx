@@ -39,7 +39,6 @@ const WizardContent = ({
 					left: "50%",
 					transform: "translate(-50%, -50%)",
 				};
-			case "bottom":
 			default:
 				return {
 					bottom: 24,

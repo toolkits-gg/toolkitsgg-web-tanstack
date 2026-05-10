@@ -404,7 +404,7 @@ const BigMyComponent = MyComponent.withProps({ size: 'xl', radius: 'lg' });
 
 ## Namespace exports
 
-Add at the bottom of the component file or `index.ts` to let consumers access types without extra imports.
+Add at the bottom of the component file or `generate-palette.ts` to let consumers access types without extra imports.
 
 ```tsx
 export namespace MyComponent {

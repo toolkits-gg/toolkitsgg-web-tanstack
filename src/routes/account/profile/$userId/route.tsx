@@ -7,24 +7,6 @@ import { getPublicUserProfileServerFn } from "#/features/auth/dal/user-profile/u
 import { getViewerUserIdServerFn } from "#/features/auth/dal/user-profile/user-profile.actions";
 import type { GameId } from "@/prisma";
 
-export const Route = createFileRoute("/account/profile/$userId")({
-	loader: async ({ params }) => {
-		const user = await getPublicUserProfileServerFn({
-			data: { userId: params.userId },
-		});
-		if (!user?.userProfile) throw notFound();
-		const viewerUserId = await getViewerUserIdServerFn();
-		return { user, isOwner: viewerUserId === user.id };
-	},
-	notFoundComponent: () => (
-		<Box p="md">
-			<Title order={1}>Profile Not Found</Title>
-			<Text>This user profile does not exist.</Text>
-		</Box>
-	),
-	component: ProfileLayout,
-});
-
 function ProfileLayout() {
 	const { user, isOwner } = Route.useLoaderData();
 	const { userId } = Route.useParams();
@@ -62,3 +44,23 @@ function ProfileLayout() {
 		</Stack>
 	);
 }
+
+const Route = createFileRoute("/account/profile/$userId")({
+	loader: async ({ params }) => {
+		const user = await getPublicUserProfileServerFn({
+			data: { userId: params.userId },
+		});
+		if (!user?.userProfile) throw notFound();
+		const viewerUserId = await getViewerUserIdServerFn();
+		return { user, isOwner: viewerUserId === user.id };
+	},
+	notFoundComponent: () => (
+		<Box p="md">
+			<Title order={1}>Profile Not Found</Title>
+			<Text>This user profile does not exist.</Text>
+		</Box>
+	),
+	component: ProfileLayout,
+});
+
+export { Route };

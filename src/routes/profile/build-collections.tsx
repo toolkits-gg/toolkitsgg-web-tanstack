@@ -1,10 +1,6 @@
 import { Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/profile/build-collections")({
-	component: BuildCollections,
-});
-
 function BuildCollections() {
 	return (
 		<Stack gap="sm">
@@ -13,3 +9,9 @@ function BuildCollections() {
 		</Stack>
 	);
 }
+
+const Route = createFileRoute("/profile/build-collections")({
+	component: BuildCollections,
+});
+
+export { Route };

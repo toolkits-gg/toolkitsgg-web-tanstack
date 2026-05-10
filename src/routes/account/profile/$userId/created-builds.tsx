@@ -1,10 +1,6 @@
 import { Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/account/profile/$userId/created-builds")({
-	component: CreatedBuilds,
-});
-
 function CreatedBuilds() {
 	return (
 		<Stack gap="sm">
@@ -13,3 +9,9 @@ function CreatedBuilds() {
 		</Stack>
 	);
 }
+
+const Route = createFileRoute("/account/profile/$userId/created-builds")({
+	component: CreatedBuilds,
+});
+
+export { Route };

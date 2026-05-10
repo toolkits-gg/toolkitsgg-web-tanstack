@@ -22,7 +22,7 @@ const stored = (() => {
 	}
 })();
 
-export const gameStore = new Store<GameState>({
+const gameStore = new Store<GameState>({
 	gameId: stored?.gameId ?? null,
 	source: stored?.source ?? "default",
 });
@@ -39,4 +39,4 @@ const setGame = (id: GameId, source: GameSource) => {
 	});
 };
 
-export { setGame };
+export { setGame, gameStore };

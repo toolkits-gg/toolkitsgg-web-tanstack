@@ -47,4 +47,4 @@ EmailVerification.PreviewProps = {
 	url: "http://localhost:3000/verify-email/abc123",
 } as EmailVerificationProps;
 
-export default EmailVerification;
+export { EmailVerification };

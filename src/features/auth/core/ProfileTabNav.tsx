@@ -9,15 +9,18 @@ type ProfileTabNavProps = {
 const TABS = [
 	{ label: "Home", path: "" },
 	{ label: "Collected Items", path: "collected-items" },
-	{ label: "Collection Stats", path: "collection-stats" },
 	{ label: "Liked Builds", path: "liked-builds" },
 	{ label: "Build Collections", path: "build-collections" },
 	{ label: "Created Builds", path: "created-builds" },
+	{ label: "Featured Builds", path: "featured-builds" },
 ] as const;
 
 const DATA_SYNC_TAB = { label: "Data Sync", path: "data-sync" } as const;
 
-export function ProfileTabNav({ basePath, showDataSync = false }: ProfileTabNavProps) {
+export function ProfileTabNav({
+	basePath,
+	showDataSync = false,
+}: ProfileTabNavProps) {
 	const navigate = useNavigate();
 	const location = useRouterState({ select: (s) => s.location });
 

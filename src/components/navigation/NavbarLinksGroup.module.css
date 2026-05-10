@@ -4,7 +4,7 @@
   width: 100%;
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
   font-size: var(--mantine-font-size-sm);
-  color: var(--mantine-color-primary-3);
+  color: var(--mantine-color-sidebarFg-5);
 
   &:hover {
     background-color: var(--mantine-color-primary-5);
@@ -25,7 +25,7 @@
   text-decoration: none;
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
   font-size: var(--mantine-font-size-sm);
-  color: var(--mantine-color-primaryFg-5);
+  color: var(--mantine-color-sidebarFg-5);
   border: none;
   background-color: transparent;
   text-align: left;
@@ -38,10 +38,11 @@
 }
 
 .label {
-  color: var(--mantine-color-primaryFg-5);
+  color: var(--mantine-color-sidebarFg-5);
 
   &:hover {
     background-color: var(--mantine-color-primary-5);
+    color: var(--mantine-color-primaryFg-5);
   }
 }
 

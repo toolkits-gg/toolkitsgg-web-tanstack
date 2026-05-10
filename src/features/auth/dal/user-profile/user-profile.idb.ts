@@ -58,7 +58,7 @@ const getLocalAvatarOverrides = async (
 	return db.getAllFromIndex(STORE_USER_AVATAR_OVERRIDE, "userId", userId);
 };
 
-export async function upsertLocalAvatarOverride(data: {
+async function upsertLocalAvatarOverride(data: {
 	userId: string;
 	gameId: GameId;
 	avatarId: string;
@@ -99,4 +99,5 @@ export {
 	upsertLocalUserProfile,
 	getLocalAvatarOverrides,
 	deleteLocalAvatarOverride,
+	upsertLocalAvatarOverride,
 };

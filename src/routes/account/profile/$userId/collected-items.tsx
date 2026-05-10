@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getGameConfig } from "#/features/game/registry/game-registry";
 import { useGameId } from "#/features/game/core/use-game-id";
-
-export const Route = createFileRoute("/account/profile/$userId/collected-items")({
-	component: CollectedItems,
-});
+import { getGameConfig } from "#/features/game/registry/game-registry";
 
 function CollectedItems() {
 	const { userId } = Route.useParams();
@@ -18,3 +14,9 @@ function CollectedItems() {
 		</>
 	);
 }
+
+const Route = createFileRoute("/account/profile/$userId/collected-items")({
+	component: CollectedItems,
+});
+
+export { Route };
