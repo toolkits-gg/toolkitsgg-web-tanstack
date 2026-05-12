@@ -45,7 +45,6 @@
     "@paralleldrive/cuid2": "3.3.0",
     "@prisma/adapter-pg": "7.4.2",
     "@prisma/client": "7.4.2",
-    "@react-email/components": "1.0.12",
     "@react-email/ui": "6.0.0",
     "@tanstack/match-sorter-utils": "8.19.4",
     "@tanstack/react-devtools": "0.10.3",

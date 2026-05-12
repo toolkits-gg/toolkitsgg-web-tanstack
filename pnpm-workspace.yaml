@@ -4,3 +4,5 @@ allowBuilds:
   esbuild: true
   sharp: true
   lightningcss: true
+  '@prisma/engines': true
+  prisma: true
