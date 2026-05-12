@@ -47,20 +47,20 @@
     "@prisma/client": "7.4.2",
     "@react-email/components": "1.0.12",
     "@react-email/ui": "6.0.0",
-    "@tanstack/match-sorter-utils": "latest",
-    "@tanstack/react-devtools": "latest",
-    "@tanstack/react-form": "latest",
-    "@tanstack/react-query": "latest",
-    "@tanstack/react-query-devtools": "latest",
-    "@tanstack/react-router": "latest",
-    "@tanstack/react-router-devtools": "latest",
-    "@tanstack/react-router-ssr-query": "latest",
-    "@tanstack/react-start": "latest",
-    "@tanstack/react-store": "latest",
-    "@tanstack/react-table": "latest",
+    "@tanstack/match-sorter-utils": "8.19.4",
+    "@tanstack/react-devtools": "0.10.3",
+    "@tanstack/react-form": "1.32.0",
+    "@tanstack/react-query": "5.100.10",
+    "@tanstack/react-query-devtools": "5.100.10",
+    "@tanstack/react-router": "1.169.2",
+    "@tanstack/react-router-devtools": "1.166.13",
+    "@tanstack/react-router-ssr-query": "1.166.12",
+    "@tanstack/react-start": "1.167.65",
+    "@tanstack/react-store": "0.11.0",
+    "@tanstack/react-table": "8.21.3",
     "@tanstack/react-virtual": "3.13.24",
-    "@tanstack/router-plugin": "1.132.0",
-    "@tanstack/store": "latest",
+    "@tanstack/router-plugin": "1.167.35",
+    "@tanstack/store": "0.11.0",
     "@tiptap/extension-link": "3.22.3",
     "@tiptap/pm": "3.22.3",
     "@tiptap/react": "3.22.3",
@@ -90,8 +90,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
     "@prisma-idb/idb-client-generator": "0.37.0",
-    "@tanstack/devtools-event-client": "latest",
-    "@tanstack/devtools-vite": "latest",
+    "@tanstack/devtools-event-client": "0.4.3",
+    "@tanstack/devtools-vite": "0.6.0",
     "@testing-library/dom": "10.4.1",
     "@testing-library/react": "16.3.0",
     "@types/culori": "4.0.1",
@@ -117,11 +117,6 @@
   "pnpm": {
     "overrides": {
       "sharp": "0.34.5"
-    },
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "lightningcss",
-      "sharp"
-    ]
+    }
   }
 }
