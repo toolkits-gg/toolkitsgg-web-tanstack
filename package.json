@@ -26,7 +26,8 @@
     "db:local:stop": "docker compose -f compose.local.yaml stop",
     "db:local:restart": "docker compose -f compose.local.yaml restart",
     "db:local:down": "docker compose -f compose.local.yaml down -v",
-    "favicons:generate": "gulp generateFavicons"
+    "favicons:generate": "gulp generateFavicons",
+    "images:generate": "gulp generateItemImages"
   },
   "dependencies": {
     "@better-auth/prisma-adapter": "1.6.5",
@@ -87,8 +88,8 @@
     "@prisma-idb/idb-client-generator": "0.37.0",
     "@tanstack/devtools-event-client": "0.4.3",
     "@tanstack/devtools-vite": "0.6.0",
-    "@tanstack/react-query-devtools": "5.100.10",
     "@tanstack/react-devtools": "0.10.3",
+    "@tanstack/react-query-devtools": "5.100.10",
     "@tanstack/react-router-devtools": "1.166.13",
     "@testing-library/dom": "10.4.1",
     "@testing-library/react": "16.3.0",
@@ -107,6 +108,7 @@
     "postcss-preset-mantine": "1.18.0",
     "postcss-simple-vars": "7.0.1",
     "react-email": "6.0.0",
+    "sharp": "^0.34.5",
     "tsx": "4.21.0",
     "typescript": "5.7.2",
     "vite": "8.0.5",

@@ -95,10 +95,9 @@ const ItemInfoModal = ({
 				{item.imageUrl ? (
 					<Box style={{ flexShrink: 0, width: 96, height: 96 }}>
 						<GameImage
+							alt={`Image of ${item.name}`}
 							src={item.imageUrl}
-							style={{ width: 96, height: 96, objectFit: "contain" }}
-							width={96}
-							height={96}
+							size="md"
 						/>
 					</Box>
 				) : null}
@@ -179,10 +178,9 @@ const ItemInfoModal = ({
 							>
 								{linkedItem.imageUrl && (
 									<GameImage
+										alt={`Image of ${linkedItem.name}`}
 										src={linkedItem.imageUrl}
-										style={{ width: 56, height: 56, objectFit: "contain" }}
-										width={56}
-										height={56}
+										size="md"
 									/>
 								)}
 								<Stack gap={2} align="center">

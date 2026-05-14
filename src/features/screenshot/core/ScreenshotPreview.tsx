@@ -47,10 +47,8 @@ function ScreenshotPreview({
 					<AppImage
 						src={screenshot}
 						alt="Screenshot preview"
-						crossOrigin="anonymous"
 						mx="auto"
-						width={150}
-						height={304}
+						size="md"
 						style={{
 							maxWidth: "100%",
 							maxHeight: 350,

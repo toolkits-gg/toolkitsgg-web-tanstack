@@ -16,5 +16,6 @@ dist-ssr
 __unconfig*
 todos.json
 /prisma/generated
+/.images
 settings.local.json
 .idea

@@ -1,13 +1,9 @@
-import { Text } from "@mantine/core";
-import { modals } from "@mantine/modals";
+import { Modal, Text } from "@mantine/core";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useRef, useState } from "react";
 import { ItemCard } from "#/features/game/items/ItemCard";
 import { ItemInfoModal } from "#/features/game/items/ItemInfoModal";
-import type {
-	AppItem,
-	CollectItemInput,
-} from "#/features/game/items/types";
+import type { AppItem, CollectItemInput } from "#/features/game/items/types";
 import classes from "./ItemVirtualGrid.module.css";
 
 const HEADER_HEIGHT = 64;
@@ -44,6 +40,7 @@ const ItemVirtualGrid = ({
 }: ItemVirtualGridProps) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [columns, setColumns] = useState(1);
+	const [activeItem, setActiveItem] = useState<AppItem | null>(null);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -87,26 +84,30 @@ const ItemVirtualGrid = ({
 	});
 
 	const handleInfo = (item: AppItem) => {
-		modals.open({
-			title: item.name,
-			size: "md",
-			centered: true,
-			children: (
-				<ItemInfoModal
-					item={item}
-					resolveLinkedItems={resolveLinkedItems}
-					isCollected={collectedIds.includes(item.id)}
-					isCollectable={isCollectable(item)}
-					onCollect={onCollect}
-					onUncollect={onUncollect}
-					readOnly={readOnly}
-				/>
-			),
-		});
+		setActiveItem(item);
 	};
 
 	return (
 		<div ref={containerRef} className={classes.container}>
+			<Modal
+				opened={activeItem !== null}
+				onClose={() => setActiveItem(null)}
+				title={activeItem?.name}
+				size="md"
+				centered
+			>
+				{activeItem && (
+					<ItemInfoModal
+						item={activeItem}
+						resolveLinkedItems={resolveLinkedItems}
+						isCollected={collectedIds.includes(activeItem.id)}
+						isCollectable={isCollectable(activeItem)}
+						onCollect={onCollect}
+						onUncollect={onUncollect}
+						readOnly={readOnly}
+					/>
+				)}
+			</Modal>
 			{rowData.length === 0 ? (
 				<div className={classes.emptyState}>
 					<Text size="xl" fw={600} c="dimmed">
@@ -122,23 +123,56 @@ const ItemVirtualGrid = ({
 					style={{ height: virtualizer.getTotalSize() }}
 				>
 					{virtualizer.getVirtualItems().map((virtualRow) => {
-					const row = rowData[virtualRow.index];
-					if (!row) return null;
+						const row = rowData[virtualRow.index];
+						if (!row) return null;
 
-					const translateY =
-						virtualRow.start - virtualizer.options.scrollMargin;
+						const translateY =
+							virtualRow.start - virtualizer.options.scrollMargin;
 
-					if (row.type === "header") {
-						const collectedInCat = items.filter(
-							(item) =>
-								String(item.category) === row.category &&
-								collectedIds.includes(item.id) &&
-								isCollectable(item),
-						).length;
-						const collectableInCat = items.filter(
-							(item) =>
-								String(item.category) === row.category && isCollectable(item),
-						).length;
+						if (row.type === "header") {
+							const collectedInCat = items.filter(
+								(item) =>
+									String(item.category) === row.category &&
+									collectedIds.includes(item.id) &&
+									isCollectable(item),
+							).length;
+							const collectableInCat = items.filter(
+								(item) =>
+									String(item.category) === row.category && isCollectable(item),
+							).length;
+
+							return (
+								<div
+									key={virtualRow.key}
+									style={{
+										position: "absolute",
+										top: 0,
+										left: 0,
+										width: "100%",
+										height: virtualRow.size,
+										transform: `translateY(${translateY}px)`,
+									}}
+								>
+									<div className={classes.categoryHeader}>
+										<span className={classes.categoryTitle}>
+											{row.category
+												.split("_")
+												.map(
+													(w) =>
+														w.charAt(0).toUpperCase() +
+														w.slice(1).toLowerCase(),
+												)
+												.join(" ")}
+										</span>
+										{collectableInCat > 0 && (
+											<span className={classes.categoryCounts}>
+												{collectedInCat} / {collectableInCat} collected
+											</span>
+										)}
+									</div>
+								</div>
+							);
+						}
 
 						return (
 							<div
@@ -148,65 +182,33 @@ const ItemVirtualGrid = ({
 									top: 0,
 									left: 0,
 									width: "100%",
-									height: virtualRow.size,
+									height: virtualRow.size - ROW_GAP,
 									transform: `translateY(${translateY}px)`,
 								}}
 							>
-								<div className={classes.categoryHeader}>
-									<span className={classes.categoryTitle}>
-										{row.category
-											.split("_")
-											.map(
-												(w) =>
-													w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(),
-											)
-											.join(" ")}
-									</span>
-									{collectableInCat > 0 && (
-										<span className={classes.categoryCounts}>
-											{collectedInCat} / {collectableInCat} collected
-										</span>
-									)}
+								<div
+									className={classes.itemRow}
+									style={{
+										gridTemplateColumns: `repeat(${columns}, 1fr)`,
+									}}
+								>
+									{row.items.map((item) => (
+										<ItemCard
+											key={item.id}
+											item={item}
+											collectedIds={collectedIds}
+											isCollectable={isCollectable(item)}
+											dimUncollected={dimUncollected}
+											onCollect={onCollect}
+											onUncollect={onUncollect}
+											onInfo={handleInfo}
+											readOnly={readOnly}
+										/>
+									))}
 								</div>
 							</div>
 						);
-					}
-
-					return (
-						<div
-							key={virtualRow.key}
-							style={{
-								position: "absolute",
-								top: 0,
-								left: 0,
-								width: "100%",
-								height: virtualRow.size - ROW_GAP,
-								transform: `translateY(${translateY}px)`,
-							}}
-						>
-							<div
-								className={classes.itemRow}
-								style={{
-									gridTemplateColumns: `repeat(${columns}, 1fr)`,
-								}}
-							>
-								{row.items.map((item) => (
-									<ItemCard
-										key={item.id}
-										item={item}
-										collectedIds={collectedIds}
-										isCollectable={isCollectable(item)}
-										dimUncollected={dimUncollected}
-										onCollect={onCollect}
-										onUncollect={onUncollect}
-										onInfo={handleInfo}
-										readOnly={readOnly}
-									/>
-								))}
-							</div>
-						</div>
-					);
-				})}
+					})}
 				</div>
 			)}
 		</div>

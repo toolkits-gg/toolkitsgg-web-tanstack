@@ -100,9 +100,8 @@ const ItemCard = ({
 					<Box style={{ flexShrink: 0, width: 48, height: 48 }}>
 						<GameImage
 							src={item.imageUrl}
-							style={{ width: 48, height: 48, objectFit: "contain" }}
-							width={48}
-							height={48}
+							size="sm"
+							alt={`Image of ${item.name}`}
 						/>
 					</Box>
 				) : null}

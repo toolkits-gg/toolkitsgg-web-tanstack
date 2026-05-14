@@ -9,7 +9,7 @@ type AppLogoProps = {
 };
 
 const AppLogo = ({ path, size = DEFAULT_LOGO_SIZE }: AppLogoProps) => {
-	return <AppImage src={path} w={size} h={size} />;
+	return <AppImage src={path} w={size} h={size} alt="Logo of Toolkits.gg" />;
 };
 
 const CleanLogo = ({
@@ -34,7 +34,10 @@ const AnimatedLogo = ({
 	size?: AppLogoProps["size"];
 }) => {
 	return (
-		<AppLogo path={`logos/${size === 64 ? 64 : 128}GradientTK.gif`} size={size} />
+		<AppLogo
+			path={`logos/${size === 64 ? 64 : 128}GradientTK.gif`}
+			size={size}
+		/>
 	);
 };
 

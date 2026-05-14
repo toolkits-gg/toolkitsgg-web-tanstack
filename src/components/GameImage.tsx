@@ -7,6 +7,9 @@ type GameImageProps = AppImageProps & {};
  * Small AppImage wrapper that automatically resolves the image URL
  * based on the current game ID.
  */
+const withResizedDir = (src: string) =>
+	src.replace(/(^|\/)([^/]+)$/, "$1resized/$2");
+
 const GameImage = ({ src, ...rest }: GameImageProps) => {
 	const gameId = useGameId();
 
@@ -14,7 +17,11 @@ const GameImage = ({ src, ...rest }: GameImageProps) => {
 		throw new Error(`Game ID is required to resolve image URL: ${src}`);
 	}
 
-	return <AppImage src={`games/${gameId}/${src}`} {...rest} />;
+	if (typeof src === "string" && !src.startsWith("http")) {
+		return <AppImage src={`games/${gameId}/${withResizedDir(src)}`} {...rest} />;
+	}
+
+	return <AppImage src={src} {...rest} />;
 };
 
 export { GameImage, type GameImageProps };
