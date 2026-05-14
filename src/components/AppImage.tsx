@@ -1,16 +1,14 @@
-import { Image as IKImage, type IKImageProps } from "@imagekit/react";
-import { Image as MantineImage } from "@mantine/core";
+import { Image as MantineImage, type ImageProps as MantineImageProps } from "@mantine/core";
 
-type AppImageProps = IKImageProps & {};
+type AppImageProps = MantineImageProps & {};
 
-const AppImage = ({ width, height, ...rest }: AppImageProps) => {
-	return (
-		<MantineImage
-			component={IKImage}
-			transformation={[{ width, height }]}
-			{...rest}
-		/>
-	);
+const AppImage = ({ src, ...rest }: AppImageProps) => {
+	const resolvedSrc =
+		src && typeof src === "string" && !src.startsWith("http")
+			? `${import.meta.env.VITE_CLOUDFRONT_URL}/${src.replace(/^\//, "")}`
+			: src;
+
+	return <MantineImage src={resolvedSrc} {...rest} />;
 };
 
 export { AppImage, type AppImageProps };
