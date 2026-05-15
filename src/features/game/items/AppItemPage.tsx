@@ -1,8 +1,12 @@
-import { Box } from "@mantine/core";
+import { ActionIcon, Box, Group, Tooltip } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useQuery } from "@tanstack/react-query";
+import { ClientOnly, useRouterState } from "@tanstack/react-router";
 import { parseAsBoolean, useQueryStates } from "nuqs";
+import { LuShare2 } from "react-icons/lu";
 import { useDalMutation } from "#/features/dal/hooks/use-dal-mutation";
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
+import { useGameId } from "#/features/game/core/use-game-id";
 import {
 	type ActiveFilter,
 	ItemFilterBar,
@@ -59,6 +63,29 @@ const AppItemPage = ({
 	const isCollectedItemsTab = viewMode !== undefined;
 	const isPublicView = viewMode?.kind === "public";
 	const publicUserId = viewMode?.kind === "public" ? viewMode.userId : null;
+	const activeGameId = useGameId();
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+	const handleShare = async () => {
+		const baseUrl =
+			import.meta.env.VITE_APP_URL ||
+			(typeof window !== "undefined" ? window.location.origin : "");
+		const url = `${baseUrl}${pathname}?gameId=${activeGameId}`;
+		try {
+			await navigator.clipboard.writeText(url);
+			notifications.show({
+				title: "Link copied",
+				message: "Share link copied to clipboard",
+				color: "green",
+			});
+		} catch {
+			notifications.show({
+				title: "Couldn't copy link",
+				message: "Try again or copy from the address bar.",
+				color: "red",
+			});
+		}
+	};
 	const [universalParams, setUniversalParams] = useQueryStates(
 		isCollectedItemsTab ? collectedItemsTabParsers : itemLookupParsers,
 	);
@@ -270,6 +297,21 @@ const AppItemPage = ({
 
 	return (
 		<Box>
+			{isCollectedItemsTab && (
+				<ClientOnly>
+					<Group justify="flex-end" px="md" pt="xs">
+						<Tooltip label="Copy share link">
+							<ActionIcon
+								variant="subtle"
+								onClick={handleShare}
+								aria-label="Copy share link"
+							>
+								<LuShare2 size={16} />
+							</ActionIcon>
+						</Tooltip>
+					</Group>
+				</ClientOnly>
+			)}
 			<ItemFilterBar
 				search={search}
 				onSearchChange={(v) => setUniversalParam("search", v)}

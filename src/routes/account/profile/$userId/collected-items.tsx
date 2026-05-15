@@ -1,11 +1,58 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useGameId } from "#/features/game/core/use-game-id";
-import { getGameConfig } from "#/features/game/registry/game-registry";
+import { useEffect, useRef } from "react";
+import { gameStore, setGame } from "#/features/game/core/store";
+import { useGameState } from "#/features/game/core/use-game-id";
+import {
+	getGameConfig,
+	isRegisteredGameId,
+} from "#/features/game/registry/game-registry";
+import type { GameId } from "@/prisma";
 
-function CollectedItems() {
+type CollectedItemsSearch = {
+	gameId?: GameId;
+};
+
+const CollectedItems = () => {
 	const { userId } = Route.useParams();
-	const gameId = useGameId();
-	const config = getGameConfig(gameId);
+	const { gameId: urlGameId } = Route.useSearch();
+	const navigate = Route.useNavigate();
+	const { gameId: storeGameIdRaw, source } = useGameState();
+	const storeGameId: GameId = storeGameIdRaw ?? "none";
+
+	// Render off url gameId to prevent hydration error.
+	// Store reads from localstorage, which causes the issue since it is null on server.
+	// Effects will still handle the needed sync after hydration.
+	const config = urlGameId ? getGameConfig(urlGameId) : undefined;
+	const initializedRef = useRef(false);
+
+	useEffect(() => {
+		if (!urlGameId) return;
+		// Read the store fresh here so a store update cannot retrigger this
+		// effect and revert a GameSwitcher (toggle-source) write.
+		const current = gameStore.state.gameId ?? "none";
+		if (urlGameId !== current) {
+			setGame(urlGameId, "route");
+		}
+	}, [urlGameId]);
+
+	useEffect(() => {
+		const firstRun = !initializedRef.current;
+		initializedRef.current = true;
+		// On mount, skip the store→URL write if the URL already has a value (URL wins).
+		// Exception: subdomain has authority over the URL, so we still need to sync
+		// the URL to the subdomain game.
+		if (firstRun && urlGameId && source !== "subdomain") return;
+		// Don't write back to URL if the store change was caused by our own
+		// URL→store sync above.
+		if (source === "route") return;
+		if (storeGameId === "none") return;
+		if (storeGameId === urlGameId) return;
+		void navigate({
+			search: (prev) => ({ ...prev, gameId: storeGameId }),
+			replace: true,
+		});
+	}, [storeGameId, source, urlGameId, navigate]);
+
 	return (
 		<>
 			{config?.PAGES.renderCollectedItems({
@@ -13,9 +60,16 @@ function CollectedItems() {
 			})}
 		</>
 	);
-}
+};
 
 const Route = createFileRoute("/account/profile/$userId/collected-items")({
+	validateSearch: (search: Record<string, unknown>): CollectedItemsSearch => {
+		const raw = search.gameId;
+		if (typeof raw === "string" && isRegisteredGameId(raw)) {
+			return { gameId: raw };
+		}
+		return {};
+	},
 	component: CollectedItems,
 });
 
