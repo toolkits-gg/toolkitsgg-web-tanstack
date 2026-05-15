@@ -17,7 +17,13 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { useState } from "react";
-import { LuChevronRight, LuHouse, LuSearch, LuStar } from "react-icons/lu";
+import {
+	LuChevronRight,
+	LuHouse,
+	LuSearch,
+	LuStar,
+	LuUser,
+} from "react-icons/lu";
 
 import { DefaultLogo } from "#/components/AppLogo";
 import { favoriteGameActions } from "#/features/auth/dal/favorite-games/favorite-games.actions";
@@ -131,6 +137,12 @@ function GameSwitcher() {
 		handleClose();
 	};
 
+	const handleGoProfileHome = () => {
+		setGame("none", "toggle");
+		navigate({ to: "/profile" });
+		handleClose();
+	};
+
 	const handleSelectGame = (id: GameId) => {
 		setGame(id, "toggle");
 
@@ -205,15 +217,27 @@ function GameSwitcher() {
 					component="div"
 					className={classes.gameRow}
 					onClick={handleGoHome}
-					data-active={activeGameId === "none" || undefined}
 				>
 					<Group gap="xs">
 						<LuHouse size={14} />
 						<Text size="sm" fw={500}>
-							Toolkits.gg
+							Home
 						</Text>
 					</Group>
 				</UnstyledButton>
+				<UnstyledButton
+					component={"div"}
+					className={classes.gameRow}
+					onClick={handleGoProfileHome}
+				>
+					<Group gap="xs">
+						<LuUser size={14} />
+						<Text size="sm" fw={500}>
+							User Profile
+						</Text>
+					</Group>
+				</UnstyledButton>
+
 				<Divider my="xs" className={classes.separator} />
 
 				<ScrollArea.Autosize mah={400} type="auto">
