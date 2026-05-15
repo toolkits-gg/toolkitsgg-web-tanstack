@@ -71,7 +71,13 @@ const SignInPage = () => {
 							<form.Field
 								name="email"
 								validators={{
-									onBlur: ({ value }) => {
+									onBlur: ({ value, fieldApi }) => {
+										if (!fieldApi.state.meta.isDirty) return undefined;
+										if (!value) return "Email is required";
+										if (!value.includes("@")) return "Enter a valid email";
+										return undefined;
+									},
+									onSubmit: ({ value }) => {
 										if (!value) return "Email is required";
 										if (!value.includes("@")) return "Enter a valid email";
 										return undefined;
@@ -98,7 +104,11 @@ const SignInPage = () => {
 							<form.Field
 								name="password"
 								validators={{
-									onBlur: ({ value }) =>
+									onBlur: ({ value, fieldApi }) => {
+										if (!fieldApi.state.meta.isDirty) return undefined;
+										return !value ? "Password is required" : undefined;
+									},
+									onSubmit: ({ value }) =>
 										!value ? "Password is required" : undefined,
 								}}
 							>

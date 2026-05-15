@@ -77,7 +77,13 @@ const SignUpPage = () => {
 							<form.Field
 								name="email"
 								validators={{
-									onBlur: ({ value }) => {
+									onBlur: ({ value, fieldApi }) => {
+										if (!fieldApi.state.meta.isDirty) return undefined;
+										if (!value) return "Email is required";
+										if (!value.includes("@")) return "Enter a valid email";
+										return undefined;
+									},
+									onSubmit: ({ value }) => {
 										if (!value) return "Email is required";
 										if (!value.includes("@")) return "Enter a valid email";
 										return undefined;
