@@ -1,3 +1,5 @@
+import { isRegisteredGameId } from "#/features/game/registry/game-registry.tsx";
+
 const ROOT_DOMAINS = ["toolkits.gg", "www.toolkits.gg", "localhost"];
 
 export function parseSubdomain(hostname: string): string | null {
@@ -12,7 +14,7 @@ export function parseSubdomain(hostname: string): string | null {
 		if (host === root) return null;
 	}
 
-	// e.g. "chess.mysite.gg" → ["chess", "mysite", "gg"]
+	// e.g. "remnant2.toolkits.gg" → ["remnant2", "toolkits", "gg"]
 	const parts = host.split(".");
 
 	// Need at least 3 parts for a subdomain: [sub, domain, tld]
@@ -23,16 +25,14 @@ export function parseSubdomain(hostname: string): string | null {
 	// Reject "www" explicitly in case it slips through
 	if (subdomain === "www") return null;
 
-	// Optionally validate against your game registry
-	// to avoid treating unrelated subdomains as gameIds
-	// import { GAMES } from '~/games/registry'
-	// if (!GAMES[subdomain]) return null
+	// Reject invalid subdomains
+	if (!isRegisteredGameId(subdomain)) return null;
 
 	return subdomain;
 }
 
-// For dev: support ?_game=chess as a subdomain override
-// Usage: http://localhost:3000?_game=chess
+// For dev: support ?_game=remnant2 as a subdomain override
+// Usage: http://localhost:3000?_game=remnant2
 export function parseDevGameOverride(): string | null {
 	if (import.meta.env.PROD) return null;
 	const params = new URLSearchParams(window.location.search);
