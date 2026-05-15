@@ -131,15 +131,15 @@ function GameSwitcher() {
 		setSearchQuery("");
 	};
 
-	const handleGoHome = () => {
+	const handleGoHome = async () => {
 		setGame("none", "toggle");
-		navigate({ to: "/" });
+		await navigate({ to: "/" });
 		handleClose();
 	};
 
-	const handleGoProfileHome = () => {
+	const handleGoProfileHome = async () => {
 		setGame("none", "toggle");
-		navigate({ to: "/profile" });
+		await navigate({ to: "/profile" });
 		handleClose();
 	};
 
