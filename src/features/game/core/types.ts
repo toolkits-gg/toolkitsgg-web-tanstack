@@ -1,4 +1,5 @@
 import type { createSearchParamsCache } from "nuqs/server";
+import type { ReactNode } from "react";
 import type { LogoSize } from "#/components/AppLogo";
 import type {
 	AppItem,
@@ -36,7 +37,7 @@ type GameMetadata = {
 	description: string;
 	/** CloudFront-relative path to the source PNG used for favicon generation */
 	faviconSourcePath: string;
-	renderLogo: (size: LogoSize) => React.ReactNode;
+	renderLogo: (size: LogoSize) => ReactNode;
 	/** Third-party resources related to the game */
 	externalResources: {
 		label: string;
@@ -45,10 +46,8 @@ type GameMetadata = {
 };
 
 type GamePages = {
-	renderItemLookup: () => React.ReactNode;
-	renderCollectedItems: (args: {
-		mode: CollectedItemsViewMode;
-	}) => React.ReactNode;
+	renderItemLookup: () => ReactNode;
+	renderCollectedItems: (args: { mode: CollectedItemsViewMode }) => ReactNode;
 };
 
 type GameConfig<
