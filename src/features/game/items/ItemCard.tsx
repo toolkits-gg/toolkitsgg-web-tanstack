@@ -56,20 +56,7 @@ const ItemCard = ({
 				>
 					<LuInfo size={16} />
 				</ActionIcon>
-				{readOnly ? (
-					isCollected ? (
-						<ActionIcon
-							size={28}
-							radius="sm"
-							variant="transparent"
-							color="white"
-							disabled
-							title="Collected"
-						>
-							<LuCheck size={16} />
-						</ActionIcon>
-					) : null
-				) : isCollectable ? (
+				{readOnly ? null : isCollectable ? (
 					<ActionIcon
 						size={28}
 						radius="sm"
@@ -89,6 +76,7 @@ const ItemCard = ({
 						color="white"
 						disabled
 						title="Not collectable"
+						className={classes.disabled}
 					>
 						<LuX size={16} />
 					</ActionIcon>
