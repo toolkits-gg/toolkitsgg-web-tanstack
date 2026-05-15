@@ -110,6 +110,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					}}
 				/>
 				<HeadContent />
+				<title>{title}</title>
 			</head>
 			<body
 				style={{
