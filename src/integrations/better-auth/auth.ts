@@ -2,6 +2,9 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { serverEnv } from "#/config/env";
+import { EmailPasswordReset } from "#/emails/auth/email-password-reset.tsx";
+import { EmailVerification } from "#/emails/auth/email-verification.tsx";
+import { resend } from "#/integrations/resend/resend";
 import { prisma } from "@/prisma";
 
 const auth = betterAuth({
@@ -13,6 +16,36 @@ const auth = betterAuth({
 		serverEnv.BETTER_AUTH_URL ||
 		import.meta.env.VITE_APP_URL ||
 		"http://localhost:3000",
+	emailAndPassword: {
+		enabled: true,
+		requireEmailVerification: true,
+		async sendResetPassword({ user, url }) {
+			await resend.emails.send({
+				from: `Toolkits.gg <noreply@app.toolkits.gg>`,
+				to: user.email,
+				subject: "Reset your password",
+				react: EmailPasswordReset({
+					toName: user.name || user.email,
+					url,
+				}),
+			});
+		},
+	},
+	emailVerification: {
+		sendOnSignUp: true,
+		autoSignInAfterVerification: true,
+		async sendVerificationEmail({ user, url }) {
+			await resend.emails.send({
+				from: `Toolkits.gg <noreply@app.toolkits.gg>`,
+				to: user.email,
+				subject: "Verify your email address",
+				react: EmailVerification({
+					toName: user.name || user.email,
+					url,
+				}),
+			});
+		},
+	},
 	session: {
 		expiresIn: 60 * 60 * 24 * 30, // 30 days
 		updateAge: 60 * 60 * 24 * 15, // 15 days - refresh session
