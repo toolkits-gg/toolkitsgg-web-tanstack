@@ -40,19 +40,28 @@ interface MyRouterContext {
 	queryClient: QueryClient;
 }
 
+const title = "Toolkits.gg";
+const description =
+	"An open-source and ad-free platform providing item collection management, build planning and sharing, and more for a variety of games.";
+const ogImage = `${import.meta.env.VITE_CLOUDFRONT_URL}/metadata/og-image.png`;
+const url = "https://toolkits.gg";
+
 const Route = createRootRouteWithContext<MyRouterContext>()({
 	head: () => ({
 		meta: [
-			{
-				charSet: "utf-8",
-			},
-			{
-				name: "viewport",
-				content: "width=device-width, initial-scale=1",
-			},
-			{
-				title: "Toolkits.gg",
-			},
+			{ charSet: "utf-8" },
+			{ name: "viewport", content: "width=device-width, initial-scale=1" },
+			{ title },
+			{ property: "og:title", content: title },
+			{ property: "og:description", content: description },
+			{ property: "og:image", content: ogImage },
+			{ property: "og:type", content: "website" },
+			{ property: "og:url", content: url },
+			{ name: "twitter:card", content: "summary_large_image" },
+			{ name: "twitter:title", content: "Toolkits.gg" },
+			{ name: "twitter:description", content: description },
+			{ name: "twitter:image", content: ogImage },
+			{ name: "twitter:url", content: url },
 		],
 		links: [
 			{
