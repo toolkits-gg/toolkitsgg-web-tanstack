@@ -25,19 +25,25 @@ Postgres is required. Local dev uses the Docker Compose stack; all `db:*` script
 
 ```bash
 pnpm db:local:start   # start local postgres (compose.local.yaml)
-pnpm db:generate      # prisma generate → writes to prisma/generated/prisma & prisma/generated/prisma-idb
+pnpm db:local:stop    # stop local postgres
+pnpm db:local:restart # restart local postgres
+pnpm db:local:down    # tear down volumes (destructive)
+pnpm db:generate      # prisma generate -> writes to prisma/generated/prisma & prisma/generated/prisma-idb
 pnpm db:push          # push schema changes directly to the database (no migration files)
+pnpm db:migrate       # prisma migrate dev (rarely used — see note below)
 pnpm db:studio        # Prisma Studio
 pnpm db:seed          # run prisma/seed.ts
 ```
 
-This project does **not** use Prisma migrations — schema changes are applied with `pnpm db:push`. After editing any `.prisma` file, run `pnpm db:generate` to regenerate both the Postgres and IndexedDB clients, then `pnpm db:push` to sync the schema to the database.
+Image/favicon pipelines (gulp): `pnpm favicons:generate`, `pnpm images:generate`.
+
+This project does **not** use Prisma migrations in normal workflow — schema changes are applied with `pnpm db:push`. After editing any `.prisma` file, run `pnpm db:generate` to regenerate both the Postgres and IndexedDB clients, then `pnpm db:push` to sync the schema to the database.
 
 Two Prisma clients are generated from a single `schema.prisma`:
 - `prisma/generated/prisma` — Postgres server client (used via `src/db.ts` and `prisma/client.ts`).
 - `prisma/generated/prisma-idb` — IndexedDB client for the browser (via `@prisma-idb/idb-client-generator`), used offline/client-side in `src/integrations/prisma-idb`.
 
-Per-game Prisma models live in separate files imported by `schema.prisma`: `prisma/models/clairobscur.prisma`, `prisma/models/remnant2.prisma`, `prisma/models/slaythespire2.prisma`. When adding a new game, create a corresponding `prisma/models/<gameId>.prisma`.
+Prisma is configured via `prisma.config.ts` with `schema: path.join('prisma')`, which enables Prisma's multi-file schema mode: every `.prisma` file under `prisma/` is auto-discovered. Per-game models live in `prisma/models/<gameId>.prisma` (currently `clairobscur.prisma`, `remnant2.prisma`, `slaythespire2.prisma`). No `@@prisma.import` directive is needed — just create the file.
 
 ## Skills
 
@@ -69,7 +75,7 @@ Skills live in `.claude/skills/`. Use the `/skill-name` slash command or referen
 ### Routing
 
 - Routes live in `src/routes/`. `routeTree.gen.ts` is **generated** — do not edit (also marked read-only in `.vscode/settings.json` and excluded from Biome).
-- Root shell is `src/routes/__root.tsx`: renders `<html>`, global providers (`GameProvider` → `MantineProviderWithTheme` → `ModalsProvider`), and the Mantine `AppShell` (header + navbar + footer).
+- Root shell is `src/routes/__root.tsx`: renders `<html>`, the Mantine `AppShell` (header + navbar + footer), and mounts `AppProviders` (`src/components/AppProviders.tsx`). The provider chain is `NuqsAdapter` -> `GameProvider` -> `MantineProviderWithTheme`; `MantineProviderWithTheme` itself wraps children in Mantine's `ModalsProvider`, and a `ScreenshotPreviewProvider` is also rendered inside it.
 - Game-scoped URLs live under `src/routes/$gameId/` — the `gameId` param is written into the game store on mount.
 - Profile routes:
   - `src/routes/profile/` — the anonymous/offline-friendly profile shell. Always reachable, even when signed out or offline (it renders the local DAL view). When the user is both authenticated **and** online, `route.tsx` redirects to `/account/profile/$userId` with the current session's user id.
@@ -77,18 +83,19 @@ Skills live in `.claude/skills/`. Use the `/skill-name` slash command or referen
 
 ### Game registry pattern
 
-Everything game-specific hangs off a central registry. Each game under `src/games/<gameId>/` exposes a `core/game-config/generate-palette.ts` that exports:
+Everything game-specific hangs off a central registry. Each game under `src/games/<gameId>/` exposes a `core/game-config/index.ts` that exports:
 
 ```typescript
-export const GAME_CONFIG = {
+const GAME_CONFIG = {
   ITEMS,         // { all, collectable, categorized, categories, uncollectableCategories }
-  THEME,         // ToolkitThemeDefinition
+  THEME,         // ToolkitThemeDefinition | undefined
   METADATA,      // id, name, label, description, faviconSourcePath, renderLogo(), externalResources[]
-  PAGES,         // { renderItemLookup: () => ReactNode }
-  SEARCH_PARAMS, // nuqs search param cache (optional — `undefined` if the game has no custom filters)
+  PAGES,         // { renderItemLookup, renderCollectedItems }
+  SEARCH_PARAMS, // nuqs search param cache | undefined (when the game has no custom filters)
   AVATARS,       // GameAvatar[] (optional)
   DAL,           // { collectedItems: GameCollectedItemsDal }
-} satisfies GameConfig<LocalItem, CategoryEnum>
+} satisfies GameConfig<LocalItem, CategoryEnum>;
+export { GAME_CONFIG };
 ```
 
 `src/features/game/registry/game-registry.tsx` wires every `gameId` to its `GameConfig` and exports: `GAME_REGISTRY`, `REGISTERED_GAME_IDS`, `getGameConfig()`, `getGameConfigTyped<TId>()`, `getGameItems()`, `getGameTheme()`, `getGameMetadata()`, `getGamePages()`, `getGameAvatars()`, `getGameLogo()`, `getGameSearchParams()`, `getAllRegisteredThemeDefinitions()`, `getAllRegisteredThemeClassNames()`, `isRegisteredGameId()`, `getValidatedGameId()`.
@@ -100,8 +107,8 @@ The `GameId` enum is defined in `schema.prisma` and imported from `@/prisma`. `g
 Game-specific logic (Prisma queries, sync handlers, server functions, DAL actions) must live in `src/games/<gameId>/`. Never add game-keyed branches or inline game handlers to files under `src/features/`.
 
 DAL actions split by scope:
-- **Cross-game** (e.g. `favoriteGames`, `userProfile`) → `src/features/<feature>/dal/<entity>/` — currently all under `src/features/auth/dal/` since both belong to the authenticated-user surface area.
-- **Game-specific** (e.g. `collectedItems`) → `src/games/<gameId>/dal/`
+- **Cross-game** (e.g. `favoriteGames`, `userProfile`) -> `src/features/<feature>/dal/<entity>/` — currently all under `src/features/auth/dal/` since both belong to the authenticated-user surface area.
+- **Game-specific** (e.g. `collectedItems`) -> `src/games/<gameId>/dal/`
 
 Within each cross-game DAL folder, files follow a consistent suffix convention:
 
@@ -118,7 +125,7 @@ Follow these steps in order. The registry is the single place to check; no other
 
 1. **Add the enum value** — open `prisma/schema.prisma` and append the new id to `enum GameId`.
 
-2. **Create game models** — copy an existing `prisma/models/<gameId>.prisma` as a template and create `prisma/models/<newGameId>.prisma`. Add the `@@prisma.import` line in `schema.prisma`.
+2. **Create game models** — copy an existing `prisma/models/<gameId>.prisma` as a template and create `prisma/models/<newGameId>.prisma`. No `@@prisma.import` is needed — Prisma's multi-file schema (configured in `prisma.config.ts`) auto-discovers every `.prisma` file under `prisma/`.
 
 3. **Generate & push** — `pnpm db:generate && pnpm db:push`.
 
@@ -127,10 +134,10 @@ Follow these steps in order. The registry is the single place to check; no other
    ```
    core/
      game-config/
-       generate-palette.ts          # exports GAME_CONFIG satisfies GameConfig<LocalItem, CategoryEnum>
+       index.ts          # exports GAME_CONFIG satisfies GameConfig<LocalItem, CategoryEnum>
        metadata.tsx      # id, name, label, description, faviconSourcePath, renderLogo()
-       pages.tsx         # GamePages with renderItemLookup()
-       theme.ts          # ToolkitThemeDefinition (colors, Mantine overrides)
+       pages.tsx         # GamePages with renderItemLookup() and renderCollectedItems()
+       theme.ts          # ToolkitThemeDefinition (colors, Mantine overrides) — uses generateThemeColors() from #/features/theme/core/generate-palette
        items.ts          # item data + categorization
        search-params.ts  # nuqs parsers (optional — only if custom filters needed)
        avatars.ts        # GameAvatar[] (optional)
@@ -156,27 +163,27 @@ Follow these steps in order. The registry is the single place to check; no other
    | `game-registry.tsx` | Entry in `GAME_REGISTRY` object |
    | `game-db-seed-registry.ts` | Entry in `allGameDBSeeds` |
    | `game-idb-seed-registry.ts` | Entry in `allGameIDBSeeds` |
-   | `game-sync-handler-registry.ts` | Entry mapping entity name → `collectedItemSyncHandler` |
+   | `game-sync-handler-registry.ts` | Entry mapping entity name -> `collectedItemSyncHandler` |
    | `favicon-registry.json` | `"<gameId>": "<favicon-path>"` |
 
 ### Active-game resolution
 
-The active game is tracked in a `@tanstack/store` at `src/features/game/store/game-store.ts` with a `source` priority: `subdomain` > `route` > `toggle`/`session` > `default`. Two providers write to it:
+The active game is tracked in a `@tanstack/store` at `src/features/game/core/store.ts` (exports `gameStore` and `setGame`) with a `source` priority: `subdomain` > `route` > `toggle`/`session` > `default`. State is rehydrated from `localStorage` (`active-game` key) on module load. Two callers write to it:
 
-- `GameProvider` (client-only, mounted in `__root.tsx`) — reads `window.location.hostname` (`parseSubdomain`) with a `?_game=` dev override.
-- `$gameId/route.tsx` — writes the route param on every navigation.
+- `GameProvider` (client-only, mounted via `AppProviders` in `__root.tsx`) — reads `window.location.hostname` (`parseSubdomain` in `#/features/game/core/utils`) with a `?_game=` dev override.
+- `src/routes/$gameId/route.tsx` — calls `setGame(gameId, "route")` on every navigation under the `$gameId` segment.
 
 A `subdomain`-sourced value deliberately wins over later `route` writes — be careful if you change this precedence.
 
 ### Theme system
 
-- Mantine theme objects live in `src/features/theme/themes/` and per-game `src/games/<gameId>/core/game-config/theme.ts`.
-- `MantineProviderWithTheme` reads the active Mantine theme from `theme-store.ts` and feeds `next-themes` with the full list of registered theme class names (`getAllRegisteredThemeClassNames()`), so `html[data-theme]`/`className` toggling is driven off the registry.
-- `SyncAndApplyTheme` syncs `next-themes` ↔ the Mantine store and persists `autoChangeTheme` in `localStorage`.
+- Mantine theme objects live in `src/features/theme/themes/` (base + default) and per-game in `src/games/<gameId>/core/game-config/theme.ts`. Per-game palettes are built with `generateThemeColors()` from `#/features/theme/core/generate-palette`.
+- `MantineProviderWithTheme` reads the active Mantine theme from `#/features/theme/core/store` (`useMantineThemeStore`) and feeds `next-themes` with the full list of registered theme class names (`getAllRegisteredThemeClassNames()`), so `html[data-theme]`/`className` toggling is driven off the registry. It also nests Mantine's `ModalsProvider`.
+- `SyncAndApplyTheme` syncs `next-themes` <-> the Mantine store and persists `autoChangeTheme` in `localStorage`.
 
 ### DAL (offline-first)
 
-The DAL (`src/features/dal/`) is an offline-first data layer. Every read/write executes against either a **remote** backend (TanStack Start server functions → Postgres) or a **local** backend (IndexedDB). The backend is chosen automatically by `chooseBackend()`: remote when the user is authenticated and online, local otherwise. Local writes are queued as `PendingOp`s and synced later with last-write-wins conflict resolution.
+The DAL (`src/features/dal/`) is an offline-first data layer. Every read/write executes against either a **remote** backend (TanStack Start server functions -> Postgres) or a **local** backend (IndexedDB). The backend is chosen automatically by `chooseBackend()`: remote when the user is authenticated and online, local otherwise. Local writes are queued as `PendingOp`s and synced later with last-write-wins conflict resolution.
 
 `src/features/dal/` contains:
 
@@ -193,9 +200,9 @@ See `src/features/dal/DIAGRAM.md` for mermaid diagrams of the read/write, sync, 
 Component
   └─ useDalQuery / useDalMutation
        └─ DalContext { anonUserId, authUserId, backend }
-            ├─ "remote"  →  action.remote(input, ctx)   (server function)
-            └─ "local"   →  action.local(input, ctx)    (IndexedDB)
-                                 └─ [writes] enqueueOp() → PendingOp → syncOps()
+            ├─ "remote"  ->  action.remote(input, ctx)   (server function)
+            └─ "local"   ->  action.local(input, ctx)    (IndexedDB)
+                                 └─ [writes] enqueueOp() -> PendingOp -> syncOps()
 ```
 
 **Key types:**
@@ -252,16 +259,16 @@ const userId = await getOptionalUserId(); // returns null if unauthenticated
 
 ### Imports & path aliases
 
-Three aliases resolve to the same place — use the one already in the file:
+Two aliases are declared in both `package.json` `imports` **and** `tsconfig.json` `paths`:
 
-- `#/*` → `./src/*` (declared in `package.json` imports **and** `tsconfig.json` paths).
-- `@/prisma` → `./prisma/client` — this is how you import `prisma` and generated types/enums (e.g. `import type { GameId } from "@/prisma"`). Do **not** import directly from `prisma/generated/prisma`.
+- `#/*` -> `./src/*`.
+- `@/prisma` -> `./prisma/client` — this is how you import `prisma` and generated types/enums (e.g. `import type { GameId } from "@/prisma"`). Do **not** import directly from `prisma/generated/prisma`.
 
 ### Env vars
 
 Validated with zod in `src/config/env.ts`. `.env.local.example` is the template. **Never read `process.env` directly** — always use the type-safe accessors below.
 
-**Server (private) vars** — import `serverEnv` from `#/config/env`. Keys: `DATABASE_URL`, `NODE_ENV`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `IMAGEKIT_CLIENT_ID`, `IMAGEKIT_CLIENT_SECRET`, `IMAGEKIT_ENDPOINT_URL`, `RESEND_KEY`.
+**Server (private) vars** — import `serverEnv` from `#/config/env`. Keys: `DATABASE_URL`, `NODE_ENV`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `RESEND_KEY`.
 
 ```typescript
 import { serverEnv } from "#/config/env";
