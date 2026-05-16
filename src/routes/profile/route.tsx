@@ -4,11 +4,9 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { ProfileHeader } from "#/features/auth/core/ProfileHeader";
 import { ProfileTabNav } from "#/features/auth/core/ProfileTabNav";
-import { useUserProfile } from "#/features/auth/hooks/use-user-profile";
 import { useSession } from "#/integrations/better-auth/auth-client";
 
-function LocalProfileLayout() {
-	const { profile } = useUserProfile();
+const LocalProfileLayout = () => {
 	const { data: session } = useSession();
 	const { online } = useNetwork();
 	const navigate = useNavigate();
@@ -26,19 +24,14 @@ function LocalProfileLayout() {
 
 	return (
 		<Stack gap={0}>
-			<ProfileHeader
-				displayName={profile?.displayName ?? "Traveler"}
-				bio={profile?.bio ?? ""}
-				serverAvatarUrl={null}
-				isOwner={true}
-			/>
+			<ProfileHeader isOwner={true} />
 			<ProfileTabNav basePath="/profile" showDataSync={false} />
 			<Box p="md">
 				<Outlet />
 			</Box>
 		</Stack>
 	);
-}
+};
 
 const Route = createFileRoute("/profile")({
 	component: LocalProfileLayout,

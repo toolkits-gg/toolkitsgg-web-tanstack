@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, getRouteApi } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { gameStore, setGame } from "#/features/game/core/store";
 import { useGameState } from "#/features/game/core/use-game-id";
@@ -12,8 +12,11 @@ type CollectedItemsSearch = {
 	gameId?: GameId;
 };
 
+const parentRouteApi = getRouteApi("/account/profile/$userId");
+
 const CollectedItems = () => {
 	const { userId } = Route.useParams();
+	const { isOwner } = parentRouteApi.useLoaderData();
 	const { gameId: urlGameId } = Route.useSearch();
 	const navigate = Route.useNavigate();
 	const { gameId: storeGameIdRaw, source } = useGameState();
@@ -38,15 +41,17 @@ const CollectedItems = () => {
 	useEffect(() => {
 		const firstRun = !initializedRef.current;
 		initializedRef.current = true;
-		// On mount, skip the store→URL write if the URL already has a value (URL wins).
+		// On mount, skip the store -> URL write if the URL already has a value (URL wins).
 		// Exception: subdomain has authority over the URL, so we still need to sync
 		// the URL to the subdomain game.
 		if (firstRun && urlGameId && source !== "subdomain") return;
-		// Don't write back to URL if the store change was caused by our own
-		// URL→store sync above.
-		if (source === "route") return;
 		if (storeGameId === "none") return;
 		if (storeGameId === urlGameId) return;
+		// Don't write back to URL if the store change was caused by our own
+		// URL -> store sync above, but only when the URL already carries a gameId.
+		// If we landed here from a `/$gameId/*` page, the store has source="route"
+		// but the new URL has no gameId, so it still requires a sync.
+		if (urlGameId && source === "route") return;
 		void navigate({
 			search: (prev) => ({ ...prev, gameId: storeGameId }),
 			replace: true,
@@ -56,7 +61,7 @@ const CollectedItems = () => {
 	return (
 		<>
 			{config?.PAGES.renderCollectedItems({
-				mode: { kind: "public", userId },
+				mode: isOwner ? { kind: "self" } : { kind: "public", userId },
 			})}
 		</>
 	);

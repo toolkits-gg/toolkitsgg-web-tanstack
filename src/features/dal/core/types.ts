@@ -56,8 +56,12 @@ type SyncHandler = (
 /** Defines a read operation: how to build the cache key and how to fetch from each backend. */
 interface DalReadAction<Input, Output> {
 	kind: "read";
-	/** Returns the TanStack Query cache key for this input. Namespaced with `["dal", ...]` by toQueryOptions. */
-	queryKey: (input: Input) => QueryKey;
+	/**
+	 * Returns the TanStack Query cache key for this input. Namespaced with `["dal", ...]` by toQueryOptions.
+	 * Receives the DalContext so actions can include the active user identity in the key, which is required
+	 * for any action with per-user data, so the anon -> authed transition triggers a key change.
+	 */
+	queryKey: (input: Input, ctx?: DalContext) => QueryKey;
 	/** Fetches from the server (Postgres via TanStack Start server function). */
 	remote: (input: Input, ctx: DalContext) => Promise<Output>;
 	/** Fetches from IndexedDB. */

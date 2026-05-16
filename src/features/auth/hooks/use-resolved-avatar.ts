@@ -3,11 +3,13 @@ import { userProfileActions } from "#/features/auth/dal/user-profile/user-profil
 import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
 import { useGameId } from "#/features/game/core/use-game-id";
 
-export function useResolvedAvatar() {
+type UseResolvedAvatarArgs = { userId?: string } | undefined;
+
+const useResolvedAvatar = (args?: UseResolvedAvatarArgs) => {
 	const gameId = useGameId();
 	const { data: profile } = useDalQuery(
 		userProfileActions.getProfile,
-		undefined,
+		args?.userId ? { userId: args.userId } : undefined,
 	);
 
 	const { avatarUrl } = resolveAvatar({
@@ -19,4 +21,6 @@ export function useResolvedAvatar() {
 	});
 
 	return { avatarUrl };
-}
+};
+
+export { useResolvedAvatar };

@@ -5,6 +5,7 @@ import {
 	requireUserId,
 } from "#/features/auth/dal/require-user.server";
 import {
+	getPublicUserProfileServerFn,
 	removeAvatarOverrideServerFn,
 	removePrimaryAvatarServerFn,
 	updateAvatarServerFn,
@@ -35,33 +36,67 @@ type UserProfileData = {
 	avatarOverrides: { gameId: GameId; avatarId: string; avatarGameId: GameId }[];
 };
 
+// Not using UserProfileData type due to needed `null` flexibility
+type UserWithProfile = {
+	userProfile: {
+		displayName: string;
+		bio: string;
+		avatarUrl: string | null;
+		primaryAvatarId: string | null;
+		primaryAvatarGameId: string | null;
+		avatarOverrides: { gameId: string; avatarId: string }[];
+	} | null;
+} | null;
+
+type GetProfileInput = { userId?: string } | undefined;
+
+const mapUserToProfileData = (
+	user: UserWithProfile,
+): UserProfileData | null => {
+	if (!user?.userProfile) return null;
+	const profile = user.userProfile;
+	return {
+		displayName: profile.displayName,
+		bio: profile.bio,
+		avatarUrl: profile.avatarUrl ?? null,
+		primaryAvatarId: profile.primaryAvatarId ?? null,
+		primaryAvatarGameId: (profile.primaryAvatarGameId as GameId) ?? null,
+		avatarOverrides: profile.avatarOverrides.map((o) => ({
+			gameId: o.gameId as GameId,
+			avatarId: o.avatarId,
+			// Server-side overrides don't store avatarGameId; use gameId as fallback
+			avatarGameId: o.gameId as GameId,
+		})),
+	};
+};
+
+// Inner cache-key tail (without the ["dal", ...] prefix that toQueryOptions adds).
+const getProfileQueryKeyTail = (userId: string) =>
+	["userProfile", "getProfile", userId] as const;
+
+// Full cache key, used from route loaders that prefetch via queryClient directly
+// Client-side useDalQuery resolves to the same prefixed key via toQueryOptions.
+const buildGetProfileQueryKey = (userId: string) =>
+	["dal", ...getProfileQueryKeyTail(userId)] as const;
+
 const resolveLocalUserId = (ctx: DalContext): string => {
 	return ctx.authUserId ?? ctx.anonUserId;
 };
 
 const userProfileActions = {
-	getProfile: defineDalRead<void, UserProfileData | null>({
-		queryKey: () => ["userProfile", "getProfile"] as const,
-		remote: async () => {
-			const user = await getUserProfileServerFn();
-			if (!user?.userProfile) return null;
-			const profile = user.userProfile;
-			return {
-				displayName: profile.displayName,
-				bio: profile.bio,
-				avatarUrl: profile.avatarUrl ?? null,
-				primaryAvatarId: profile.primaryAvatarId ?? null,
-				primaryAvatarGameId: (profile.primaryAvatarGameId as GameId) ?? null,
-				avatarOverrides: profile.avatarOverrides.map((o) => ({
-					gameId: o.gameId as GameId,
-					avatarId: o.avatarId,
-					// Server-side overrides don't store avatarGameId; use gameId as fallback
-					avatarGameId: o.gameId as GameId,
-				})),
-			};
+	getProfile: defineDalRead<GetProfileInput, UserProfileData | null>({
+		queryKey: (input, ctx) =>
+			getProfileQueryKeyTail(
+				input?.userId ?? ctx?.authUserId ?? ctx?.anonUserId ?? "",
+			),
+		remote: async (input) => {
+			const user = input?.userId
+				? await getPublicUserProfileServerFn({ data: { userId: input.userId } })
+				: await getUserProfileServerFn();
+			return mapUserToProfileData(user);
 		},
-		local: async (_input, ctx) => {
-			const userId = resolveLocalUserId(ctx);
+		local: async (input, ctx) => {
+			const userId = input?.userId ?? resolveLocalUserId(ctx);
 			const profile = await getLocalUserProfile(userId);
 			const overrides = await getLocalAvatarOverrides(userId);
 			return {
@@ -176,7 +211,7 @@ const userProfileActions = {
 			`userProfile:update:${ctx.anonUserId}`,
 		describe: (input) => ({
 			title: "Updated profile",
-			details: `Display name → ${input.displayName}`,
+			details: `Display name -> ${input.displayName}`,
 		}),
 		remote: async (input) => updateProfileServerFn({ data: input }),
 		local: async (input, ctx) => {
@@ -211,4 +246,10 @@ const getUserProfileServerFn = createServerFn({ method: "GET" }).handler(
 	},
 );
 
-export { getViewerUserIdServerFn, getUserProfileServerFn, userProfileActions };
+export {
+	buildGetProfileQueryKey,
+	getViewerUserIdServerFn,
+	getUserProfileServerFn,
+	mapUserToProfileData,
+	userProfileActions,
+};

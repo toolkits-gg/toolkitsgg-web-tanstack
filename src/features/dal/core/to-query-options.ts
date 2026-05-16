@@ -19,12 +19,13 @@ const toQueryOptions = <Input, Output>(
 	input: Input,
 	ctxGetter: DalContextGetter,
 ) => {
+	const ctx = ctxGetter();
 	return queryOptions({
-		queryKey: ["dal", ...(action.queryKey(input) as readonly unknown[])],
+		queryKey: ["dal", ...(action.queryKey(input, ctx) as readonly unknown[])],
 		queryFn: async () => {
-			const ctx = ctxGetter();
-			if (ctx.backend === "remote") return action.remote(input, ctx);
-			return action.local(input, ctx);
+			const execCtx = ctxGetter();
+			if (execCtx.backend === "remote") return action.remote(input, execCtx);
+			return action.local(input, execCtx);
 		},
 	});
 };

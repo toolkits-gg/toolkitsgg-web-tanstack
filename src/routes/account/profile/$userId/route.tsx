@@ -2,38 +2,20 @@ import { Box, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
 import { ProfileHeader } from "#/features/auth/core/ProfileHeader";
 import { ProfileTabNav } from "#/features/auth/core/ProfileTabNav";
-import { resolveAvatar } from "#/features/auth/core/utils";
 import { getPublicUserProfileServerFn } from "#/features/auth/dal/user-profile/user-profile";
-import { getViewerUserIdServerFn } from "#/features/auth/dal/user-profile/user-profile.actions";
-import type { GameId } from "@/prisma";
+import {
+	buildGetProfileQueryKey,
+	getViewerUserIdServerFn,
+	mapUserToProfileData,
+} from "#/features/auth/dal/user-profile/user-profile.actions";
 
-function ProfileLayout() {
-	const { user, isOwner } = Route.useLoaderData();
+const ProfileLayout = () => {
+	const { isOwner } = Route.useLoaderData();
 	const { userId } = Route.useParams();
-	if (!user.userProfile) throw notFound();
-
-	const profile = user.userProfile;
-
-	const { avatarUrl: serverAvatarUrl } = resolveAvatar({
-		primaryAvatarId: profile.primaryAvatarId ?? null,
-		primaryAvatarGameId: (profile.primaryAvatarGameId as GameId) ?? null,
-		overrides: profile.avatarOverrides.map((o) => ({
-			gameId: o.gameId as GameId,
-			avatarId: o.avatarId,
-			avatarGameId: o.gameId as GameId,
-		})),
-		currentGameId: "none",
-		fallbackAvatarUrl: profile.avatarUrl ?? null,
-	});
 
 	return (
 		<Stack gap={0}>
-			<ProfileHeader
-				displayName={profile.displayName}
-				bio={profile.bio}
-				serverAvatarUrl={serverAvatarUrl}
-				isOwner={isOwner}
-			/>
+			<ProfileHeader userId={userId} isOwner={isOwner} />
 			<ProfileTabNav
 				basePath={`/account/profile/${userId}`}
 				showDataSync={isOwner}
@@ -43,16 +25,23 @@ function ProfileLayout() {
 			</Box>
 		</Stack>
 	);
-}
+};
 
 const Route = createFileRoute("/account/profile/$userId")({
-	loader: async ({ params }) => {
-		const user = await getPublicUserProfileServerFn({
-			data: { userId: params.userId },
+	loader: async ({ params, context }) => {
+		const { queryClient } = context;
+		const profile = await queryClient.ensureQueryData({
+			queryKey: buildGetProfileQueryKey(params.userId),
+			queryFn: async () => {
+				const user = await getPublicUserProfileServerFn({
+					data: { userId: params.userId },
+				});
+				return mapUserToProfileData(user);
+			},
 		});
-		if (!user?.userProfile) throw notFound();
+		if (!profile) throw notFound();
 		const viewerUserId = await getViewerUserIdServerFn();
-		return { user, isOwner: viewerUserId === user.id };
+		return { isOwner: viewerUserId === params.userId };
 	},
 	notFoundComponent: () => (
 		<Box p="md">
