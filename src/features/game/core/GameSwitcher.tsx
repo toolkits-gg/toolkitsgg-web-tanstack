@@ -138,7 +138,6 @@ function GameSwitcher() {
 	};
 
 	const handleGoProfileHome = async () => {
-		setGame("none", "toggle");
 		await navigate({ to: "/profile" });
 		handleClose();
 	};
