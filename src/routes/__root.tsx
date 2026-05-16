@@ -27,6 +27,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import type { ReactNode } from "react";
 import { DefaultLogo } from "#/components/AppLogo";
 import { AppProviders } from "#/components/AppProviders";
 import { AppNavbar } from "#/components/navigation/AppNavbar";
@@ -92,7 +93,7 @@ const Route = createRootRouteWithContext<MyRouterContext>()({
 	},
 });
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({ children }: { children: ReactNode }) {
 	const [navbarOpened, { toggle: toggleNavbar }] = useDisclosure();
 
 	const { openWizard, closeWizard, setCurrentWizardStepId, wizardOpened } =

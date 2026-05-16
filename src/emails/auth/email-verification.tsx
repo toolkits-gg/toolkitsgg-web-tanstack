@@ -23,8 +23,8 @@ const EmailVerification = ({ toName, url }: EmailVerificationProps) => {
 					<Container>
 						<Section>
 							<Text>
-								Hello {toName}, welcome to {`${"Toolkits.gg"}`}! Please verify
-								your email address by clicking the button below.
+								Hello {toName}, welcome to {import.meta.env.VITE_APP_NAME}!
+								Please verify your email address by clicking the button below.
 							</Text>
 						</Section>
 						<Section>

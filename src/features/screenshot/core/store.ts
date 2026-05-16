@@ -1,4 +1,4 @@
-import { useStore } from "@tanstack/react-store";
+import { useSelector } from "@tanstack/react-store";
 import { Store } from "@tanstack/store";
 
 type ScreenshotPreviewState = {
@@ -65,7 +65,7 @@ function clearPreview() {
 }
 
 const useScreenshotPreviewStore = () => {
-	const store = useStore(screenshotPreviewStore, (s) => s);
+	const store = useSelector(screenshotPreviewStore, (s) => s);
 
 	return {
 		openPreview,

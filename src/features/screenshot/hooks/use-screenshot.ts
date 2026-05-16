@@ -1,6 +1,6 @@
 import { useMantineTheme } from "@mantine/core";
 import { domToBlob } from "modern-screenshot";
-import { useRef } from "react";
+import { type RefObject, useRef } from "react";
 import { useScreenshotPreviewStore } from "#/features/screenshot/core/store";
 import { logger } from "#/integrations/pino/logger";
 
@@ -10,7 +10,7 @@ type ScreenshotResult = {
 };
 
 type UseScreenshotProps = {
-	ref?: React.RefObject<HTMLElement | null>;
+	ref?: RefObject<HTMLElement | null>;
 	filename?: string;
 };
 

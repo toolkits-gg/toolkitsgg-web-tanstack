@@ -134,13 +134,17 @@ const AppItemPage = ({
 			showUncollectedItems: !isCollectedItemsTab,
 			dimUncollectedItems: false,
 			showCollectableOnly: false,
+		}).then(() => {
+			// placeholder - no action needed
 		});
 		if (gameFilterConfig) {
 			setGameParams(
 				Object.fromEntries(
 					gameFilterConfig.defs.map((def) => [def.key, null]),
 				) as Parameters<typeof setGameParams>[0],
-			);
+			).then(() => {
+				// placeholder - no action needed
+			});
 		}
 	};
 

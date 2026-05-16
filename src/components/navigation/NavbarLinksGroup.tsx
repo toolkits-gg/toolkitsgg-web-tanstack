@@ -1,13 +1,14 @@
 import { Box, Collapse, Group, ThemeIcon, UnstyledButton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Link } from "@tanstack/react-router";
+import type { FC } from "react";
 import { LuChevronRight } from "react-icons/lu";
 import type { NavLinkSubLink } from "#/components/navigation/get-nav-links";
 import classes from "./NavbarLinksGroup.module.css";
 
 interface NavbarLinksGroupProps {
 	// biome-ignore lint/suspicious/noExplicitAny: <Need to allow any type of icon component>
-	icon: React.FC<any> | undefined;
+	icon: FC<any> | undefined;
 	label: string;
 	initiallyOpened?: boolean;
 	links?: NavLinkSubLink[];

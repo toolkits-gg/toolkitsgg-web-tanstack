@@ -44,7 +44,9 @@ export function ProfileTabNav({
 
 	const handleTabChange = (value: string | null) => {
 		if (!value) return;
-		navigate({ to: value });
+		navigate({ to: value }).then(() => {
+			// placeholder - no action needed
+		});
 	};
 
 	return (

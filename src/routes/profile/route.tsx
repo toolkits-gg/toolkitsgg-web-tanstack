@@ -18,6 +18,8 @@ const LocalProfileLayout = () => {
 				to: "/account/profile/$userId",
 				params: { userId: authedUserId },
 				replace: true,
+			}).then(() => {
+				// placeholder - no action needed
 			});
 		}
 	}, [online, authedUserId, navigate]);

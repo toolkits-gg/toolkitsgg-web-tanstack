@@ -2,6 +2,7 @@ import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import type { PropsWithChildren } from "react";
 import { SyncFavicon } from "#/features/game/core/SyncFavicon";
 import { getAllRegisteredThemeClassNames } from "#/features/game/registry/game-registry";
 import { DEFAULT_NEXT_THEME } from "#/features/theme/core/constants";
@@ -10,7 +11,7 @@ import { useMantineThemeStore } from "#/features/theme/core/store";
 
 const allThemeClassNames: string[] = getAllRegisteredThemeClassNames();
 
-type ThemeProviderProps = React.PropsWithChildren;
+type ThemeProviderProps = PropsWithChildren;
 
 const MantineProviderWithTheme = ({
 	children,

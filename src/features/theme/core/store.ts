@@ -1,5 +1,5 @@
 import type { MantineThemeOverride } from "@mantine/core";
-import { useStore } from "@tanstack/react-store";
+import { useSelector } from "@tanstack/react-store";
 import { Store } from "@tanstack/store";
 
 import { defaultTheme } from "#/features/theme/themes/default-theme";
@@ -15,7 +15,7 @@ function changeMantineTheme(newTheme: MantineThemeOverride) {
 }
 
 function useMantineThemeStore<T>(selector: (state: ThemeState) => T): T {
-	return useStore(themeStore, selector);
+	return useSelector(themeStore, selector);
 }
 
 export { themeStore, changeMantineTheme, useMantineThemeStore };

@@ -80,4 +80,4 @@ const seed = async () => {
 	console.log(`DB Seed: Finished (${t1 - t0}ms)`);
 };
 
-seed();
+seed().then(() => console.info('Seed successfully ran.'));

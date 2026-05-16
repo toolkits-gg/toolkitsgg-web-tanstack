@@ -1,3 +1,4 @@
+import type { FC } from "react";
 import { BsCollection } from "react-icons/bs";
 import { GiLockedChest } from "react-icons/gi";
 import { LuBadgeHelp } from "react-icons/lu";
@@ -12,7 +13,7 @@ type NavLinkSubLink = {
 
 type NavLinkBase = {
 	label: string;
-	icon: React.FC | undefined;
+	icon: FC | undefined;
 	initiallyOpened: boolean;
 	links?: NavLinkSubLink[];
 };

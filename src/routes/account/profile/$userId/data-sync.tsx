@@ -245,8 +245,12 @@ function DataSync() {
 			});
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
-			queryClient.invalidateQueries({ queryKey: ["dal"] });
+			queryClient.invalidateQueries({ queryKey: ["dal-queue"] }).then(() => {
+				// placeholder - no action needed
+			});
+			queryClient.invalidateQueries({ queryKey: ["dal"] }).then(() => {
+				// placeholder - no action needed
+			});
 		},
 	});
 
@@ -275,8 +279,12 @@ function DataSync() {
 			});
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
-			queryClient.invalidateQueries({ queryKey: ["dal"] });
+			queryClient.invalidateQueries({ queryKey: ["dal-queue"] }).then(() => {
+				// placeholder - no action needed
+			});
+			queryClient.invalidateQueries({ queryKey: ["dal"] }).then(() => {
+				// placeholder - no action needed
+			});
 		},
 	});
 
@@ -290,8 +298,12 @@ function DataSync() {
 			});
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: ["dal-queue"] });
-			queryClient.invalidateQueries({ queryKey: ["dal"] });
+			queryClient.invalidateQueries({ queryKey: ["dal-queue"] }).then(() => {
+				// placeholder - no action needed
+			});
+			queryClient.invalidateQueries({ queryKey: ["dal"] }).then(() => {
+				// placeholder - no action needed
+			});
 		},
 	});
 

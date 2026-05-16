@@ -38,7 +38,9 @@ export function ProfileEditForm({
 			onSubmit={(e) => {
 				e.preventDefault();
 				e.stopPropagation();
-				form.handleSubmit();
+				form.handleSubmit().then(() => {
+					// placeholder - no action required
+				});
 			}}
 		>
 			<Stack>

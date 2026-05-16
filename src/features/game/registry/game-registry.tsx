@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import type { LogoSize } from "#/components/AppLogo";
 import type { GameAvatar, GameConfig } from "#/features/game/core/types";
-import type { AppItem } from "#/features/game/items/types";
 import type { ToolkitThemeDefinition } from "#/features/theme/core/types";
 import { defaultTheme } from "#/features/theme/themes/default-theme";
 import { GAME_CONFIG as CLAIROBSCUR_CONFIG } from "#/games/clairobscur/core/game-config";
@@ -9,7 +9,7 @@ import { GAME_CONFIG as SLAYTHESPIRE2_CONFIG } from "#/games/slaythespire2/core/
 import type { GameId } from "@/prisma";
 
 // Widened type for runtime-keyed access (base AppItem, string category)
-type AnyGameConfig = GameConfig<AppItem, string>;
+type AnyGameConfig = GameConfig;
 
 // The registry — keys are the exact gameId strings
 const GAME_REGISTRY = {
@@ -46,7 +46,7 @@ function getGameItems(gameId: string): AnyGameConfig["ITEMS"] | undefined {
 }
 
 // Logo shortcut - returns METADATA.renderLogo response or undefined
-function getGameLogo(gameId: string, logoSize: LogoSize = 36): React.ReactNode {
+function getGameLogo(gameId: string, logoSize: LogoSize = 36): ReactNode {
 	return GAME_REGISTRY[gameId as RegistryGameId]?.METADATA?.renderLogo?.(
 		logoSize,
 	);

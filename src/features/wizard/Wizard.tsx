@@ -83,7 +83,9 @@ const Wizard = ({
 
 		if (!opened) return;
 
-		openWizard();
+		openWizard().then(() => {
+			// placeholder - no action needed
+		});
 	}, [opened, onBeforeOpen]);
 
 	useEffect(() => {

@@ -7,7 +7,7 @@ import {
 } from "@mantine/core";
 import { upperFirst, useLocalStorage } from "@mantine/hooks";
 import { useTheme as useNextTheme } from "next-themes";
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import {
 	getAllRegisteredThemeClassNames,
 	getAllRegisteredThemeDefinitions,
@@ -36,7 +36,7 @@ const ThemeModal = ({ gameId }: ThemeModalProps) => {
 		defaultValue: true,
 	});
 
-	const { colorScheme: _colorScheme, setColorScheme } = useMantineColorScheme();
+	const { setColorScheme } = useMantineColorScheme();
 
 	const { theme: nextTheme, setTheme: setNextTheme } = useNextTheme();
 	const [mode, setMode] = useState<MantineColorScheme>("auto");
@@ -79,7 +79,7 @@ const ThemeModal = ({ gameId }: ThemeModalProps) => {
 				<Switch
 					checked={autoChangeTheme}
 					label="Auto change theme on game change"
-					onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+					onChange={(event: ChangeEvent<HTMLInputElement>) => {
 						const checked = event.currentTarget.checked;
 						setAutoChangeTheme(checked);
 
@@ -121,10 +121,7 @@ const ThemeModal = ({ gameId }: ThemeModalProps) => {
 							if (mode === "dark" && def.label.includes("Dark")) {
 								return true;
 							}
-							if (mode === "light" && def.label.includes("Light")) {
-								return true;
-							}
-							return false;
+							return mode === "light" && def.label.includes("Light");
 						})
 						.map((def) => ({
 							label: def.label,
