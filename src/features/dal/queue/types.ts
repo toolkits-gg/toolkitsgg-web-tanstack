@@ -13,7 +13,7 @@ type PendingOpOperation = "create" | "update" | "upsert" | "delete";
 interface PendingOpSummary {
 	/** Primary line, e.g. "Collected: Sword of Legends". */
 	title: string;
-	/** Optional secondary line, e.g. "Display name → Joshua". */
+	/** Optional secondary line, e.g. "Display name -> SomeUser20". */
 	details?: string;
 	/** Optional game association — UI renders a small game badge when set. */
 	gameId?: GameId;
@@ -33,9 +33,9 @@ interface PendingOpConflictInfo {
 
 /**
  * Lifecycle of a pending op:
- * `pending` → `syncing` → `synced` (deleted after clearSynced)
- *                       → `conflict` (server record is newer; user must reconcile)
- *                       → `failed` (network error or no handler; can be retried)
+ * `pending` -> `syncing` -> `synced` (deleted after clearSynced)
+ *                       -> `conflict` (server record is newer; user must reconcile)
+ *                       -> `failed` (network error or no handler; can be retried)
  */
 type PendingOpStatus = "pending" | "syncing" | "synced" | "failed" | "conflict";
 

@@ -14,7 +14,7 @@ export function parseSubdomain(hostname: string): string | null {
 		if (host === root) return null;
 	}
 
-	// e.g. "remnant2.toolkits.gg" → ["remnant2", "toolkits", "gg"]
+	// e.g. "remnant2.toolkits.gg" -> ["remnant2", "toolkits", "gg"]
 	const parts = host.split(".");
 
 	// Need at least 3 parts for a subdomain: [sub, domain, tld]

@@ -61,7 +61,7 @@ const getLocalDB = (): Promise<IDBPDatabase<LocalDB>> | null => {
 				}
 
 				if (oldVersion < 2) {
-					// v1 → v2: avatar schema changed from imageUrl to avatarId/avatarGameId.
+					// v1 -> v2: avatar schema changed from imageUrl to avatarId/avatarGameId.
 					// The old store must be dropped and recreated because IDB can't alter key paths.
 					if (db.objectStoreNames.contains(STORE_USER_AVATAR_OVERRIDE)) {
 						db.deleteObjectStore(STORE_USER_AVATAR_OVERRIDE);

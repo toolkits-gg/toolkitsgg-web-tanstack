@@ -424,7 +424,7 @@ const MUTATORS: Remnant2MutatorItem[] = [
 		dlc: "BASE",
 		searchableTags: ["Ranged Damage", "Reload Speed"],
 		description: [
-			"Increases the attached weapon's Ranged Damage by 15% → 25% after being stowed for 2s. Lasts 7s upon being brandished.",
+			"Increases the attached weapon's Ranged Damage by 15% -> 25% after being stowed for 2s. Lasts 7s upon being brandished.",
 		],
 		maxLevelBonus: [
 			`Automatically reloads the attached weapon after being stowed for 2s.`,

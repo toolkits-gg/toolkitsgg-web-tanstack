@@ -99,7 +99,7 @@ const createCollectedItemsDal = (config: {
 			local: async (input, ctx) => {
 				const userId = ctx.authUserId ?? ctx.anonUserId;
 				const idb = await getIDBClient();
-				// IDB enforces a FK from collectedItem.userId → user.id, so we must
+				// IDB enforces a FK from collectedItem.userId -> user.id, so we must
 				// ensure a stub user row exists before writing the item row.
 				await idb.user.upsert({
 					where: { id: userId },

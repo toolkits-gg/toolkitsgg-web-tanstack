@@ -118,15 +118,15 @@ flowchart TD
     B{"op.serverUpdatedAt\n(baseline) present?"}
 
     C{"serverTime\nvs baselineTime"}
-    SW1["server-wins → conflict\nanother writer committed\nafter this op was enqueued"]
+    SW1["server-wins -> conflict\nanother writer committed\nafter this op was enqueued"]
     LW2["local-wins\napply the op"]
-    EQ1["equal → noop\nop already reflected\non server"]
+    EQ1["equal -> noop\nop already reflected\non server"]
 
     D{"opTime\nvs serverTime\n(fallback — action has no getServerUpdatedAt)"}
-    SW2["server-wins → conflict"]
+    SW2["server-wins -> conflict"]
     LW3["local-wins\napply the op"]
-    EQ2["equal → noop"]
-    SW3["server-wins → conflict\n(opTime unknown)"]
+    EQ2["equal -> noop"]
+    SW3["server-wins -> conflict\n(opTime unknown)"]
 
     Start --> A
     A -->|"null — no server record"| LW1

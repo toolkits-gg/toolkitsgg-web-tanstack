@@ -152,7 +152,7 @@ Factory<{
 
 ## useProps
 
-Merges default props from three sources in priority order (highest → lowest):
+Merges default props from three sources in priority order (highest -> lowest):
 1. Props passed by the user
 2. Default props from `MantineProvider` theme (`components.MyComponent.defaultProps`)
 3. Component-level `defaultProps`

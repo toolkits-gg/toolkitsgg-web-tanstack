@@ -70,9 +70,9 @@ CLI looks for `auth.ts` in: `./`, `./lib`, `./utils`, or under `./src`. Use `--c
 ## Session Management
 
 **Storage priority:**
-1. If `secondaryStorage` defined → sessions go there (not DB)
+1. If `secondaryStorage` defined -> sessions go there (not DB)
 2. Set `session.storeSessionInDatabase: true` to also persist to DB
-3. No database + `cookieCache` → fully stateless mode
+3. No database + `cookieCache` -> fully stateless mode
 
 **Cookie cache strategies:**
 - `compact` (default) - Base64url + HMAC. Smallest.
