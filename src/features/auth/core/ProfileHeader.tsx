@@ -1,44 +1,81 @@
-import { ActionIcon, Avatar, Box, Group, Stack, Text } from "@mantine/core";
+import {
+	ActionIcon,
+	Avatar,
+	Box,
+	Group,
+	Skeleton,
+	Stack,
+	Text,
+} from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { ClientOnly } from "@tanstack/react-router";
 import { LuCamera, LuPencil } from "react-icons/lu";
 import { AvatarPicker } from "#/features/auth/core/AvatarPicker";
 import { ProfileEditForm } from "#/features/auth/core/ProfileEditForm";
 import { useResolvedAvatar } from "#/features/auth/hooks/use-resolved-avatar";
+import { useUserProfile } from "#/features/auth/hooks/use-user-profile";
 import classes from "./ProfileHeader.module.css";
 
 type ProfileHeaderProps = {
-	displayName: string;
-	bio: string;
-	serverAvatarUrl: string | null;
+	userId?: string;
 	isOwner: boolean;
 };
 
-function openAvatarPicker() {
+const openAvatarPicker = () => {
 	modals.open({
 		title: "Choose avatar",
 		size: "lg",
 		children: <AvatarPicker />,
 	});
-}
+};
 
-function openProfileEdit(displayName: string, bio: string) {
+const openProfileEdit = (displayName: string, bio: string) => {
 	modals.open({
 		title: "Edit profile",
 		children: (
 			<ProfileEditForm initialDisplayName={displayName} initialBio={bio} />
 		),
 	});
-}
+};
 
-export function ProfileHeader({
-	displayName,
-	bio,
-	serverAvatarUrl,
-	isOwner,
-}: ProfileHeaderProps) {
-	const { avatarUrl: clientAvatarUrl } = useResolvedAvatar();
-	const avatarUrl =
-		isOwner && clientAvatarUrl ? clientAvatarUrl : serverAvatarUrl;
+type ProfileAvatarProps = {
+	userId?: string;
+	initials: string;
+};
+
+const ProfileAvatar = ({ userId, initials }: ProfileAvatarProps) => {
+	const { avatarUrl } = useResolvedAvatar(userId ? { userId } : undefined);
+	return (
+		<Avatar src={avatarUrl} size={96} radius="md" className={classes.avatar}>
+			{initials}
+		</Avatar>
+	);
+};
+
+const ProfileHeader = ({ userId, isOwner }: ProfileHeaderProps) => {
+	const { profile, isLoading } = useUserProfile(
+		userId ? { userId } : undefined,
+	);
+
+	if (isLoading && !profile) {
+		return (
+			<Box>
+				<Box className={classes.banner} />
+				<Box className={classes.profileContent}>
+					<Group align="flex-end" gap="md">
+						<Skeleton height={96} width={96} radius="md" />
+						<Stack className={classes.info} gap={4}>
+							<Skeleton height={24} width={160} />
+							<Skeleton height={16} width={240} />
+						</Stack>
+					</Group>
+				</Box>
+			</Box>
+		);
+	}
+
+	const displayName = profile?.displayName ?? "Traveler";
+	const bio = profile?.bio ?? "";
 
 	const initials = displayName
 		.split(" ")
@@ -53,14 +90,11 @@ export function ProfileHeader({
 			<Box className={classes.profileContent}>
 				<Group align="flex-end" gap="md">
 					<Box className={classes.avatarWrapper}>
-						<Avatar
-							src={avatarUrl}
-							size={96}
-							radius="md"
-							className={classes.avatar}
+						<ClientOnly
+							fallback={<Skeleton height={96} width={96} radius="md" />}
 						>
-							{initials}
-						</Avatar>
+							<ProfileAvatar userId={userId} initials={initials} />
+						</ClientOnly>
 						{isOwner && (
 							<ActionIcon
 								variant="filled"
@@ -99,4 +133,6 @@ export function ProfileHeader({
 			</Box>
 		</Box>
 	);
-}
+};
+
+export { ProfileHeader };
