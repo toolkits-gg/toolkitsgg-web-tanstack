@@ -4,7 +4,7 @@ import { useDalQuery } from "#/features/dal/hooks/use-dal-query";
 import { useSession } from "#/integrations/better-auth/auth-client";
 import type { GameId } from "@/prisma";
 
-export function useUserProfile() {
+const useUserProfile = () => {
 	const { data: session, isPending: sessionPending } = useSession();
 	const profileQuery = useDalQuery(userProfileActions.getProfile, undefined);
 	const updateAvatarMutation = useDalMutation(userProfileActions.updateAvatar);
@@ -35,4 +35,6 @@ export function useUserProfile() {
 		removeAvatarOverride: (targetGameId: GameId) =>
 			removeAvatarOverrideMutation.mutateAsync({ targetGameId }),
 	};
-}
+};
+
+export { useUserProfile };
