@@ -144,3 +144,7 @@ flowchart TD
     D -->|"opTime = serverTime"| EQ2
     D -->|"opTime null"| SW3
 ```
+
+---
+
+> _This documentation was generated with the help of AI, and reviewed and refined by a human._

@@ -281,6 +281,8 @@ const url = serverEnv.DATABASE_URL;
 const appUrl = import.meta.env.VITE_APP_URL;
 ```
 
+Client-side `import.meta.env` is type-safe via `vite-env.d.ts` (repo root). Every `VITE_*` key must be declared in the `ImportMetaEnv` interface there or TypeScript will reject `import.meta.env.VITE_FOO`. When adding a new client env var, update `vite-env.d.ts` in addition to `.env.local.example` and `src/config/env.ts`.
+
 ## Code style
 
 - **Tabs** for indentation, double quotes (Biome config). Organize-imports runs on save in VS Code.
@@ -288,3 +290,28 @@ const appUrl = import.meta.env.VITE_APP_URL;
 - `routeTree.gen.ts` and `styles.css` are excluded from Biome; don't hand-edit them.
 - **Arrow functions over `function` declarations.** Prefer `const foo = () => {}` over `function foo() {}` for all module-level functions. Do not use `function` declarations except where required (e.g. generators, or framework APIs that demand them).
 - **Exports at the bottom of the file.** Declare everything (`const`, `type`, `class`, etc.) without an `export` keyword inline, then put a single `export { ... }` block (and `export type { ... }` if needed) at the very end of the file. No `export const`, `export function`, `export type`, or `export default` at the declaration site. This keeps the public surface area of each file visible in one place.
+
+## Documentation
+
+**After any non-trivial code change, check whether the contributor docs need to be updated.** Stale docs are worse than missing docs — a contributor who follows an out-of-date guide loses time and trust.
+
+The contributor-facing docs live in two places:
+
+- `.github/CONTRIBUTING.md` — entry point: workflow, code style, commit/PR conventions, links to the deep dives.
+- `docs/LOCALSETUP.md` — environment setup (Node, pnpm, Docker, env vars, db scripts, troubleshooting).
+- `docs/ARCHITECTURE.md` — framework stack, routing, active-game store, the game registry pattern, the feature/game separation rule, "Adding a new game" checklist.
+- `docs/THEMES.md` — per-game theming, palette generation, light/dark handling.
+- `docs/DAL.md` — offline-first data layer, action factories, sync queue.
+
+And `CLAUDE.md` itself (this file) is the source of truth for AI-assisted work — keep it in sync with the contributor docs when the underlying behavior changes.
+
+Use this checklist when finishing a change:
+
+- Did you add, remove, or rename a `pnpm` script? Update `CLAUDE.md` Commands, `CONTRIBUTING.md`, and `LOCALSETUP.md`.
+- Did you add or change an env var? Update `.env.local.example`, `src/config/env.ts`, `CLAUDE.md` Env vars, `LOCALSETUP.md` config table, and `ARCHITECTURE.md` Env vars. **If it's a client-side `VITE_*` var, also add it to `vite-env.d.ts`'s `ImportMetaEnv` interface** — without that, `import.meta.env.VITE_FOO` won't typecheck.
+- Did you add a new game, change the registry shape, or change "Adding a new game" steps? Update `CLAUDE.md` Architecture and `docs/ARCHITECTURE.md`.
+- Did you change the theme system (palette generator, light/dark switching, registry expansion)? Update `docs/THEMES.md`.
+- Did you change DAL action shapes, the sync flow, or the file conventions under `src/features/dal/` or `src/games/*/dal/`? Update `docs/DAL.md` and `src/features/dal/DIAGRAM.md` if the diagrams are now wrong.
+- Did you change routing structure (root shell, provider chain, profile redirect, `$gameId` route behavior)? Update `CLAUDE.md` Routing and `docs/ARCHITECTURE.md` Routing.
+
+If you're unsure whether a change warrants a doc update, mention it in your response so the user can decide — don't silently skip it.
