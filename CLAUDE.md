@@ -80,6 +80,10 @@ Skills live in `.claude/skills/`. Use the `/skill-name` slash command or referen
 - Profile routes:
   - `src/routes/profile/` — the anonymous/offline-friendly profile shell. Always reachable, even when signed out or offline (it renders the local DAL view). When the user is both authenticated **and** online, `route.tsx` redirects to `/account/profile/$userId` with the current session's user id.
   - `src/routes/account/profile/$userId/` — the canonical, userId-keyed profile route. Used for both the current user (after the redirect above) and public views of other users.
+- HTML head metadata:
+  - Root tags (title, og:*, twitter:*) are defined in `__root.tsx`. Routes can override them with their own `head()` — TanStack Router merges by `property`/`name`, with child routes winning on key conflicts.
+  - The canonical profile route (`/account/profile/$userId`) overrides root metadata with user-specific OG/Twitter tags. The OG image is the active-game avatar override → primary avatar → legacy `avatarUrl` → site default. The active game is resolved from the request `Host` header via `getActiveGameIdFromRequestServerFn` (`src/features/game/dal/active-game.ts`), so subdomain-aware previews work during SSR.
+  - Per-tab title overrides (e.g. "Display Name — Collected Items | Toolkits.gg") use the shared helpers in `src/features/auth/core/profile-tab-head.ts`. Each tab's `loader` calls `loadProfileTabData()` (cache-hit from the parent loader's `ensureQueryData` — no extra fetch).
 
 ### Game registry pattern
 
