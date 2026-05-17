@@ -15,7 +15,30 @@ import { useForm } from "@tanstack/react-form";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { LuSwords } from "react-icons/lu";
+import { z } from "zod";
 import { authClient } from "#/integrations/better-auth/auth-client";
+
+const emailSchema = z
+	.string()
+	.min(1, "Email is required")
+	.email("Enter a valid email");
+
+const usernameSchema = z.string().min(1, "Username is required");
+
+const passwordSchema = z
+	.string()
+	.min(1, "Password is required")
+	.min(8, "Password must be at least 8 characters");
+
+const fieldError = (errors: unknown[]): string | undefined => {
+	const first = errors[0];
+	if (!first) return undefined;
+	if (typeof first === "string") return first;
+	if (typeof first === "object" && first !== null && "message" in first) {
+		return String((first as { message: unknown }).message);
+	}
+	return String(first);
+};
 
 const SignUpPage = () => {
 	const navigate = useNavigate();
@@ -79,30 +102,22 @@ const SignUpPage = () => {
 							<form.Field
 								name="email"
 								validators={{
-									onBlur: ({ value, fieldApi }) => {
-										if (!fieldApi.state.meta.isDirty) return undefined;
-										if (!value) return "Email is required";
-										if (!value.includes("@")) return "Enter a valid email";
-										return undefined;
-									},
-									onSubmit: ({ value }) => {
-										if (!value) return "Email is required";
-										if (!value.includes("@")) return "Enter a valid email";
-										return undefined;
-									},
+									onBlur: emailSchema,
+									onSubmit: emailSchema,
 								}}
 							>
 								{(field) => (
 									<TextInput
 										label="Email"
 										placeholder="you@example.com"
+										type="email"
+										autoComplete="email"
 										value={field.state.value}
 										onChange={(e) => field.handleChange(e.currentTarget.value)}
 										onBlur={field.handleBlur}
 										error={
-											field.state.meta.isTouched &&
-											field.state.meta.errors.length > 0
-												? field.state.meta.errors[0]
+											field.state.meta.isTouched
+												? fieldError(field.state.meta.errors)
 												: undefined
 										}
 										radius="md"
@@ -112,21 +127,21 @@ const SignUpPage = () => {
 							<form.Field
 								name="username"
 								validators={{
-									onChange: ({ value }) =>
-										!value ? "Username is required" : undefined,
+									onBlur: usernameSchema,
+									onSubmit: usernameSchema,
 								}}
 							>
 								{(field) => (
 									<TextInput
 										label="Username"
 										placeholder="Username"
+										autoComplete="username"
 										value={field.state.value}
 										onChange={(e) => field.handleChange(e.currentTarget.value)}
 										onBlur={field.handleBlur}
 										error={
-											field.state.meta.isTouched &&
-											field.state.meta.errors.length > 0
-												? field.state.meta.errors[0]
+											field.state.meta.isTouched
+												? fieldError(field.state.meta.errors)
 												: undefined
 										}
 										radius="md"
@@ -136,25 +151,21 @@ const SignUpPage = () => {
 							<form.Field
 								name="password"
 								validators={{
-									onChange: ({ value }) => {
-										if (!value) return "Password is required";
-										if (value.length < 8)
-											return "Password must be at least 8 characters";
-										return undefined;
-									},
+									onBlur: passwordSchema,
+									onSubmit: passwordSchema,
 								}}
 							>
 								{(field) => (
 									<PasswordInput
 										label="Password"
 										placeholder="Password"
+										autoComplete="new-password"
 										value={field.state.value}
 										onChange={(e) => field.handleChange(e.currentTarget.value)}
 										onBlur={field.handleBlur}
 										error={
-											field.state.meta.isTouched &&
-											field.state.meta.errors.length > 0
-												? field.state.meta.errors[0]
+											field.state.meta.isTouched
+												? fieldError(field.state.meta.errors)
 												: undefined
 										}
 										radius="md"
@@ -164,10 +175,18 @@ const SignUpPage = () => {
 							<form.Field
 								name="confirmPassword"
 								validators={{
-									onChangeListenTo: ["password"],
-									onChange: ({ value, fieldApi }) => {
-										const password = fieldApi.form.getFieldValue("password");
-										if (value !== password) return "Passwords do not match";
+									onBlur: ({ value, fieldApi }) => {
+										if (!value) return "Confirm your password";
+										if (value !== fieldApi.form.getFieldValue("password")) {
+											return "Passwords do not match";
+										}
+										return undefined;
+									},
+									onSubmit: ({ value, fieldApi }) => {
+										if (!value) return "Confirm your password";
+										if (value !== fieldApi.form.getFieldValue("password")) {
+											return "Passwords do not match";
+										}
 										return undefined;
 									},
 								}}
@@ -176,13 +195,13 @@ const SignUpPage = () => {
 									<PasswordInput
 										label="Confirm Password"
 										placeholder="Confirm password"
+										autoComplete="new-password"
 										value={field.state.value}
 										onChange={(e) => field.handleChange(e.currentTarget.value)}
 										onBlur={field.handleBlur}
 										error={
-											field.state.meta.isTouched &&
-											field.state.meta.errors.length > 0
-												? field.state.meta.errors[0]
+											field.state.meta.isTouched
+												? fieldError(field.state.meta.errors)
 												: undefined
 										}
 										radius="md"
