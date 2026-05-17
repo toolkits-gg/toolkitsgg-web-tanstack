@@ -13,6 +13,10 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import {
+	buildTabHead,
+	loadProfileTabData,
+} from "#/features/auth/core/profile-tab-head";
 import { resolveWriteAction } from "#/features/dal/core/registry";
 import { clearSynced, deleteOp } from "#/features/dal/queue/pending-ops";
 import { forceSyncOp, syncOps } from "#/features/dal/queue/sync-runner";
@@ -360,6 +364,14 @@ function DataSync() {
 }
 
 const Route = createFileRoute("/account/profile/$userId/data-sync")({
+	loader: async ({ params, context }) =>
+		loadProfileTabData(params.userId, context.queryClient),
+	head: ({ loaderData }) => ({
+		meta: buildTabHead(
+			loaderData?.displayName ?? "Toolkits.gg User",
+			"Data Sync",
+		),
+	}),
 	component: DataSync,
 });
 

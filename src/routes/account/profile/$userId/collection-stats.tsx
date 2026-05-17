@@ -1,5 +1,9 @@
 import { Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
+import {
+	buildTabHead,
+	loadProfileTabData,
+} from "#/features/auth/core/profile-tab-head";
 
 function CollectionStats() {
 	return (
@@ -11,6 +15,14 @@ function CollectionStats() {
 }
 
 const Route = createFileRoute("/account/profile/$userId/collection-stats")({
+	loader: async ({ params, context }) =>
+		loadProfileTabData(params.userId, context.queryClient),
+	head: ({ loaderData }) => ({
+		meta: buildTabHead(
+			loaderData?.displayName ?? "Toolkits.gg User",
+			"Collection Stats",
+		),
+	}),
 	component: CollectionStats,
 });
 

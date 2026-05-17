@@ -34,6 +34,7 @@ import { AppNavbar } from "#/components/navigation/AppNavbar";
 import { SocialMedia } from "#/components/SocialMedia";
 import { GettingStartedWizard } from "#/components/wizards/getting-started/components/GettingStartedWizard";
 import { useGettingStartedWizard } from "#/components/wizards/getting-started/hooks/use-getting-started-wizard";
+import { OG_IMAGE } from "#/constants";
 import { GameSwitcher } from "#/features/game/core/GameSwitcher";
 import classes from "./Root.module.css";
 
@@ -44,7 +45,6 @@ interface MyRouterContext {
 const title = "Toolkits.gg";
 const description =
 	"An open-source and ad-free platform providing item collection management, build planning and sharing, and more for a variety of games.";
-const ogImage = `${import.meta.env.VITE_CLOUDFRONT_URL}/metadata/og-image.png`;
 const url = "https://toolkits.gg";
 
 const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -55,13 +55,13 @@ const Route = createRootRouteWithContext<MyRouterContext>()({
 			{ title },
 			{ property: "og:title", content: title },
 			{ property: "og:description", content: description },
-			{ property: "og:image", content: ogImage },
+			{ property: "og:image", content: OG_IMAGE },
 			{ property: "og:type", content: "website" },
 			{ property: "og:url", content: url },
 			{ name: "twitter:card", content: "summary_large_image" },
 			{ name: "twitter:title", content: "Toolkits.gg" },
 			{ name: "twitter:description", content: description },
-			{ name: "twitter:image", content: ogImage },
+			{ name: "twitter:image", content: OG_IMAGE },
 			{ name: "twitter:url", content: url },
 		],
 		links: [

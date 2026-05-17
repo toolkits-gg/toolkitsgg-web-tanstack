@@ -1,7 +1,7 @@
 import { Text } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { SupportButtons } from "#/components/SupportButtons";
-import { DISCORD_URL, GITHUB_URL } from "#/constants/paths";
+import { DISCORD_URL, GITHUB_URL } from "#/constants.ts";
 import type { WizardStep } from "#/features/wizard/types";
 import { SocialMediaContent } from "../components/SocialMediaContent";
 

@@ -1,9 +1,14 @@
 import { createFileRoute, getRouteApi } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
+import {
+	buildTabHead,
+	loadProfileTabData,
+} from "#/features/auth/core/profile-tab-head";
 import { gameStore, setGame } from "#/features/game/core/store";
 import { useGameState } from "#/features/game/core/use-game-id";
 import {
 	getGameConfig,
+	getGameMetadata,
 	isRegisteredGameId,
 } from "#/features/game/registry/game-registry";
 import type { GameId } from "@/prisma";
@@ -75,6 +80,24 @@ const Route = createFileRoute("/account/profile/$userId/collected-items")({
 		}
 		return {};
 	},
+	loader: async ({ params, context, location }) => {
+		const { displayName } = await loadProfileTabData(
+			params.userId,
+			context.queryClient,
+		);
+		const gameId = (location.search as CollectedItemsSearch).gameId;
+		const gameLabel = gameId ? getGameMetadata(gameId)?.label : undefined;
+		const tabLabel = gameLabel
+			? `${gameLabel} Collected Items`
+			: "Collected Items";
+		return { displayName, tabLabel };
+	},
+	head: ({ loaderData }) => ({
+		meta: buildTabHead(
+			loaderData?.displayName ?? "Toolkits.gg User",
+			loaderData?.tabLabel ?? "Collected Items",
+		),
+	}),
 	component: CollectedItems,
 });
 
