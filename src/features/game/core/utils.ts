@@ -1,8 +1,9 @@
 import { isRegisteredGameId } from "#/features/game/registry/game-registry.tsx";
+import type { GameId } from "@/prisma";
 
 const ROOT_DOMAINS = ["toolkits.gg", "www.toolkits.gg", "localhost"];
 
-export function parseSubdomain(hostname: string): string | null {
+export function parseSubdomain(hostname: string): GameId | null {
 	// Strip port (e.g. localhost:3000)
 	const host = hostname.split(":")[0];
 
